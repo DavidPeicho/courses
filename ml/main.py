@@ -10,6 +10,7 @@ from tp1.RandomClassifier import RandomClassifier
 from tp1.MajorityClassifier import MajorityClassifier
 from tp1.Lin1_GaussClassifier import Lin1_GaussClassifier
 from tp1.Lin2_GaussClassifier import Lin2_GaussClassifier
+from tp1.Gen_GaussClassifier import Gen_GaussClassifier
 
 if __name__ == "__main__":
 
@@ -28,11 +29,12 @@ if __name__ == "__main__":
     }
     classifier_tester = ClassifierTester()
 
-    print('Starting comparison with raw data...')
-    classifier_tester.compare(classifiers, train_data, train_labels, test_data, test_labels)
+    #print('Starting comparison with raw data...')
+    #classifier_tester.compare(classifiers, train_data, train_labels, test_data, test_labels)
 
     print('Starting comparison with extracted features data...')
     classifiers["Lin2"] = Lin2_GaussClassifier()
+    classifiers["Gen"] = Gen_GaussClassifier()
 
     Feat = extractFeature('tp1/')
     train_dataF = Feat.process(train_data)
