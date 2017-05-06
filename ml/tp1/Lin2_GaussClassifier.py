@@ -1,7 +1,8 @@
 import math
 import numpy as np
+from numpy.linalg import inv
 
-class Lin1_GaussClassifier(object):
+class Lin2_GaussClassifier(object):
 
     def __init__(self):
         self.trained_data = None
@@ -9,6 +10,9 @@ class Lin1_GaussClassifier(object):
     def train(self, data, labels):
         unique_labels = np.unique(labels)
         self.trained_data = np.zeros((unique_labels[-1] + 1, data.shape[0]))
+        # Computes the covariance matrix
+        self.inv_cov = inv(np.cov(data))
+
         # Goes through each labels to average
         # every images labeled by the same number.
         for i in unique_labels:
@@ -28,7 +32,9 @@ class Lin1_GaussClassifier(object):
             label = 0
             for x in range(0, self.trained_data.shape[0]):
                 trained_data = self.trained_data[x]
-                dist = np.linalg.norm(trained_data - test_data)
+                centered_vec = test_data - trained_data
+                # Uses the Mahalanobis distance
+                dist = centered_vec.T.dot(self.inv_cov).dot(centered_vec)
                 if dist < min_dist:
                     min_dist = dist
                     label = x

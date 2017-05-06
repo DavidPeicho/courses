@@ -1,12 +1,15 @@
 from tp1.mnist import load_mnist
 import numpy as np
 
+from tp1.extractFeature import extractFeature
+
 from ClassifierTester import ClassifierTester
 
 # Classifiers
 from tp1.RandomClassifier import RandomClassifier
 from tp1.MajorityClassifier import MajorityClassifier
 from tp1.Lin1_GaussClassifier import Lin1_GaussClassifier
+from tp1.Lin2_GaussClassifier import Lin2_GaussClassifier
 
 if __name__ == "__main__":
 
@@ -21,7 +24,18 @@ if __name__ == "__main__":
     classifiers = {
         "Random" : RandomClassifier(),
         "Majority" : MajorityClassifier(),
-        "Lin1" : Lin1_GaussClassifier()
+        "Lin1" : Lin1_GaussClassifier(),
     }
     classifier_tester = ClassifierTester()
+
+    print('Starting comparison with raw data...')
     classifier_tester.compare(classifiers, train_data, train_labels, test_data, test_labels)
+
+    print('Starting comparison with extracted features data...')
+    classifiers["Lin2"] = Lin2_GaussClassifier()
+
+    Feat = extractFeature('tp1/')
+    train_dataF = Feat.process(train_data)
+    test_dataF  = Feat.process(test_data)
+
+    classifier_tester.compare(classifiers, train_dataF, train_labels, test_dataF, test_labels)
