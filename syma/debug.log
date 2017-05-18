@@ -1,0 +1,3 @@
+WARN  [AWT-EventQueue-0] 2017-05-18 14:11:15,063 repast.simphony.scenario.ScenarioCPInitializer - Warning while parsing classpath: Empty or non-existent path 'C:\Users\David\Documents\Development\epita\courses\syma\bin'.
+WARN  [AWT-EventQueue-0] 2017-05-18 14:11:15,065 repast.simphony.scenario.ScenarioWatcheeInitializer - While initializing watchers: Empty or non-existent path 'C:\Users\David\Documents\Development\epita\courses\syma\bin'.
+WARN  [AWT-EventQueue-0] 2017-05-18 14:11:15,077 repast.simphony.scenario.ScenarioLoader - While initializing classpath: Empty or non-existent path 'C:\Users\David\Documents\Development\epita\courses\syma\bin'.
