@@ -1,4 +1,17 @@
 *.swp
+*.gz
+
+# Eclipse
+.metadata
+bin/
+tmp/
+*.tmp
+*.bak
+*~.nib
+local.properties
+.settings/
+.loadpath
+.recommenders
 
 # Python
 *.pyc
