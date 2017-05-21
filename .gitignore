@@ -12,6 +12,7 @@ local.properties
 .settings/
 .loadpath
 .recommenders
+debug.log
 
 # Python
 *.pyc
