@@ -21,7 +21,7 @@ public class GridParser {
 		
 	}
 	
-	public Map parse(String filePath) throws IOException  {
+	public BaseMap parse(String filePath) throws IOException  {
 		
 		BufferedReader br = new BufferedReader(new FileReader(filePath));
 		
@@ -30,14 +30,15 @@ public class GridParser {
 
 	    while (line != null) {
 	        sb.append(line);
-	        sb.append(System.lineSeparator());
 	        line = br.readLine();
 	    }
 		
 		Gson gson = new Gson();
-		Map parsedMap = gson.fromJson(sb.toString(), Map.class);
+		MapObject parsedMap = gson.fromJson(sb.toString().replaceAll("\\s+",""), MapObject.class);
 		
-		return parsedMap;
+		BaseMap result = new BaseMap(parsedMap);
+		
+		return result;
 		
 	}
 	

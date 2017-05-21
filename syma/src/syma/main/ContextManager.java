@@ -1,8 +1,11 @@
 package syma.main;
 
 import syma.agent.*;
+import syma.environment.Building;
+import syma.environment.Road;
+import syma.parsing.BaseMap;
 import syma.parsing.GridParser;
-import syma.parsing.Map;
+import syma.utils.Const;
 
 import java.io.IOException;
 
@@ -16,16 +19,16 @@ import repast.simphony.space.grid.GridBuilderParameters;
 import repast.simphony.space.grid.SimpleGridAdder;
 import repast.simphony.engine.environment.RunEnvironment;
 
-public class ContextManager implements ContextBuilder<IAgent> {
+public class ContextManager implements ContextBuilder<GridElement> {
 
 	@Override
-	public Context build(Context<IAgent> context) {
+	public Context build(Context<GridElement> context) {
 		
 		context.setId("moutouCity");
 		
 		int width = 10;
 		int height = 10;
-		Map map = null;
+		BaseMap map = null;
 		
 		String pathToMap = RunEnvironment.getInstance().getParameters().getString("mapPath");
 		try {
@@ -37,16 +40,33 @@ public class ContextManager implements ContextBuilder<IAgent> {
 		}
 		
 		GridFactory gfac = GridFactoryFinder.createGridFactory(null);
-		GridBuilderParameters<IAgent> gbp = new GridBuilderParameters<IAgent>(new WrapAroundBorders(), new SimpleGridAdder<IAgent>(), true, width, height);
-		Grid<IAgent> grid = gfac.createGrid("grid", context, gbp);
+		GridBuilderParameters<GridElement> gbp = new GridBuilderParameters<GridElement>(new WrapAroundBorders(), new SimpleGridAdder<GridElement>(), true, width, height);
+		Grid<GridElement> grid = gfac.createGrid("grid", context, gbp);
 		
 		if (map == null) return context;
 		
-		map.props.forEach((x) -> {
+		String mapStr = map.getRawMap();
+		for (int i = 0; i < mapStr.length(); ++i) {
+			char val = mapStr.charAt(i);
+			String type = map.getType(val);
 			
+			if (type == null) continue;
 			
+			int x = i % width;
+			int y = i / width;
 			
-		});
+			GridElement elt = null;
+			if (type.equals("ROAD")) {
+				elt = new Road(x, y, grid);
+			} else if (type.equals("BUILDING")) {
+				elt = new Building(x, y, grid);
+			}
+			
+			if (elt == null) continue;
+			
+			context.add(elt);
+			grid.moveTo(elt, x, height - y - 1);
+		}
 		
 		return context;
 		
