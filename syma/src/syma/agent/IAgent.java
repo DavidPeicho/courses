@@ -6,14 +6,14 @@ import repast.simphony.space.grid.Grid;
 import repast.simphony.space.grid.GridPoint;
 import repast.simphony.util.ContextUtils;
 
-public abstract class Agent{
+public abstract class IAgent{
 
 	protected int x;
 	protected int y;
 	
-	protected Grid<Agent> grid;
+	protected Grid<IAgent> grid;
 
-	public Agent(int x, int y, Grid<Agent> grid){
+	public IAgent(int x, int y, Grid<IAgent> grid){
 		this.x = x;
 		this.y = y;
 		this.grid = grid;
