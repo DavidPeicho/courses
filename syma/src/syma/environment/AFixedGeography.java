@@ -3,10 +3,11 @@ package syma.environment;
 import repast.simphony.space.grid.Grid;
 import syma.main.GridElement;
 
-public class Building extends AFixedGeography {
+public abstract class AFixedGeography extends GridElement {
 
-	public Building(int x, int y, Grid<GridElement> grid) {
+	public AFixedGeography(int x, int y, Grid<GridElement> grid) {
 		super(x, y, grid);
 	}
+
 	
 }
