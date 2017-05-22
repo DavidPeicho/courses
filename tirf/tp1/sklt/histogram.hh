@@ -19,6 +19,10 @@ namespace tirf {
 
   histogram_1d cumulativeHistogram(const histogram_1d& histogram);
 
+  void balance(gray8_image* img);
+
+  void balance(rgb24_image* img);
+
 }
 
 #endif

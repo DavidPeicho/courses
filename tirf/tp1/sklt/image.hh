@@ -80,7 +80,11 @@ class rgb24_image {
             */
             rgb24_image(int sx, int sy);
             rgb24_image(const gray8_image* grayImg);
+            rgb24_image(const gray8_image* r, const gray8_image* g,
+                        const gray8_image* b);
             ~rgb24_image();
+
+            gray8_image* extractChannel(int channel);
 
             /**
              * Gives the pixel buffer aligned according to TL_IMAGE_ALIGNMENT

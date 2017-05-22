@@ -1,5 +1,5 @@
 CC = g++
-CXX_FLAGS = -Werror -Wall -Wextra -std=c++11 -O3
+CXX_FLAGS = -Werror -Wall -Wextra -std=c++11 -O0 -g
 LDLIBS = -lm
 
 MAIN = main.cpp
