@@ -4,8 +4,7 @@ import numpy as np
 class Pca:
     def train(self, data):
         # Covariance centered matrix of train data.
-        mean = np.tile(np.mean(data, axis=1), (data.shape[1], 1)).T
-        centered = data - mean
+        centered = (data.T - np.mean(data, axis=1)).T
         self.cov = np.cov(centered)
         # Eigenvalues and eigenvectors of covariance matrix.
         self.eigenval, self.eigenvect = np.linalg.eigh(self.cov)
@@ -32,7 +31,6 @@ class Pca:
 
     # Project in n dimensions.
     def project(self, data, n):
-        mean = np.tile(np.mean(data, axis=1), (data.shape[1], 1)).T
-        centered = data - mean
+        centered = (data.T - np.mean(data, axis=1)).T
         nv = self.eigenvect[:, :n]
         return np.dot(nv.T, centered)

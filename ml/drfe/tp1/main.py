@@ -63,12 +63,23 @@ if __name__ == '__main__':
     # plt.show()
 
     # Question F.
-    proj_train_data = pca.project(train_data, pca.eigenvect[:, :2])
-    proj_test_data = pca.project(test_data, pca.eigenvect[:, :2])
+    proj_train_data = pca.project(train_data, 2)
+    proj_test_data = pca.project(test_data, 2)
+    Q1.train(proj_train_data, train_labels)
 
-    # TODO
+    colors = ['gold', 'green', 'black', 'magenta', 'teal', 'olivedrab', 'forestgreen', 'darkmagenta', 'khaki', 'darkgray']
     # for i in range(Q1.nbclasses):
         # d = proj_train_data[:, np.where(train_labels == i)[0]]
-        # plt.plot(d[0,:], d[1,:])
-        # plt.show()
+        # plt.scatter(d[0,:], d[1,:], c=colors[i], s=0.6, marker='.', label=i)
 
+    # plt.legend()
+    # plt.show()
+
+    # Question G.
+    out = Q1.process(proj_test_data)
+    for i in range(Q1.nbclasses):
+        d = proj_test_data[:, np.where(out == i)[0]]
+        plt.scatter(d[0,:], d[1,:], c=colors[i], s=0.6, marker='.', label=i)
+
+    plt.legend()
+    plt.show()
