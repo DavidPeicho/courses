@@ -1,5 +1,8 @@
 *.swp
 *.gz
+*.bz2
+*.tga
+*.png
 
 # Eclipse
 .metadata
@@ -14,6 +17,13 @@ local.properties
 .recommenders
 debug.log
 *.log
+
+# Idea
+.idea/
+target/
+
+# VSCODE
+.vscode/
 
 # Python
 *.pyc

@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 
 from Lin1_Gauss import Lin1_Gauss
 from Pca import Pca
+from Lda import Lda
 
 train_data, train_labels = load_mnist(dataset='training', path='./')
 test_data, test_labels = load_mnist(dataset='testing', path='./')
@@ -32,15 +33,15 @@ if __name__ == '__main__':
 
     # Question 4
     # Question A.
-    pca = Pca()
-    pca.train(train_data)
+    # pca = Pca()
+    # pca.train(train_data)
 
     # Question B.
     # plt.plot(pca.eigenval)
     # plt.show()
 
     # Question C.
-    rates = [0.75, 0.90, 0.95, 0.995]
+    # rates = [0.75, 0.90, 0.95, 0.995]
     # nb_eigenval = pca.computecompression(rates)
     # print(nb_eigenval)
 
@@ -63,11 +64,11 @@ if __name__ == '__main__':
     # plt.show()
 
     # Question F.
-    proj_train_data = pca.project(train_data, 2)
-    proj_test_data = pca.project(test_data, 2)
-    Q1.train(proj_train_data, train_labels)
+    # proj_train_data = pca.project(train_data, 2)
+    # proj_test_data = pca.project(test_data, 2)
+    # Q1.train(proj_train_data, train_labels)
 
-    colors = ['gold', 'green', 'black', 'magenta', 'teal', 'olivedrab', 'forestgreen', 'darkmagenta', 'khaki', 'darkgray']
+    # colors = ['gold', 'green', 'black', 'magenta', 'teal', 'olivedrab', 'forestgreen', 'darkmagenta', 'khaki', 'darkgray']
     # for i in range(Q1.nbclasses):
         # d = proj_train_data[:, np.where(train_labels == i)[0]]
         # plt.scatter(d[0,:], d[1,:], c=colors[i], s=0.6, marker='.', label=i)
@@ -76,10 +77,29 @@ if __name__ == '__main__':
     # plt.show()
 
     # Question G.
-    out = Q1.process(proj_test_data)
-    for i in range(Q1.nbclasses):
-        d = proj_test_data[:, np.where(out == i)[0]]
-        plt.scatter(d[0,:], d[1,:], c=colors[i], s=0.6, marker='.', label=i)
+    # out = Q1.process(proj_test_data)
+    # for i in range(Q1.nbclasses):
+        # d = proj_test_data[:, np.where(out == i)[0]]
+        # plt.scatter(d[0,:], d[1,:], c=colors[i], s=0.6, marker='.', label=i)
 
-    plt.legend()
-    plt.show()
+    # plt.legend()
+    # plt.show()
+
+    ########### PART 2 ###########
+
+    # Question 1
+    pca = Pca()
+    pca.train(train_data)
+
+    proj_train_data = pca.project(train_data, 87)
+    proj_test_data = pca.project(test_data, 87)
+
+    lda = Lda()
+    lda.train(proj_train_data, train_labels)
+
+    for i in range(1, 87):
+        lda_projected_train = lda.project(proj_train_data, i)
+        lda_projected_data = lda.project(proj_test_data, i)
+        Q1.train(lda_projected_train, train_labels)
+        out = Q1.process(lda_projected_data)
+        print(i, " Rate = ", ((out == test_labels).sum() / test_labels.shape[0]))
