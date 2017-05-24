@@ -88,18 +88,26 @@ if __name__ == '__main__':
     ########### PART 2 ###########
 
     # Question 1
-    pca = Pca()
-    pca.train(train_data)
-
-    proj_train_data = pca.project(train_data, 87)
-    proj_test_data = pca.project(test_data, 87)
-
     lda = Lda()
-    lda.train(proj_train_data, train_labels)
+    lda.train(train_data, train_labels)
 
-    for i in range(1, 87):
-        lda_projected_train = lda.project(proj_train_data, i)
-        lda_projected_data = lda.project(proj_test_data, i)
+    # Computes 1...9 dimensions
+    for i in range(1, 10):
+        lda_projected_train = lda.project(train_data, i)
+        lda_projected_data = lda.project(test_data, i)
         Q1.train(lda_projected_train, train_labels)
         out = Q1.process(lda_projected_data)
         print(i, " Rate = ", ((out == test_labels).sum() / test_labels.shape[0]))
+
+
+    # pca = Pca()
+    # pca.train(train_data)
+    # proj_train_data = pca.project(train_data, 87)
+    # proj_test_data = pca.project(test_data, 87)
+
+    # for i in range(1, 87):
+    #     lda_projected_train = lda.project(proj_train_data, i)
+    #     lda_projected_data = lda.project(proj_test_data, i)
+    #     Q1.train(lda_projected_train, train_labels)
+    #     out = Q1.process(lda_projected_data)
+    #     print(i, " Rate = ", ((out == test_labels).sum() / test_labels.shape[0]))
