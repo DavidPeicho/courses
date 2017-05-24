@@ -1,15 +1,23 @@
 import numpy as np
 
 class Lda:
+    def _compute_eig(self):
+        inv_sw = np.linalg.pinv(self.sw)
+        self.eigenval, self.eigenvect = np.linalg.eig(inv_sw.dot(self.sb))
+        iw = np.argsort(self.eigenval)[::-1]
+        self.eigenval = self.eigenval[iw]
+        self.eigenvect = self.eigenvect[:, iw]
+
     def train(self, data, labels):
         # Fetch number of classes.
         self.nbclasses = np.unique(labels).shape[0]
-        # Compute the mean for each classes.
-        self.mean = np.zeros((data.shape[0], self.nbclasses))
+        # Overall mean computation
+        self.overallMean = np.mean(data,axis = 1)
+        # Saves each class in an array
         self.classes = [data[:, np.where(labels == i)[0]]
                         for i in range(self.nbclasses)]
-
-
+        # Compute the mean for each classes.
+        self.mean = np.zeros((data.shape[0], self.nbclasses))
         for i in range(self.nbclasses):
             self.mean[:, i] = np.mean(self.classes[i], axis = 1)
 
@@ -22,9 +30,6 @@ class Lda:
             centered = (vectors - meanMatrix)
             self.sw += centered.dot(centered.T)
 
-        # Overall mean computation
-        self.overallMean = np.mean(data,axis = 1)
-
         # Between-class scatter matrix
         self.sb = np.zeros((data.shape[0], data.shape[0]))
         for i in range(self.nbclasses):
@@ -34,11 +39,9 @@ class Lda:
             centered = mean - overallMean
             self.sb += nbElts * centered.dot(centered.T)
 
-        inv_sw = np.linalg.pinv(self.sw)
-        self.eigenval, self.eigenvect = np.linalg.eig(inv_sw.dot(self.sb))
-        iw = np.argsort(self.eigenval)[::-1]
-        self.eigenval = self.eigenval[iw]
-        self.eigenvect = self.eigenvect[:, iw]
+        # Computes eigenvalues and eigenvector from the
+        # scatters matrices
+        self._compute_eig()
 
     # Project in n dimensions.
     def project(self, data, n):
