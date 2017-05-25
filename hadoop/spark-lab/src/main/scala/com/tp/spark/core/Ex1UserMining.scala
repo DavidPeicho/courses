@@ -24,9 +24,7 @@ object Ex1UserMining {
 
   val pathToFile = "data/reduced-tweets.json"
 
-  case class JSONTweet(id: String, user: String, text: String, place: String, country: String)
-
-  implicit val jsonTweetReads = Json.reads[JSONTweet]
+  implicit val jsonTweetReads = Json.reads[Tweet]
   /**
    *  Load the data from the json file and return an RDD of Tweet
    */
@@ -42,8 +40,7 @@ object Ex1UserMining {
     val jsonStr = sc.textFile(pathToFile)
     jsonStr.map((s : String) => {
       val obj = Json.parse(s)
-      val jsontweet = obj.as[JSONTweet](jsonTweetReads)
-      Tweet.apply(jsontweet.id, jsontweet.user, jsontweet.text, jsontweet.place, jsontweet.country, "")
+      obj.as[Tweet](jsonTweetReads)
     })
 
   }
@@ -53,7 +50,9 @@ object Ex1UserMining {
    */
   def tweetsByUser(): RDD[(String, Iterable[Tweet])] = {
 
-    loadData().map(x => (x.user, x)).groupByKey()
+    loadData()
+      .map(x => (x.user, x))
+      .groupByKey()
 
   }
 
@@ -62,8 +61,9 @@ object Ex1UserMining {
    */
   def tweetByUserNumber(): RDD[(String, Int)] = {
 
-    tweetsByUser().mapValues(list => {
-      list.map(tweet => 1).sum
+    tweetsByUser()
+      .mapValues(list => {
+        list.map(tweet => 1).sum
     })
 
   }
@@ -74,7 +74,9 @@ object Ex1UserMining {
    */
   def topTenTwitterers(): Array[(String, Int)] = {
 
-    tweetByUserNumber().sortBy(_._2, false).take(10)
+    tweetByUserNumber()
+      .sortBy(_._2, false)
+      .take(10)
 
   }
 

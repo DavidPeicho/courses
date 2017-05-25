@@ -7,6 +7,6 @@ object TweetUtils {
 		text : String,
 		place : String,
 		country : String,
-		lang : String
+		lang : Option[String]
 		)
 }
