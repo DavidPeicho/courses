@@ -35,15 +35,15 @@
         },
         {
             "key": "h",
-            "type": "BUILDING"
+            "type": "HOUSE"
         },
         {
             "key": "a",
-            "type": "BUILDING"
+            "type": "WORKPLACE"
         },
         {
             "key": "b",
-            "type": "BUILDING"
+            "type": "WORKPLACE"
         },
         {
             "key": "r",

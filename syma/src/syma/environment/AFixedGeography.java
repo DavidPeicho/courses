@@ -12,8 +12,21 @@ public abstract class AFixedGeography extends GridElement {
 	
 	public AFixedGeography(int x, int y, Grid<GridElement> grid) {
 		super(x, y, grid);
-		
 		agents_ = new CopyOnWriteArrayList<AAgent>();
+	}
+	
+	/* GETTERS // SETTERS */
+	
+	public void addAgent(AAgent a) {
+		agents_.add(a);
+	}
+	
+	public void removeAgent(AAgent a) {
+		agents_.remove(a);
+	}
+	
+	public boolean isEmpty() {
+		return agents_.isEmpty();
 	}
 	
 }

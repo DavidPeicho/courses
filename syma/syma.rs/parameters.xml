@@ -6,6 +6,12 @@
 						converter="repast.simphony.parameter.StringConverterFactory$IntConverter"
 									
 		/>
+				<parameter name="maxNbAgents" displayName="Start Number Agents" type="int" 
+						defaultValue="10" 
+						isReadOnly="false" 
+						converter="repast.simphony.parameter.StringConverterFactory$IntConverter"
+									
+		/>
 				<parameter name="mapPath" displayName="Map Path" type="java.lang.String" 
 						defaultValue="assets/map1.syma" 
 						isReadOnly="false" 

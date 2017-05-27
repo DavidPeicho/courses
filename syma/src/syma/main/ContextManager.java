@@ -1,13 +1,17 @@
 package syma.main;
 
 import syma.agent.*;
+import syma.environment.AFixedGeography;
 import syma.environment.Building;
 import syma.environment.Road;
+import syma.environment.WorkPlace;
+import syma.exceptions.EnvironmentException;
+import syma.exceptions.SymaException;
 import syma.parsing.BaseMap;
 import syma.parsing.GridParser;
-import syma.utils.Const;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 import repast.simphony.context.Context;
 import repast.simphony.context.space.grid.GridFactory;
@@ -31,6 +35,7 @@ public class ContextManager implements ContextBuilder<GridElement> {
 		BaseMap map = null;
 		
 		String pathToMap = RunEnvironment.getInstance().getParameters().getString("mapPath");
+		int nbAgents = RunEnvironment.getInstance().getParameters().getInteger("maxNbAgents");
 		try {
 			map = GridParser.instance().parse(pathToMap);
 			width = map.getWidth();
@@ -45,6 +50,22 @@ public class ContextManager implements ContextBuilder<GridElement> {
 		
 		if (map == null) return context;
 		
+		buildGrid(map, width, height, context, grid);
+		
+		// Checks whether the given map matches the parameters
+		if (nbAgents > Building.globalList.size()) {
+			System.err.println("Number of default agents is greater than number of houses.");
+			return context;
+		}
+		
+		spawnDefaultAgents(nbAgents, context, grid);
+		
+		return context;
+		
+	}
+	
+	private void buildGrid(BaseMap map, int w, int h, Context<GridElement> context, Grid<GridElement> grid) {
+		
 		String mapStr = map.getRawMap();
 		for (int i = 0; i < mapStr.length(); ++i) {
 			char val = mapStr.charAt(i);
@@ -52,23 +73,78 @@ public class ContextManager implements ContextBuilder<GridElement> {
 			
 			if (type == null) continue;
 			
-			int x = i % width;
-			int y = i / width;
+			int x = i % w;
+			int y = i / w;
+			
+			int relativeX = x;
+			int relativeY = h - y;
 			
 			GridElement elt = null;
 			if (type.equals("ROAD")) {
-				elt = new Road(x, y, grid);
-			} else if (type.equals("BUILDING")) {
-				elt = new Building(x, y, grid);
+				elt = new Road(relativeX, relativeY, grid);
+			} else if (type.equals("HOUSE")) {
+				elt = new Building(relativeX, relativeY, grid);
+				Building.globalList.add((Building)elt);
+			} else if (type.equals("WORKPLACE")) {
+				elt = new WorkPlace(relativeX, relativeY, grid);
+				WorkPlace.globalList.add((WorkPlace)elt);
 			}
 			
 			if (elt == null) continue;
 			
 			context.add(elt);
-			grid.moveTo(elt, x, height - y - 1);
+			grid.moveTo(elt, relativeX, relativeY);
 		}
 		
-		return context;
+	}
+	
+	private void spawnDefaultAgents(int nbAgents, Context<GridElement> context, Grid<GridElement> grid) {
+		
+		for (int i = 0; i < nbAgents; ++i) {
+			// Finds a house for the newly created agent
+			Building home = getEmptyGeography(Building.globalList);
+			int x = home.getX();
+			int y = home.getY();
+			// Finds a workplace for the newly created agent
+			WorkPlace workplace = getEmptyGeography(WorkPlace.globalList);
+			
+			boolean gender = Math.random() >= 0.5f;
+			int age = (int)(Math.random() * 50.0d + 18.0d);
+			
+			HumanAgent agent = new HumanAgent(x, y, grid, age, gender);
+			agent.setHome(home);
+			agent.setWorkPlace(workplace);
+			
+			home.addAgent(agent);
+			
+			context.add(agent);
+			grid.moveTo(agent, x, y);
+		}
+		
+	}
+	
+	/**
+	 * Loops through every registered building to find an empty one,
+	 * after applying a random selection.
+	 * @return The first building being empty after random search.
+	 */
+	private <T extends AFixedGeography> T getEmptyGeography(ArrayList<T> list) {
+		
+		int nbGeography = list.size();
+		
+		int initialIdx = (int)(Math.random() * (nbGeography - 1)); 
+		int idx = initialIdx;
+		
+		T elt = list.get(idx);
+		while (!elt.isEmpty()) {
+			idx = (idx + 1) % nbGeography;
+			if (idx == initialIdx) {
+				return null;
+			}
+			elt = list.get(idx);
+		}
+		
+		return elt;
 		
 	}
 
