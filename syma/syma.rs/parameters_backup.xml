@@ -3,8 +3,15 @@
 					<parameter name="randomSeed" displayName="Default Random Seed" type="int" 
 						defaultValue="__NULL__"
 						isReadOnly="false" 
-						converter="repast.simphony.parameter.StringConverterFactory$IntConverter"/>
-		
-</parameters>
+						converter="repast.simphony.parameter.StringConverterFactory$IntConverter"
+									
+		/>
+				<parameter name="mapPath" displayName="Map Path" type="java.lang.String" 
+						defaultValue="assets/map1.syma" 
+						isReadOnly="false" 
+						converter="repast.simphony.parameter.StringConverterFactory$StringStringConverter"
+									
+		/>
+		</parameters>
 
 

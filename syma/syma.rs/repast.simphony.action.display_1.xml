@@ -7,12 +7,12 @@
       <string>repast.simphony.visualization.editedStyle.EditedStyle2D</string>
     </entry>
     <entry>
-      <string>syma.environment.Road</string>
+      <string>syma.agent.HumanAgent</string>
       <string>repast.simphony.visualization.editedStyle.EditedStyle2D</string>
     </entry>
     <entry>
-      <string>syma.agent.AAgent</string>
-      <string>repast.simphony.visualizationOGL2D.DefaultStyleOGL2D</string>
+      <string>syma.environment.Road</string>
+      <string>repast.simphony.visualization.editedStyle.EditedStyle2D</string>
     </entry>
   </styles>
   <editedStyles>
@@ -21,12 +21,12 @@
       <string>syma.environment.Building.style_2.xml</string>
     </entry>
     <entry>
-      <string>syma.environment.Road</string>
-      <string>syma.environment.Road.style_2.xml</string>
+      <string>syma.agent.HumanAgent</string>
+      <string>syma.agent.HumanAgent.style_0.xml</string>
     </entry>
     <entry>
-      <string>syma.agent.AAgent</string>
-      <null/>
+      <string>syma.environment.Road</string>
+      <string>syma.environment.Road.style_2.xml</string>
     </entry>
   </editedStyles>
   <netStyles/>
@@ -39,7 +39,7 @@
     <pType>LAST</pType>
     <duration>-1.0</duration>
     <frequency>REPEAT</frequency>
-    <hashCode>-104273118</hashCode>
+    <hashCode>1143619278</hashCode>
   </schedParams>
   <layoutClassName>foo.bar.baz</layoutClassName>
   <layoutProjection>grid</layoutProjection>
@@ -47,14 +47,14 @@
   <layerOrder>
     <entry>
       <string>syma.environment.Building</string>
+      <int>1</int>
+    </entry>
+    <entry>
+      <string>syma.agent.HumanAgent</string>
       <int>2</int>
     </entry>
     <entry>
       <string>syma.environment.Road</string>
-      <int>1</int>
-    </entry>
-    <entry>
-      <string>syma.agent.AAgent</string>
       <int>0</int>
     </entry>
   </layerOrder>
