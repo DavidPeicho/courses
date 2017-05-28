@@ -50,6 +50,10 @@ public class ContextManager implements ContextBuilder<GridElement> {
 		
 		if (map == null) return context;
 		
+		GodAgent.init(grid);
+		context.add(GodAgent.instance());
+		grid.moveTo(GodAgent.instance(), 0, 0);
+		
 		buildGrid(map, width, height, context, grid);
 		
 		// Checks whether the given map matches the parameters
@@ -77,7 +81,7 @@ public class ContextManager implements ContextBuilder<GridElement> {
 			int y = i / w;
 			
 			int relativeX = x;
-			int relativeY = h - y;
+			int relativeY = h - 1 - y;
 			
 			GridElement elt = null;
 			if (type.equals("ROAD")) {
@@ -100,6 +104,8 @@ public class ContextManager implements ContextBuilder<GridElement> {
 	
 	private void spawnDefaultAgents(int nbAgents, Context<GridElement> context, Grid<GridElement> grid) {
 		
+		GodAgent env = GodAgent.instance();
+		
 		for (int i = 0; i < nbAgents; ++i) {
 			// Finds a house for the newly created agent
 			Building home = getEmptyGeography(Building.globalList);
@@ -111,10 +117,7 @@ public class ContextManager implements ContextBuilder<GridElement> {
 			boolean gender = Math.random() >= 0.5f;
 			int age = (int)(Math.random() * 50.0d + 18.0d);
 			
-			HumanAgent agent = new HumanAgent(x, y, grid, age, gender);
-			agent.setHome(home);
-			agent.setWorkPlace(workplace);
-			
+			HumanAgent agent = env.createAgent(x, y, grid, age, gender, home, workplace);
 			home.addAgent(agent);
 			
 			context.add(agent);
@@ -122,6 +125,7 @@ public class ContextManager implements ContextBuilder<GridElement> {
 		}
 		
 	}
+
 	
 	/**
 	 * Loops through every registered building to find an empty one,
