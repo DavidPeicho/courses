@@ -22,7 +22,6 @@ public class GodAgent extends AAgent {
 	
 	public GodAgent(Grid<GridElement> grid) {
 		super(0, 0, grid);
-		
 		yearListeners_ = new CopyOnWriteArrayList<UpdateListener>();
 		day_ = 0;
 		hour_ = 0;
@@ -60,7 +59,6 @@ public class GodAgent extends AAgent {
 				e.updateEvent(null);
 			});
 		}
-		//System.out.println("Min = " + min_ + " " + hour_ + " " + day_);
 	}
 	
 	public HumanAgent createAgent(int x, int y, Grid<GridElement> grid, int age, boolean gender, Building home, WorkPlace workplace) {

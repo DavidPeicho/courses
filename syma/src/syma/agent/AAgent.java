@@ -10,16 +10,26 @@ import syma.main.GridElement;
 
 public abstract class AAgent extends GridElement implements IAgent {
 	
+	private static long ID = -1;
+	 
 	protected int speed_;
-	
 	protected final ArrayList<ABehavior> behaviors_;
 
+	protected long id_; 
+	
 	public AAgent(int x, int y, Grid<GridElement> grid) {
 		super(x, y, grid);
 		behaviors_ = new ArrayList<ABehavior>();
+		
+		id_ = ++ID;
 	}
 
 	public abstract void step();
+	
+	/* GETTERS // SETTERS */
+	public long getID() {
+		return id_;
+	}
 	
 	public void setSpeed(int s) {
 		speed_ = s;
