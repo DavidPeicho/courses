@@ -14,10 +14,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import repast.simphony.context.Context;
+import repast.simphony.context.space.graph.NetworkBuilder;
 import repast.simphony.context.space.grid.GridFactory;
 import repast.simphony.context.space.grid.GridFactoryFinder;
 import repast.simphony.dataLoader.ContextBuilder;
 import repast.simphony.space.grid.WrapAroundBorders;
+import repast.simphony.space.graph.Network;
 import repast.simphony.space.grid.Grid;
 import repast.simphony.space.grid.GridBuilderParameters;
 import repast.simphony.space.grid.SimpleGridAdder;
@@ -55,6 +57,8 @@ public class ContextManager implements ContextBuilder<GridElement> {
 		grid.moveTo(GodAgent.instance(), 0, 0);
 		
 		buildGrid(map, width, height, context, grid);
+		NetworkBuilder<Object> netBuilder = new NetworkBuilder<Object>("genealogy", (Context)context, false);
+		netBuilder.buildNetwork();
 		
 		// Checks whether the given map matches the parameters
 		if (nbAgents > Building.globalList.size()) {
@@ -119,9 +123,11 @@ public class ContextManager implements ContextBuilder<GridElement> {
 			
 			HumanAgent agent = env.createAgent(x, y, grid, age, gender, home, workplace);
 			home.addAgent(agent);
-			
+
 			context.add(agent);
 			grid.moveTo(agent, x, y);
+
+			// Network<Object> gen = (Network<Object>)context.getProjection("genealogy");
 		}
 		
 	}
