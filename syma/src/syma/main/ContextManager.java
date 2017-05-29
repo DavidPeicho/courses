@@ -1,6 +1,7 @@
 package syma.main;
 
 import syma.agent.*;
+import syma.behaviors.MoveTo;
 import syma.environment.AFixedGeography;
 import syma.environment.Building;
 import syma.environment.Road;
@@ -10,6 +11,7 @@ import syma.exceptions.SymaException;
 import syma.parsing.BaseMap;
 import syma.parsing.GridParser;
 import syma.utils.Const;
+import syma.utils.PathSearch;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -23,6 +25,7 @@ import repast.simphony.space.grid.WrapAroundBorders;
 import repast.simphony.space.graph.Network;
 import repast.simphony.space.grid.Grid;
 import repast.simphony.space.grid.GridBuilderParameters;
+import repast.simphony.space.grid.GridPoint;
 import repast.simphony.space.grid.SimpleGridAdder;
 import repast.simphony.engine.environment.RunEnvironment;
 
@@ -108,6 +111,8 @@ public class ContextManager implements ContextBuilder<GridElement> {
 	}
 	
 	private void spawnDefaultAgents(int nbAgents, Context<GridElement> context, Grid<GridElement> grid) {
+		int w = grid.getDimensions().getWidth();
+		int h = grid.getDimensions().getHeight();
 		GodAgent env = GodAgent.instance();
 		
 		for (int i = 0; i < nbAgents; ++i) {
@@ -122,7 +127,11 @@ public class ContextManager implements ContextBuilder<GridElement> {
 			int age = (int)(Math.random() * 50.0d + 18.0d);
 			
 			HumanAgent agent = env.createAgent(x, y, grid, age, gender, home, workplace);
-			agent.getPath(workplace.getPos());
+			// DEBUG
+			PathSearch p = new PathSearch(grid);
+			p.search(agent.getPos(), workplace.getPos());
+			p.convertToBehavior(agent);
+			// END DEBUG
 			
 			home.addAgent(agent);
 
@@ -140,7 +149,6 @@ public class ContextManager implements ContextBuilder<GridElement> {
 		}
 		
 	}
-
 	
 	/**
 	 * Loops through every registered building to find an empty one,
