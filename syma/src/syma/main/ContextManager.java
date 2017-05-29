@@ -9,6 +9,7 @@ import syma.exceptions.EnvironmentException;
 import syma.exceptions.SymaException;
 import syma.parsing.BaseMap;
 import syma.parsing.GridParser;
+import syma.utils.Const;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -57,7 +58,7 @@ public class ContextManager implements ContextBuilder<GridElement> {
 		grid.moveTo(GodAgent.instance(), 0, 0);
 		
 		buildGrid(map, width, height, context, grid);
-		NetworkBuilder<Object> netBuilder = new NetworkBuilder<Object>("genealogy", (Context)context, false);
+		NetworkBuilder<Object> netBuilder = new NetworkBuilder<Object>("genealogy", (Context)context, true);
 		netBuilder.buildNetwork();
 		
 		// Checks whether the given map matches the parameters
@@ -107,7 +108,6 @@ public class ContextManager implements ContextBuilder<GridElement> {
 	}
 	
 	private void spawnDefaultAgents(int nbAgents, Context<GridElement> context, Grid<GridElement> grid) {
-		
 		GodAgent env = GodAgent.instance();
 		
 		for (int i = 0; i < nbAgents; ++i) {
@@ -129,7 +129,14 @@ public class ContextManager implements ContextBuilder<GridElement> {
 			context.add(agent);
 			grid.moveTo(agent, x, y);
 
-			// Network<Object> gen = (Network<Object>)context.getProjection("genealogy");
+			if (i == 0) {
+				HumanAgent child = env.createAgent(x, y, grid, 10, gender, home, null);
+				home.addAgent(child);
+				context.add(child);
+				grid.moveTo(child, x, y);
+				Network n = (Network)context.getProjection("genealogy");
+				n.addEdge(agent, child, Const.PARENTOF);
+			}
 		}
 		
 	}
