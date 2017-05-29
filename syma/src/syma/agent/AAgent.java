@@ -10,7 +10,7 @@ import syma.behaviors.ABehavior;
 import syma.events.UpdateListener;
 import syma.main.GridElement;
 
-public abstract class AAgent extends GridElement implements IAgent {
+public class AAgent extends GridElement implements IAgent {
 	
 	private static long ID = -1;
 	 
@@ -48,7 +48,7 @@ public abstract class AAgent extends GridElement implements IAgent {
 		return speed_;
 	}
 	
-	public void addListener(ABehavior behavior) {
+	public void addBehavior(ABehavior behavior) {
 		behaviors_.add(behavior);
 	}
 	
