@@ -122,6 +122,8 @@ public class ContextManager implements ContextBuilder<GridElement> {
 			int age = (int)(Math.random() * 50.0d + 18.0d);
 			
 			HumanAgent agent = env.createAgent(x, y, grid, age, gender, home, workplace);
+			agent.getPath(workplace.getPos());
+			
 			home.addAgent(agent);
 
 			context.add(agent);

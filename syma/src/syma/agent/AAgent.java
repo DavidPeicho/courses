@@ -1,6 +1,8 @@
 package syma.agent;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import repast.simphony.space.grid.Grid;
@@ -13,22 +15,29 @@ public abstract class AAgent extends GridElement implements IAgent {
 	private static long ID = -1;
 	 
 	protected int speed_;
-	protected final ArrayList<ABehavior> behaviors_;
+	
+	protected final Queue<ABehavior> behaviors_;
+	protected final CopyOnWriteArrayList<UpdateListener> listeners_;
 
 	protected long id_; 
 	
 	public AAgent(int x, int y, Grid<GridElement> grid) {
 		super(x, y, grid);
-		behaviors_ = new ArrayList<ABehavior>();
-		
 		id_ = ++ID;
+		behaviors_ = new LinkedList<ABehavior>();
+		listeners_ = new CopyOnWriteArrayList<UpdateListener>();
 	}
-
-	public abstract void step();
 	
 	/* GETTERS // SETTERS */
 	public long getID() {
 		return id_;
+	}
+
+	@Override
+	public void step() {
+		if (behaviors_.isEmpty())
+			return;
+		behaviors_.poll().update();
 	}
 	
 	public void setSpeed(int s) {

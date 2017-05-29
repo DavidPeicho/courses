@@ -28,4 +28,12 @@ public class GridElement {
 		return y_;
 	}
 	
+	public void setX(int val) {
+		x_ = val;
+	}
+	
+	public void setY(int val) {
+		y_ = val;
+	}
+	
 }
