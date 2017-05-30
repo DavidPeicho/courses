@@ -6,7 +6,7 @@ import java.util.Queue;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import repast.simphony.space.grid.Grid;
-import syma.behaviors.ABehavior;
+import syma.behaviors.AGoal;
 import syma.events.UpdateListener;
 import syma.main.GridElement;
 
@@ -16,15 +16,15 @@ public class AAgent extends GridElement implements IAgent {
 	 
 	protected int speed_;
 	
-	protected final Queue<ABehavior> behaviors_;
+	protected final Queue<AGoal> goals_;
 	protected final CopyOnWriteArrayList<UpdateListener> listeners_;
 
-	protected long id_; 
+	protected long id_;
 	
 	public AAgent(int x, int y, Grid<GridElement> grid) {
 		super(x, y, grid);
 		id_ = ++ID;
-		behaviors_ = new LinkedList<ABehavior>();
+		goals_ = new LinkedList<AGoal>();
 		listeners_ = new CopyOnWriteArrayList<UpdateListener>();
 	}
 	
@@ -32,12 +32,17 @@ public class AAgent extends GridElement implements IAgent {
 	public long getID() {
 		return id_;
 	}
+	
+	@Override
+	public void decide() {
+	
+	}
 
 	@Override
 	public void step() {
-		if (behaviors_.isEmpty())
+		if (goals_.isEmpty())
 			return;
-		behaviors_.poll().update();
+		goals_.peek().update();
 	}
 	
 	public void setSpeed(int s) {
@@ -48,12 +53,12 @@ public class AAgent extends GridElement implements IAgent {
 		return speed_;
 	}
 	
-	public void addBehavior(ABehavior behavior) {
-		behaviors_.add(behavior);
+	public void addGoal(AGoal behavior) {
+		goals_.add(behavior);
 	}
 	
-	public void removeBehavior(ABehavior behavior) {
-		behaviors_.remove(behavior);
+	public void removeGoal(AGoal behavior) {
+		goals_.remove(behavior);
 	}
 	
 }
