@@ -6,8 +6,8 @@ import java.util.Queue;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import repast.simphony.space.grid.Grid;
-import syma.behaviors.AGoal;
 import syma.events.UpdateListener;
+import syma.goal.AGoal;
 import syma.main.GridElement;
 
 public class AAgent extends GridElement implements IAgent {
@@ -21,8 +21,8 @@ public class AAgent extends GridElement implements IAgent {
 
 	protected long id_;
 	
-	public AAgent(int x, int y, Grid<GridElement> grid) {
-		super(x, y, grid);
+	public AAgent(Grid<GridElement> grid) {
+		super(grid);
 		id_ = ++ID;
 		goals_ = new LinkedList<AGoal>();
 		listeners_ = new CopyOnWriteArrayList<UpdateListener>();

@@ -5,8 +5,8 @@ import syma.main.GridElement;
 
 public class Road extends AFixedGeography {
 
-	public Road(int x, int y, Grid<GridElement> grid) {
-		super(x, y, grid);
+	public Road(Grid<GridElement> grid) {
+		super(grid);
 	}
 
 }

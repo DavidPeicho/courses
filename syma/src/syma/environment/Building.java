@@ -14,8 +14,8 @@ public class Building extends AFixedGeography {
 	 */
 	public static ArrayList<Building> globalList = new ArrayList<Building>();
 
-	public Building(int x, int y, Grid<GridElement> grid) {
-		super(x, y, grid);
+	public Building(Grid<GridElement> grid) {
+		super(grid);
 	}
 	
 }

@@ -14,7 +14,7 @@ public class HumanStyle extends DefaultStyleOGL2D {
 			HumanAgent a = (HumanAgent)o;
 			float rate = (float)a.getAge() / (float)Const.MAX_AGE;
 			int value = 255 - Math.min((int)(rate * 255.0f), 255);
-			return new Color(value, value, value);
+			return a.getID() == 11 ? new Color(255, 0, 0) : new Color(value, value, value);
 		}
 		return null;
 	}

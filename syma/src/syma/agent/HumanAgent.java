@@ -22,13 +22,14 @@ import java.util.Stack;
 
 import repast.simphony.space.grid.Grid;
 import repast.simphony.space.grid.GridPoint;
-import syma.behaviors.MoveTo;
 import syma.environment.AFixedGeography;
 import syma.environment.Building;
 import syma.environment.Road;
 import syma.environment.WorkPlace;
 import syma.events.EventObject;
 import syma.events.UpdateListener;
+import syma.goal.Follow;
+import syma.goal.MoveTo;
 import syma.main.GridElement;
 import syma.utils.Const;
 
@@ -55,8 +56,8 @@ public class HumanAgent extends AAgent {
 		
 	};
 
-	public HumanAgent(int x, int y, Grid<GridElement> grid, int age, boolean gender) {
-		super(x, y, grid);
+	public HumanAgent(Grid<GridElement> grid, int age, boolean gender) {
+		super(grid);
 		age_ = age;
 		gender_ = gender;
 		maxAge_ = Const.MAX_AGE + (int)((Math.random() * 30) - 15);
@@ -69,8 +70,8 @@ public class HumanAgent extends AAgent {
 		super.step();
 		double deathRate = ((float)age_ / (float)maxAge_) * Math.random();
 
-		// Test Watcher
-		if (!order_ && id_ == 1 && age_ >= 30) {
+		if (!order_ && id_ == 10 && age_ >= 40) {
+			addGoal(new MoveTo(this, workplace_, grid_));
 			order_ = true;
 		}
 
@@ -89,15 +90,15 @@ public class HumanAgent extends AAgent {
 	@Watch(watcheeClassName="syma.agent.HumanAgent",
 		   watcheeFieldNames="order_",
 		   query="linked_from 'genealogy'",
-		   whenToTrigger=WatcherTriggerSchedule.IMMEDIATE)
+		   whenToTrigger=WatcherTriggerSchedule.IMMEDIATE,
+		   triggerCondition="$watcher.getAge() < 18")
 	public void react() {
 		Stream<AAgent> ps = getParents().filter((AAgent a) -> ((HumanAgent)a).getOrder());
 		Optional<AAgent> p = ps.findFirst();
 
 		if (p.isPresent()) {
-			HumanAgent hp = (HumanAgent)p.get();
-			System.out.println("I am " + id_);
-			System.out.println("I received an order from " + hp.getID());
+			LOGGER.log(Level.INFO, "Agent " + id_ + " should follow its parent.");
+			addGoal(new Follow(this, p.get(), grid_));
 		}
 	}
 
