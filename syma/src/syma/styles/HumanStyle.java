@@ -24,7 +24,6 @@ public class HumanStyle extends DefaultStyleOGL2D {
 		if (spatial == null) {
 			spatial = shapeFactory.createCircle(6, 10);
 		}
-			
 		return spatial;
 	}
 

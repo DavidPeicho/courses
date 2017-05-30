@@ -1,6 +1,5 @@
 package syma.utils;
 
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Stack;
@@ -9,9 +8,6 @@ import java.util.logging.Logger;
 
 import repast.simphony.space.grid.Grid;
 import repast.simphony.space.grid.GridPoint;
-import syma.agent.AAgent;
-import syma.agent.HumanAgent;
-import syma.behaviors.MoveTo;
 import syma.environment.AFixedGeography;
 import syma.environment.Road;
 import syma.main.GridElement;
@@ -29,6 +25,7 @@ public class PathSearch {
 	
 	int[] weights_;
 	GridPoint[] previous_;
+	Stack<GridPoint> path_;
 	
 	GridPoint start_;
 	GridPoint dest_;
@@ -43,6 +40,7 @@ public class PathSearch {
 		
 		weights_ = new int[w * h];
 		previous_ = new GridPoint[w * h];
+		path_ = new Stack<GridPoint>();
 		
 		queue_ = new LinkedList<GridPoint>();
 	}
@@ -113,26 +111,25 @@ public class PathSearch {
 		
 	}
 	
-	public void convertToBehavior(AAgent agent) {
+	public Stack<GridPoint> computePath() {
 		if (!found_) {
-			LOGGER.log(Level.WARNING, "Path: no path found but try to add behaviors to agent " + agent.getID());
-			return;
+			LOGGER.log(Level.WARNING, "Path: no path found");
+			return null;
 		}
-		
 		int w = grid_.getDimensions().getWidth();
 		int h = grid_.getDimensions().getHeight();
 		
-		Stack<GridPoint> m = new Stack<GridPoint>();
 		GridPoint curr = dest_;
 		while (curr.getX() != -1 && curr.getY() != -1) {
-			m.push(curr);
+			path_.push(curr);
 			curr = previous_[curr.getX() + curr.getY() * w];
 		}
 		
-		while (!m.isEmpty()) {
-			curr = m.pop();
-			agent.addBehavior(new MoveTo(agent, new GridPoint(curr.getX(), curr.getY()), grid_));
-		}
+		return path_;
+	}
+	
+	public Stack<GridPoint> getPath() {
+		return path_;
 	}
 	
 	private void init(GridPoint start, GridPoint dest) {
@@ -145,7 +142,7 @@ public class PathSearch {
 		found_ = false;
 		
 		queue_.clear();
-		
+		path_.clear();
 		for (int i = 0; i < width * height; ++i) {
 			previous_[i] = null;
 		}

@@ -64,7 +64,7 @@ public class HumanAgent extends AAgent {
 	}
 	
 	@Override
-	@ScheduledMethod(start = 1, interval = 1)
+	@ScheduledMethod(start = 1, interval = 1, priority = 1)
 	public void step() {
 		super.step();
 		double deathRate = ((float)age_ / (float)maxAge_) * Math.random();

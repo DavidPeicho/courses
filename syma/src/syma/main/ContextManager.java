@@ -128,9 +128,7 @@ public class ContextManager implements ContextBuilder<GridElement> {
 			
 			HumanAgent agent = env.createAgent(x, y, grid, age, gender, home, workplace);
 			// DEBUG
-			PathSearch p = new PathSearch(grid);
-			p.search(agent.getPos(), workplace.getPos());
-			p.convertToBehavior(agent);
+			agent.addGoal(new MoveTo(agent, workplace, grid));
 			// END DEBUG
 			
 			home.addAgent(agent);

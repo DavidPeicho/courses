@@ -1,6 +1,6 @@
 package syma.behaviors;
 
-public interface IBehavior {
+public interface IGoal {
 
 	public abstract void update();
 	
