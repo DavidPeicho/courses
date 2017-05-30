@@ -11,8 +11,8 @@ public class AVehicle extends GridElement {
 	protected final CopyOnWriteArrayList<AAgent> agents_;
 	protected int nbSeats_;
 	
-	public AVehicle(int x, int y, Grid<GridElement> grid) {
-		super(x, y, grid);
+	public AVehicle(Grid<GridElement> grid) {
+		super(grid);
 		
 		agents_ = new CopyOnWriteArrayList<AAgent>();
 	}

@@ -5,8 +5,8 @@ import syma.main.GridElement;
 
 public class Bus extends AVehicle {
 
-	public Bus(int x, int y, Grid<GridElement> grid) {
-		super(x, y, grid);
+	public Bus(Grid<GridElement> grid) {
+		super(grid);
 		nbSeats_ = 20;
 	}
 	

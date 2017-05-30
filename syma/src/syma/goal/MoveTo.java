@@ -1,4 +1,4 @@
-package syma.behaviors;
+package syma.goal;
 
 import repast.simphony.space.grid.Grid;
 import repast.simphony.space.grid.GridPoint;
@@ -28,7 +28,7 @@ public class MoveTo extends AGoal {
 		if (path_.getPath().isEmpty()) return;
 		
 		GridPoint dest = path_.getPath().pop();
-		grid_.moveTo(target_, dest.getX(), dest.getY());
+		target_.setPos(dest.getX(), dest.getY());
 	}
 	
 	public GridPoint getDest() {

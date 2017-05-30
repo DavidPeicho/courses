@@ -10,8 +10,8 @@ public abstract class AFixedGeography extends GridElement {
 
 	protected final CopyOnWriteArrayList<AAgent> agents_;
 	
-	public AFixedGeography(int x, int y, Grid<GridElement> grid) {
-		super(x, y, grid);
+	public AFixedGeography(Grid<GridElement> grid) {
+		super(grid);
 		agents_ = new CopyOnWriteArrayList<AAgent>();
 	}
 	

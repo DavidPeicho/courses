@@ -4,36 +4,26 @@ import repast.simphony.space.grid.Grid;
 import repast.simphony.space.grid.GridPoint;
 
 public class GridElement {
-
-	protected int x_;
-	protected int y_;
 	
 	protected Grid<GridElement> grid_;
 
-	public GridElement(int x, int y, Grid<GridElement> grid) {
-		x_ = x;
-		y_ = y;
+	public GridElement(Grid<GridElement> grid) {
 		grid_ = grid;
 	}
 	
 	public GridPoint getPos() {
-		return new GridPoint(x_, y_);
+		return grid_.getLocation(this);
 	}
 	
 	public int getX() {
-		return x_;
+		return getPos().getX();
 	}
 	
 	public int getY() {
-		return y_;
+		return getPos().getY();
 	}
 	
-	public void setX(int val) {
-		x_ = val;
+	public void setPos(int x, int y) {
+		grid_.moveTo(this, x, y);
 	}
-	
-	public void setY(int val) {
-		y_ = val;
-	}
-	
 }

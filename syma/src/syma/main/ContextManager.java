@@ -1,13 +1,14 @@
 package syma.main;
 
 import syma.agent.*;
-import syma.behaviors.MoveTo;
 import syma.environment.AFixedGeography;
 import syma.environment.Building;
 import syma.environment.Road;
 import syma.environment.WorkPlace;
 import syma.exceptions.EnvironmentException;
 import syma.exceptions.SymaException;
+import syma.goal.AGoal;
+import syma.goal.MoveTo;
 import syma.parsing.BaseMap;
 import syma.parsing.GridParser;
 import syma.utils.Const;
@@ -93,12 +94,12 @@ public class ContextManager implements ContextBuilder<GridElement> {
 			
 			GridElement elt = null;
 			if (type.equals("ROAD")) {
-				elt = new Road(relativeX, relativeY, grid);
+				elt = new Road(grid);
 			} else if (type.equals("HOUSE")) {
-				elt = new Building(relativeX, relativeY, grid);
+				elt = new Building(grid);
 				Building.globalList.add((Building)elt);
 			} else if (type.equals("WORKPLACE")) {
-				elt = new WorkPlace(relativeX, relativeY, grid);
+				elt = new WorkPlace(grid);
 				WorkPlace.globalList.add((WorkPlace)elt);
 			}
 			
@@ -126,18 +127,17 @@ public class ContextManager implements ContextBuilder<GridElement> {
 			boolean gender = Math.random() >= 0.5f;
 			int age = (int)(Math.random() * 50.0d + 18.0d);
 			
-			HumanAgent agent = env.createAgent(x, y, grid, age, gender, home, workplace);
-			// DEBUG
-			agent.addGoal(new MoveTo(agent, workplace, grid));
-			// END DEBUG
-			
+			HumanAgent agent = env.createAgent(grid, i == nbAgents - 1 ? 40 : age, gender, home, workplace);
 			home.addAgent(agent);
-
 			context.add(agent);
 			grid.moveTo(agent, x, y);
 
-			if (i == 0) {
-				HumanAgent child = env.createAgent(x, y, grid, 10, gender, home, null);
+			// DEBUG
+			agent.addGoal(new MoveTo(agent, workplace, grid));
+			// END DEBUG
+
+			if (i == nbAgents - 1) {
+				HumanAgent child = env.createAgent(grid, 20, gender, home, workplace);
 				home.addAgent(child);
 				context.add(child);
 				grid.moveTo(child, x, y);
@@ -172,5 +172,4 @@ public class ContextManager implements ContextBuilder<GridElement> {
 		return elt;
 		
 	}
-
 }

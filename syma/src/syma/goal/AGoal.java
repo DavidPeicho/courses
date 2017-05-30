@@ -1,4 +1,4 @@
-package syma.behaviors;
+package syma.goal;
 
 import syma.agent.AAgent;
 

@@ -14,8 +14,8 @@ public class WorkPlace extends AFixedGeography {
 	 */
 	public static ArrayList<WorkPlace> globalList = new ArrayList<WorkPlace>();
 	
-	public WorkPlace(int x, int y, Grid<GridElement> grid) {
-		super(x, y, grid);
+	public WorkPlace(Grid<GridElement> grid) {
+		super(grid);
 	}
 
 }
