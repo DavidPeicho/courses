@@ -14,22 +14,17 @@ import repast.simphony.space.graph.RepastEdge;
 import repast.simphony.space.grid.Grid;
 import repast.simphony.util.ContextUtils;
 
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.Optional;
-import java.util.Queue;
-import java.util.Stack;
 
-import repast.simphony.space.grid.Grid;
 import repast.simphony.space.grid.GridPoint;
 import syma.environment.AFixedGeography;
 import syma.environment.Building;
-import syma.environment.Road;
 import syma.environment.WorkPlace;
-import syma.events.EventObject;
-import syma.events.UpdateListener;
 import syma.goal.Follow;
 import syma.goal.MoveTo;
+import syma.events.AEventObject;
+import syma.events.EventTimeObject;
+import syma.events.IUpdateListener;
 import syma.main.GridElement;
 import syma.utils.Const;
 
@@ -47,21 +42,37 @@ public class HumanAgent extends AAgent {
 
 	private float maxAge_;
 
-	private UpdateListener yearListener_ = new UpdateListener() {
-
+	private IUpdateListener yearListener_ = new IUpdateListener() {
+		
 		@Override
-		public void updateEvent(EventObject e) {
-			++age_;
+		public void updateEvent(AEventObject e) {
+			if (e == null) return;
+			
+			EventTimeObject obj = (EventTimeObject)e;
+			if (obj.type == EventTimeObject.Type.YEAR) {
+				++age_;
+			} else if (obj.type == EventTimeObject.Type.MORNING_HOUR) {
+				Stream<AAgent> c = getChildren(); 
+				if (c != null && !c.findFirst().isPresent() && workplace_ != null) {
+					//HumanAgent.this.addGoal(new MoveTo(HumanAgent.this, workplace_, grid_));
+				}
+			}	
 		}
 		
 	};
 
-	public HumanAgent(Grid<GridElement> grid, int age, boolean gender) {
+	public HumanAgent(Grid<GridElement> grid, int age, boolean gender, WorkPlace workplace) {
 		super(grid);
 		age_ = age;
 		gender_ = gender;
 		maxAge_ = Const.MAX_AGE + (int)((Math.random() * 30) - 15);
+		workplace_ = workplace;
 		order_ = false;
+	}
+	
+	@Override
+	@ScheduledMethod(start = 1, interval = 1, priority = 2)
+	public void decide() {
 	}
 	
 	@Override
@@ -133,7 +144,7 @@ public class HumanAgent extends AAgent {
 	}
 
 
-	public UpdateListener getYearListener() {
+	public IUpdateListener getYearListener() {
 		return yearListener_;
 	}
 
@@ -150,7 +161,10 @@ public class HumanAgent extends AAgent {
 	}
 
 	public Stream<AAgent> getRelatedAgent(double relationship, boolean in) {
-		Network n = (Network)ContextUtils.getContext(this).getProjection("genealogy");
+		Context c = ContextUtils.getContext(this);
+		if (c == null) return null;
+		
+		Network n = (Network)c.getProjection("genealogy");
 		Iterable<RepastEdge> edges = in ? n.getInEdges(this) : n.getOutEdges(this);
 		return StreamSupport.stream(edges.spliterator(), false)
 				.filter((RepastEdge e) -> e.getWeight() == relationship)

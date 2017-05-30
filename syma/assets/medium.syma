@@ -1,0 +1,62 @@
+{
+
+    "size": {
+        "width": "50",
+        "height": "20"
+    },
+
+    "map": "
+        rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr
+        --r-a-----a--r--a-----a-r----------------------a-r
+        --r--b-a-----r----a-b---r----------b-------------r
+        --rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr
+        --r----------------------------r---------s----r--r
+        --r----------------------------r--------------r--r
+        --r----------------------------rrrrrrrrrrrrrrrrrrr
+        --r-rrrrrrrrrrrrrrrrrrrrrr-----r-r-r-r-r-r-r-r-r-r
+        --r-r-----------s--------r-----rhrhrhrhrhrhrhrhrhr
+        --r-r-r-h-h-h-rrrrrr-h-h-r-----rhrhrhrhrhrhrhrhrhr
+        --r-rrrrrrrrrrr--r-rrrrrrr-----rhrhrhrhrhrhrhrhrhr
+        --r--------------r-------------rhrhrhrhrhrhrhrhrhr
+        --r-hhh-hhh-hhh-sr-------------rhrhrhrhrhrhrhrhrhr
+        -rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrhrhrhrhrhrhrhrhrhr
+        -r---------------------------------------r-------r
+        rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr
+        rb-b-brb-b-br-r-r-hhhhhhhhhhhhhhhhhhhhhhhhhhhhhh-r
+        rb----r----br-r-r-hhhhhhhhhhhhhhhhhhhhhhhhhhhhhh-r
+        rb-b-brb-b-br-r-rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr
+        rrrrrrrrrrrrrrrrr-hhhhhhhhhhhhhhhhhhhhhhhhhhhhhh-r
+    ",
+
+    "bus": [
+
+    ],
+
+    "props": [
+        {
+            "key": "-",
+            "type": "NONE"
+        },
+        {
+            "key": "h",
+            "type": "HOUSE"
+        },
+        {
+            "key": "a",
+            "type": "WORKPLACE"
+        },
+        {
+            "key": "b",
+            "type": "BAR"
+        },
+        {
+            "key": "s",
+            "type": "SCHOOL"
+        },
+        {
+            "key": "r",
+            "type": "ROAD"
+        }
+    ]
+
+}

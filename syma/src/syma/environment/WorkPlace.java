@@ -14,8 +14,24 @@ public class WorkPlace extends AFixedGeography {
 	 */
 	public static ArrayList<WorkPlace> globalList = new ArrayList<WorkPlace>();
 	
-	public WorkPlace(Grid<GridElement> grid) {
+	private int startHour_;
+	private int endHour_;
+	
+	public WorkPlace(int x, int y, Grid<GridElement> grid) {
 		super(grid);
+		
+		startHour_ = 9;
+		endHour_ = 18;
+	}
+	
+	/* GETTERS // SETTERS */
+	
+	public int getStartHour() {
+		return startHour_;
+	}
+	
+	public int getEndHour() {
+		return endHour_;
 	}
 
 }

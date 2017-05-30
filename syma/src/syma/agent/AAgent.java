@@ -1,12 +1,11 @@
 package syma.agent;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import repast.simphony.space.grid.Grid;
-import syma.events.UpdateListener;
+import syma.events.IUpdateListener;
 import syma.goal.AGoal;
 import syma.main.GridElement;
 
@@ -17,7 +16,7 @@ public class AAgent extends GridElement implements IAgent {
 	protected int speed_;
 	
 	protected final Queue<AGoal> goals_;
-	protected final CopyOnWriteArrayList<UpdateListener> listeners_;
+	protected final CopyOnWriteArrayList<IUpdateListener> listeners_;
 
 	protected long id_;
 	
@@ -25,7 +24,7 @@ public class AAgent extends GridElement implements IAgent {
 		super(grid);
 		id_ = ++ID;
 		goals_ = new LinkedList<AGoal>();
-		listeners_ = new CopyOnWriteArrayList<UpdateListener>();
+		listeners_ = new CopyOnWriteArrayList<IUpdateListener>();
 	}
 	
 	/* GETTERS // SETTERS */
@@ -34,9 +33,7 @@ public class AAgent extends GridElement implements IAgent {
 	}
 	
 	@Override
-	public void decide() {
-	
-	}
+	public void decide() { }
 
 	@Override
 	public void step() {
