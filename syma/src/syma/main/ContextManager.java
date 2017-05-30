@@ -3,16 +3,11 @@ package syma.main;
 import syma.agent.*;
 import syma.environment.AFixedGeography;
 import syma.environment.Building;
-import syma.environment.Road;
 import syma.environment.WorkPlace;
-import syma.exceptions.EnvironmentException;
-import syma.exceptions.SymaException;
-import syma.goal.AGoal;
 import syma.goal.MoveTo;
 import syma.parsing.BaseMap;
 import syma.parsing.GridParser;
 import syma.utils.Const;
-import syma.utils.PathSearch;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -34,7 +29,7 @@ public class ContextManager implements ContextBuilder<GridElement> {
 
 	@Override
 	public Context build(Context<GridElement> context) {
-		
+		context.clear();
 		context.setId("moutouCity");
 		
 		int width = 10;
@@ -57,6 +52,8 @@ public class ContextManager implements ContextBuilder<GridElement> {
 		
 		if (map == null) return context;
 		
+		init();
+		
 		GodAgent.init(grid);
 		context.add(GodAgent.instance());
 		grid.moveTo(GodAgent.instance(), 0, 0);
@@ -74,11 +71,17 @@ public class ContextManager implements ContextBuilder<GridElement> {
 		spawnDefaultAgents(nbAgents, context, grid);
 		
 		return context;
+	}
+	
+	private void init() {
+	
+		Building.globalList.clear();
+		WorkPlace.globalList.clear();
 		
 	}
 	
 	private void buildGrid(BaseMap map, int w, int h, Context<GridElement> context, Grid<GridElement> grid) {
-		
+				
 		String mapStr = map.getRawMap();
 		for (int i = 0; i < mapStr.length(); ++i) {
 			char val = mapStr.charAt(i);
@@ -91,17 +94,8 @@ public class ContextManager implements ContextBuilder<GridElement> {
 			
 			int relativeX = x;
 			int relativeY = h - 1 - y;
-			
-			GridElement elt = null;
-			if (type.equals("ROAD")) {
-				elt = new Road(grid);
-			} else if (type.equals("HOUSE")) {
-				elt = new Building(grid);
-				Building.globalList.add((Building)elt);
-			} else if (type.equals("WORKPLACE")) {
-				elt = new WorkPlace(grid);
-				WorkPlace.globalList.add((WorkPlace)elt);
-			}
+
+			AFixedGeography elt = GridParser.instance().typeToFixedGeography(type, relativeX, relativeY, grid);
 			
 			if (elt == null) continue;
 			
@@ -128,13 +122,10 @@ public class ContextManager implements ContextBuilder<GridElement> {
 			int age = (int)(Math.random() * 50.0d + 18.0d);
 			
 			HumanAgent agent = env.createAgent(grid, i == nbAgents - 1 ? 40 : age, gender, home, workplace);
+		
 			home.addAgent(agent);
 			context.add(agent);
 			grid.moveTo(agent, x, y);
-
-			// DEBUG
-			agent.addGoal(new MoveTo(agent, workplace, grid));
-			// END DEBUG
 
 			if (i == nbAgents - 1) {
 				HumanAgent child = env.createAgent(grid, 20, gender, home, workplace);

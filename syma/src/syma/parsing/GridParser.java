@@ -1,12 +1,22 @@
 package syma.parsing;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonObject;
+
+import repast.simphony.space.grid.Grid;
+import repast.simphony.space.grid.GridPoint;
+import syma.environment.AFixedGeography;
+import syma.environment.Bar;
+import syma.environment.Building;
+import syma.environment.Road;
+import syma.environment.School;
+import syma.environment.WorkPlace;
+import syma.main.GridElement;
+import syma.utils.Const;
 
 
 public class GridParser {
@@ -41,5 +51,29 @@ public class GridParser {
 		return result;
 		
 	}
+	
+	public AFixedGeography typeToFixedGeography(String type, int x, int y, Grid<GridElement> grid) {
+		AFixedGeography result = null;
+		switch (type) {
+			case Const.BAR_TYPE:
+				result = new Bar(grid);
+				break;
+			case Const.ROAD_TYPE:
+				result = new Road(grid);
+				break;
+			case Const.HOUSE_TYPE:
+				result = new Building(grid);
+				Building.globalList.add((Building)result);
+				break;
+			case Const.SCHOOL_TYPE:
+				result = new School(grid);
+				break;
+			case Const.WORKPLACE_TYPE:
+				result = new WorkPlace(x, y, grid);
+				WorkPlace.globalList.add((WorkPlace)result);
+				break;
+		}
+		return result;
+	} 
 	
 }

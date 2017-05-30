@@ -1,19 +1,23 @@
 package syma.agent;
 
+import java.util.ArrayList;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import repast.simphony.engine.schedule.ScheduledMethod;
 import repast.simphony.space.grid.Grid;
 import syma.environment.Building;
 import syma.environment.WorkPlace;
-import syma.events.UpdateListener;
+import syma.events.AEventObject;
+import syma.events.EventTimeObject;
+import syma.events.IUpdateListener;
 import syma.main.GridElement;
+import syma.utils.Const;
 
 public class GodAgent extends AAgent {
 
 	private static GodAgent instance_ = null;
 	
-	protected final CopyOnWriteArrayList<UpdateListener> yearListeners_;
+	protected final ArrayList<IUpdateListener> timeListeners_;
 	
 	private long year_;
 	private long day_;
@@ -22,7 +26,7 @@ public class GodAgent extends AAgent {
 	
 	public GodAgent(Grid<GridElement> grid) {
 		super(grid);
-		yearListeners_ = new CopyOnWriteArrayList<UpdateListener>();
+		timeListeners_ = new ArrayList<IUpdateListener>();
 		day_ = 0;
 		hour_ = 0;
 		min_ = 0;
@@ -46,35 +50,46 @@ public class GodAgent extends AAgent {
 		if (min_ == 60) {
 			min_ = 0;
 			++hour_;
+			if (hour_ == Const.MORNING_HOUR) {
+				callEvt(new EventTimeObject(EventTimeObject.Type.MORNING_HOUR));
+			}
 		}
-		if (hour_ == 1) {
+		if (hour_ == 24) {
 			++day_;
 			hour_ = 0;
 		}
 		if (day_ == 365) {
 			day_ = 0;
 			++year_;
-			// Calls every listener for new year event
-			yearListeners_.forEach((UpdateListener e) -> {
-				e.updateEvent(null);
-			});
+			callEvt(new EventTimeObject(EventTimeObject.Type.YEAR));
 		}
+		
 	}
 	
 	public HumanAgent createAgent(Grid<GridElement> grid, int age, boolean gender, Building home, WorkPlace workplace) {
 		
-		HumanAgent agent = new HumanAgent(grid, age, gender);
+		HumanAgent agent = new HumanAgent(grid, age, gender, workplace);
 		agent.setHome(home);
 		agent.setWorkPlace(workplace);
 	
-		yearListeners_.add(agent.getYearListener());
+		timeListeners_.add(agent.getYearListener());
 		
 		return agent;
 	}
 	
 	/* GETTERS // SETTERS */
-	public void setGrid() {
-		
+	public int getHour() {
+		return hour_;
+	}
+	
+	public int getMin() {
+		return min_;
+	}
+	
+	private void callEvt(AEventObject o) {
+		timeListeners_.forEach((IUpdateListener e) -> {
+			e.updateEvent(o);
+		});	
 	}
 	
 }
