@@ -1,6 +1,7 @@
 package syma.goal;
 
 import syma.agent.AAgent;
+import syma.events.AEventObject;
 import syma.events.IUpdateListener;
 
 public abstract class AGoal implements IGoal {
@@ -8,20 +9,31 @@ public abstract class AGoal implements IGoal {
 	protected final AAgent target_;
 	protected IUpdateListener callback_;
 	
-	public AGoal(AAgent target) {
+	public AGoal(AAgent target, IUpdateListener callback) {
 		target_ = target;
+		callback_ = callback;
 	}
 	
 	@Override
 	public abstract void update();
 	
-	public void imply(AGoal goal) {
-		target_.addGoal(goal);
-		target_.removeGoal(this);
+	@Override
+	public boolean success() {
+		return false;
+	}
+
+	@Override
+	public void refresh() {
 	}
 	
 	public void addCallback(IUpdateListener l) {
 		callback_ = l;
+	}
+
+	public void triggerCallback(AEventObject o) {
+		if (callback_ != null) {
+			callback_.updateEvent(o);
+		}
 	}
 
 }

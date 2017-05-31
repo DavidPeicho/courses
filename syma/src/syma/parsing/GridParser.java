@@ -69,9 +69,10 @@ public class GridParser {
 				break;
 			case Const.SCHOOL_TYPE:
 				result = new School(grid);
+				School.globalList.add((School)result);
 				break;
 			case Const.WORKPLACE_TYPE:
-				result = new WorkPlace(x, y, grid);
+				result = new WorkPlace(grid);
 				WorkPlace.globalList.add((WorkPlace)result);
 				break;
 		}

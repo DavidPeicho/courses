@@ -17,7 +17,7 @@ public class WorkPlace extends AFixedGeography {
 	private int startHour_;
 	private int endHour_;
 	
-	public WorkPlace(int x, int y, Grid<GridElement> grid) {
+	public WorkPlace(Grid<GridElement> grid) {
 		super(grid);
 		
 		startHour_ = 9;
