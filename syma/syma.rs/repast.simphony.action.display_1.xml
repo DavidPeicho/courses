@@ -34,6 +34,10 @@
       <string>syma.environment.Road</string>
       <string>syma.styles.GeographyStyle</string>
     </entry>
+    <entry>
+      <string>syma.agent.Tram</string>
+      <string>repast.simphony.visualization.editedStyle.EditedStyle2D</string>
+    </entry>
   </styles>
   <editedStyles>
     <entry>
@@ -68,6 +72,10 @@
       <string>syma.environment.Road</string>
       <null/>
     </entry>
+    <entry>
+      <string>syma.agent.Tram</string>
+      <string>syma.agent.Tram.style_2.xml</string>
+    </entry>
   </editedStyles>
   <netStyles/>
   <editedNetStyles/>
@@ -79,7 +87,7 @@
     <pType>LAST</pType>
     <duration>-1.0</duration>
     <frequency>REPEAT</frequency>
-    <hashCode>688324920</hashCode>
+    <hashCode>1478454037</hashCode>
   </schedParams>
   <layoutClassName>foo.bar.baz</layoutClassName>
   <layoutProjection>grid</layoutProjection>
@@ -87,7 +95,7 @@
   <layerOrder>
     <entry>
       <string>syma.environment.Bar</string>
-      <int>3</int>
+      <int>4</int>
     </entry>
     <entry>
       <string>syma.environment.Ground</string>
@@ -95,11 +103,11 @@
     </entry>
     <entry>
       <string>syma.environment.Building</string>
-      <int>5</int>
+      <int>6</int>
     </entry>
     <entry>
       <string>syma.environment.WorkPlace</string>
-      <int>4</int>
+      <int>5</int>
     </entry>
     <entry>
       <string>syma.environment.BusStop</string>
@@ -107,15 +115,19 @@
     </entry>
     <entry>
       <string>syma.agent.HumanAgent</string>
-      <int>7</int>
+      <int>8</int>
     </entry>
     <entry>
       <string>syma.environment.School</string>
-      <int>6</int>
+      <int>7</int>
     </entry>
     <entry>
       <string>syma.environment.Road</string>
       <int>0</int>
+    </entry>
+    <entry>
+      <string>syma.agent.Tram</string>
+      <int>3</int>
     </entry>
   </layerOrder>
   <projections>

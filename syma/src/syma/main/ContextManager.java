@@ -88,6 +88,8 @@ public class ContextManager implements ContextBuilder<GridElement> {
 	private void parseBus(BaseMap map, Context<GridElement> context, Grid<GridElement> grid) {
 		ArrayList<BusStop> stops = parseBusStops(map, context, grid);
 		Tram t = new Tram(grid, stops);
+		context.add(t);
+		grid.moveTo(t, t.getStart().getX(), t.getStart().getY());
 	}
 	
 	private ArrayList<BusStop> parseBusStops(BaseMap map, Context<GridElement> context, Grid<GridElement> grid) {
