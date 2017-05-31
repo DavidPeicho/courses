@@ -34,6 +34,13 @@ public class MoveTo extends AGoal {
 
 	@Override
 	public void update() {
+		if (target_.getX() == dest_.getX() && target_.getY() == dest_.getY()) {
+			triggerCallback(null);
+			if (autoRemoveWhenReached_) {
+				target_.pollGoal();
+			}
+			return;
+		}
 		if (dest_ == null) {
 			triggerCallback(null);
 			return;

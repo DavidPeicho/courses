@@ -26,6 +26,9 @@ public class Const {
 	public static final double MARRIEDTO = 1;
 	public static final double PARENTOF = 2;
 	
+	/* BUS */
+	public static final int BUS_WAITING_TIME = 10;
+	
 	/* GRID TYPE */
 	public static final String NONE_TYPE = "NONE";
 	public static final String BAR_TYPE = "BAR";
