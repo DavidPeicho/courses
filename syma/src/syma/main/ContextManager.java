@@ -41,6 +41,8 @@ public class ContextManager implements ContextBuilder<GridElement> {
 		
 		String pathToMap = RunEnvironment.getInstance().getParameters().getString("mapPath");
 		int nbAgents = RunEnvironment.getInstance().getParameters().getInteger("maxNbAgents");
+		Const.MINUTE_TIME_FACTOR = RunEnvironment.getInstance().getParameters().getInteger("timeFactor");
+
 		try {
 			map = GridParser.instance().parse(pathToMap);
 			width = map.getWidth();

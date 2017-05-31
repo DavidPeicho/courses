@@ -85,7 +85,6 @@ public class HumanAgent extends AAgent {
 					if (hasToBringToSchool()) {
 						addGoal(new MoveTo(HumanAgent.this, bringToSchoolListener_, school_.get(), grid_));
 						order_ = true;
-						System.out.println("ORDER TRIGGERED ON " + getID());
 					} else {
 						HumanAgent.this.addGoalMoveToWork();
 					}
@@ -258,7 +257,8 @@ public class HumanAgent extends AAgent {
 			}
 
 		};
-		Wait waitAtWork = new Wait(HumanAgent.this, callback, Const.timeToTick(0, 3, 0));
+		int workHour = workplace_.getEndHour() - workplace_.getStartHour();
+		Wait waitAtWork = new Wait(HumanAgent.this, callback, Const.timeToTick(0, workHour, 0));
 		this.addGoal(waitAtWork);
 	}
 

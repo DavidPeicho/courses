@@ -60,6 +60,7 @@ public class GodAgent extends AAgent {
 			++day_;
 			hour_ = 0;
 		}
+
 		if (Const.dayToMin(day_) >= (Const.YEAR_IN_MIN / Const.MINUTE_TIME_FACTOR)) {
 			day_ = 0;
 			++year_;
