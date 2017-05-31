@@ -76,7 +76,7 @@ public class HumanAgent extends AAgent {
 			if (obj.type == EventTimeObject.Type.YEAR) {
 				++age_;
 				System.out.println("Age is " + age_ + " Married at " + searchPartnerAge_);
-				if (age_ == searchPartnerAge_) {
+				if (age_ == searchPartnerAge_ && !HumanAgent.this.hasCompanion()) {
 					findPartner();
 				}
 			} else if (obj.type == EventTimeObject.Type.MORNING_HOUR) {
@@ -85,6 +85,7 @@ public class HumanAgent extends AAgent {
 					if (hasToBringToSchool()) {
 						addGoal(new MoveTo(HumanAgent.this, bringToSchoolListener_, school_.get(), grid_));
 						order_ = true;
+						System.out.println("ORDER TRIGGERED ON " + getID());
 					} else {
 						HumanAgent.this.addGoalMoveToWork();
 					}
@@ -98,9 +99,11 @@ public class HumanAgent extends AAgent {
 		age_ = age;
 		gender_ = gender;
 		maxAge_ = Const.MAX_AGE + (int)((Math.random() * 30) - 15);
-		home_ = home;
 		workplace_ = workplace;
 		order_ = false;
+		
+		home_ = home;
+		home_.addAgent(this);
 		
 		PathSearch ps = new PathSearch(grid_);
 		school_ = School.globalList.stream().sorted(
@@ -143,6 +146,8 @@ public class HumanAgent extends AAgent {
 	private void die() {
 		LOGGER.log(Level.INFO, "Agent " + id_ + " died at " + age_);
 		
+		GodAgent env = GodAgent.instance();
+		
 		// Removes link between companion
 		Optional<AAgent> partner = this.getCompanions().findFirst();
 		if (partner.isPresent()) {
@@ -159,6 +164,8 @@ public class HumanAgent extends AAgent {
 			LOGGER.log(Level.INFO, "A new house is now available and living.");
 		}
 		
+		env.timeListeners_.remove(this.yearListener_);
+		
 		Context<HumanAgent> context = ContextUtils.getContext(this);
 		context.remove(this);
 	}
@@ -173,7 +180,9 @@ public class HumanAgent extends AAgent {
 			if (!(e instanceof HumanAgent)) return false;
 			
 			HumanAgent a = (HumanAgent)e;
-			return a.gender_ != gender_ && !a.hasCompanion();
+			if (a.getID() == id_) return false;
+			
+			return a.gender_ != gender_ && !a.hasCompanion() && a.getParents().anyMatch(p -> p != e);
 		});
 		
 		Optional<HumanAgent> opt = agents.findFirst(); 
@@ -185,7 +194,15 @@ public class HumanAgent extends AAgent {
 			
 			partner.setHome(this.home_);
 			
+			// Spawns a child agent
+			GodAgent env = GodAgent.instance();
+			HumanAgent child = env.createChildAgent(grid_, home_);
+			context.add(child);
+			grid_.moveTo(child, home_.getX(), home_.getY());
+			n.addEdge(this, child, Const.PARENTOF);
+			
 			LOGGER.log(Level.INFO, "Agent " + id_ + " get married with Agent " + partner.getID());
+			LOGGER.log(Level.INFO, "A new agent is born from " + id_ + " and " + partner.getID());
 		}
 		
 	}
@@ -241,6 +258,10 @@ public class HumanAgent extends AAgent {
 	}
 
 	/* GETTERS // SETTERS */
+	
+	public boolean getGender() {
+		return gender_;
+	}
 
 	public int getAge() {
 		return age_;
@@ -263,10 +284,6 @@ public class HumanAgent extends AAgent {
 
 	public WorkPlace getWorkPlace() {
 		return workplace_;
-	}
-
-	public void setOrder(boolean order) {
-		order_ = order;
 	}
 
 	public boolean getOrder() {

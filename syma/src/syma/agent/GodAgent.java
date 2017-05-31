@@ -17,7 +17,7 @@ public class GodAgent extends AAgent {
 
 	private static GodAgent instance_ = null;
 	
-	protected final ArrayList<IUpdateListener> timeListeners_;
+	protected final CopyOnWriteArrayList<IUpdateListener> timeListeners_;
 	
 	private long year_;
 	private long day_;
@@ -26,7 +26,7 @@ public class GodAgent extends AAgent {
 	
 	public GodAgent(Grid<GridElement> grid) {
 		super(grid);
-		timeListeners_ = new ArrayList<IUpdateListener>();
+		timeListeners_ = new CopyOnWriteArrayList<IUpdateListener>();
 	}
 	
 	public static void init(Grid<GridElement> grid) {
@@ -48,7 +48,7 @@ public class GodAgent extends AAgent {
 	@Override
 	@ScheduledMethod(start = 1, interval = 1)
 	public void step() {
-		min_ += Const.MINUTE_TIME_FACTOR;
+		++min_;
 		if (min_ >= 60) {
 			min_ = 0;
 			++hour_;
@@ -60,7 +60,7 @@ public class GodAgent extends AAgent {
 			++day_;
 			hour_ = 0;
 		}
-		if (day_ >= 365) {
+		if (Const.dayToMin(day_) >= (Const.YEAR_IN_MIN / Const.MINUTE_TIME_FACTOR)) {
 			day_ = 0;
 			++year_;
 			callEvt(new EventTimeObject(EventTimeObject.Type.YEAR));
@@ -71,10 +71,17 @@ public class GodAgent extends AAgent {
 	public HumanAgent createAgent(Grid<GridElement> grid, int age, boolean gender, Building home, WorkPlace workplace) {
 		
 		HumanAgent agent = new HumanAgent(grid, age, gender, home, workplace);
-	
 		timeListeners_.add(agent.getYearListener());
 		
 		return agent;
+	}
+	
+	public HumanAgent createChildAgent(Grid<GridElement> grid, Building home) {
+		
+		HumanAgent a = new HumanAgent(grid, 1, Math.random() >= 0.5f, home, null);
+		timeListeners_.add(a.getYearListener());
+		
+		return a;
 	}
 	
 	/* GETTERS // SETTERS */

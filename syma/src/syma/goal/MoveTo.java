@@ -44,12 +44,7 @@ public class MoveTo extends AGoal {
 		GridPoint dest = path_.getPath().pop();
 		target_.setPos(dest.getX(), dest.getY());
 		
-		if (dest.getX() == dest_.getX() && dest.getY() == dest_.getY()) {
-			triggerCallback(null);
-			if (autoRemoveWhenReached_) {
-				target_.pollGoal();
-			}
-		}
+		if (success()) target_.pollGoal();
 
 	}
 

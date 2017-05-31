@@ -165,7 +165,7 @@ public class ContextManager implements ContextBuilder<GridElement> {
 			
 			HumanAgent agent = env.createAgent(grid, age, gender, home, workplace);
 		
-			home.addAgent(agent);
+			//home.addAgent(agent);
 			context.add(agent);
 			grid.moveTo(agent, x, y);
 

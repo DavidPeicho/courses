@@ -14,9 +14,11 @@ public class Wait extends AGoal {
 	@Override
 	public void update() {
 		tickNb_--;
-		if (tickNb_ == 0) {
-			triggerCallback(null);
-		}
+	}
+	
+	@Override
+	public boolean success() {
+		return tickNb_ <= 0;
 	}
 
 }
