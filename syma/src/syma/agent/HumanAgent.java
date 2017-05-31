@@ -12,18 +12,19 @@ import repast.simphony.engine.watcher.WatcherTriggerSchedule;
 import repast.simphony.space.graph.Network;
 import repast.simphony.space.graph.RepastEdge;
 import repast.simphony.space.grid.Grid;
+import repast.simphony.space.grid.GridPoint;
 import repast.simphony.util.ContextUtils;
 
 import java.util.Optional;
+import java.util.Random;
 
-import repast.simphony.space.grid.GridPoint;
-import syma.environment.AFixedGeography;
 import syma.environment.Building;
 import syma.environment.School;
 import syma.environment.WorkPlace;
 import syma.goal.AGoal;
 import syma.goal.Follow;
 import syma.goal.MoveTo;
+import syma.goal.Wait;
 import syma.events.AEventObject;
 import syma.events.EventTimeObject;
 import syma.events.IUpdateListener;
@@ -37,6 +38,7 @@ public class HumanAgent extends AAgent {
 	private static Logger LOGGER = Logger.getLogger(HumanAgent.class.getName());
 
 	private int age_;
+	private int searchPartnerAge_;
 	private boolean gender_;
 
 	private Building home_;
@@ -48,7 +50,7 @@ public class HumanAgent extends AAgent {
 
 	private IUpdateListener bringToSchoolListener_ = (AEventObject o) -> {
 		HumanAgent.this.pollGoal();
-		HumanAgent.this.addGoal(new MoveTo(HumanAgent.this, null, workplace_, grid_));
+		HumanAgent.this.addGoalMoveToWork();
 	};
 
 	private boolean hasToWork() { return workplace_ != null; }
@@ -73,14 +75,18 @@ public class HumanAgent extends AAgent {
 			EventTimeObject obj = (EventTimeObject)e;
 			if (obj.type == EventTimeObject.Type.YEAR) {
 				++age_;
+				System.out.println("Age is " + age_ + " Married at " + searchPartnerAge_);
+				if (age_ == searchPartnerAge_) {
+					findPartner();
+				}
 			} else if (obj.type == EventTimeObject.Type.MORNING_HOUR) {
-				if (hasToWork()) {
+				if (age_ >= 18 && hasToWork()) {
 					// FIXME they won't go to school if it doesn't have a job!!!!!
 					if (hasToBringToSchool()) {
 						addGoal(new MoveTo(HumanAgent.this, bringToSchoolListener_, school_.get(), grid_));
 						order_ = true;
 					} else {
-						addGoal(new MoveTo(HumanAgent.this, null, workplace_, grid_));
+						HumanAgent.this.addGoalMoveToWork();
 					}
 				}
 			}
@@ -95,6 +101,7 @@ public class HumanAgent extends AAgent {
 		home_ = home;
 		workplace_ = workplace;
 		order_ = false;
+		
 		PathSearch ps = new PathSearch(grid_);
 		school_ = School.globalList.stream().sorted(
 				(School s1, School s2) -> {
@@ -103,6 +110,9 @@ public class HumanAgent extends AAgent {
 					int d2 = ps.search(h, s2.getPos()).length;
 					return d2 - d1;
 				}).findFirst();
+		
+		Random rand = new Random();
+		searchPartnerAge_ = rand.nextInt(Const.MAX_SEARCH_PARTNER_AGE + 1 - 18) + 18;
 	}
 
 	@Override
@@ -132,20 +142,62 @@ public class HumanAgent extends AAgent {
 
 	private void die() {
 		LOGGER.log(Level.INFO, "Agent " + id_ + " died at " + age_);
-
+		
+		// Removes link between companion
+		Optional<AAgent> partner = this.getCompanions().findFirst();
+		if (partner.isPresent()) {
+			Context<HumanAgent> context = ContextUtils.getContext(this);
+			Network n = (Network)context.getProjection("genealogy");
+			n.getEdges(this).forEach(e -> {
+				n.removeEdge((RepastEdge)e);
+			});
+		}
+		
+		// Removes agent from home
+		home_.removeAgent(this);
+		if (home_.isEmpty()) {
+			LOGGER.log(Level.INFO, "A new house is now available and living.");
+		}
+		
 		Context<HumanAgent> context = ContextUtils.getContext(this);
 		context.remove(this);
 	}
-
+	
+	/**
+	 * Searches through every agents to find
+	 * a partner to live with.
+	 */
+	private void findPartner() {
+		Context<HumanAgent> context = ContextUtils.getContext(this);
+		Stream<HumanAgent> agents = context.stream().filter((GridElement e) -> {
+			if (!(e instanceof HumanAgent)) return false;
+			
+			HumanAgent a = (HumanAgent)e;
+			return a.gender_ != gender_ && !a.hasCompanion();
+		});
+		
+		Optional<HumanAgent> opt = agents.findFirst(); 
+		if (opt.isPresent()) {
+			HumanAgent partner = opt.get();
+			Network n = (Network)context.getProjection("genealogy");
+			n.addEdge(partner, this, Const.MARRIEDTO);
+			n.addEdge(this, partner, Const.MARRIEDTO);
+			
+			partner.setHome(this.home_);
+			
+			LOGGER.log(Level.INFO, "Agent " + id_ + " get married with Agent " + partner.getID());
+		}
+		
+	}
+	
 	@Watch(watcheeClassName="syma.agent.HumanAgent",
 			watcheeFieldNames="order_",
 			query="linked_from 'genealogy'",
 			whenToTrigger=WatcherTriggerSchedule.LATER,
-			triggerCondition="$watcher.getAge() < 18")
+			triggerCondition="$watcher.getAge() < 18 && $watcher.isParent($watchee)")
 	public void react() {
 		Stream<AAgent> ps = getParents().filter((AAgent a) -> ((HumanAgent)a).getOrder());
 		Optional<AAgent> p = ps.findFirst();
-
 		if (p.isPresent()) {
 			LOGGER.log(Level.INFO, "Agent " + id_ + " should follow its parent " + p.get().getID());
 			IUpdateListener clbk = (AEventObject o) -> {
@@ -157,6 +209,36 @@ public class HumanAgent extends AAgent {
 			peekGoal().triggerCallback(new SuccessEvent());
 		}
 	}
+	
+	public void addGoalMoveToWork() {
+		IUpdateListener callback = new IUpdateListener() {
+
+			@Override
+			public void updateEvent(AEventObject e) {
+				HumanAgent.this.pollGoal();
+				HumanAgent.this.addGoalWaitAtWork();
+			}
+			
+		};
+		MoveTo moveToWork = new MoveTo(HumanAgent.this, callback, workplace_, grid_); 
+		this.addGoal(moveToWork);
+	}
+	
+	public void addGoalWaitAtWork() {
+		IUpdateListener callback = new IUpdateListener() {
+
+			@Override
+			public void updateEvent(AEventObject e) {
+				HumanAgent.this.pollGoal();
+				MoveTo moveToHouse = new MoveTo(HumanAgent.this, null, home_, grid_);
+				moveToHouse.setAutoremoveWhenReached(true);
+				HumanAgent.this.addGoal(moveToHouse);
+			}
+			
+		};
+		Wait waitAtWork = new Wait(HumanAgent.this, callback, Const.timeToTick(0, 3, 0));
+		this.addGoal(waitAtWork);
+	}
 
 	/* GETTERS // SETTERS */
 
@@ -165,7 +247,10 @@ public class HumanAgent extends AAgent {
 	}
 
 	public void setHome(Building building) {
-		home_ = building;
+		if (home_ != null) {
+			home_.removeAgent(this);
+			home_ = building;
+		}
 	}
 
 	public Building getHome() {
@@ -188,7 +273,6 @@ public class HumanAgent extends AAgent {
 		return order_;
 	}
 
-
 	public IUpdateListener getYearListener() {
 		return yearListener_;
 	}
@@ -196,9 +280,17 @@ public class HumanAgent extends AAgent {
 	public Stream<AAgent> getCompanions() {
 		return getRelatedAgent(Const.MARRIEDTO, true);
 	}
+	
+	public boolean hasCompanion() {
+		return getCompanions().findFirst().isPresent();
+	}
 
 	public Stream<AAgent> getParents() {
 		return getRelatedAgent(Const.PARENTOF, true);
+	}
+	
+	public boolean isParent(HumanAgent a) {
+		return this.getParents().anyMatch((e) -> e == a);
 	}
 
 	public Stream<AAgent> getChildren() {

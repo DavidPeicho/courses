@@ -9,7 +9,6 @@ import java.util.logging.Logger;
 
 import repast.simphony.space.grid.Grid;
 import repast.simphony.space.grid.GridPoint;
-import syma.environment.AFixedGeography;
 import syma.environment.Road;
 import syma.main.GridElement;
 
@@ -114,7 +113,7 @@ public class PathSearch {
 	
 	public Stack<GridPoint> computePath() {
 		if (!found_) {
-			LOGGER.log(Level.WARNING, "Path: no path found");
+			//LOGGER.log(Level.WARNING, "Path: no path found");
 			return null;
 		}
 		int w = grid_.getDimensions().getWidth();

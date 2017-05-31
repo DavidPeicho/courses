@@ -9,15 +9,18 @@ import syma.environment.School;
 import syma.environment.WorkPlace;
 
 public class Const {
-
+	
+	/* TIME */
+	public static int MINUTE_TIME_FACTOR = 5;
+	
 	/* GOD AGENT */
 	public static final int MORNING_HOUR = 7;
 	
 	/* HUMAN CONST */
 	public static final int MAX_AGE = 90;
+	public static final int MAX_SEARCH_PARTNER_AGE = 45;
 	
 	public static final double MARRIEDTO = 1;
-
 	public static final double PARENTOF = 2;
 	
 	/* GRID TYPE */
@@ -55,4 +58,10 @@ public class Const {
 		}
 		return res;
 	}
+	
+	public static int timeToTick(int day, int h, int min) {
+		int total = min + h * 60 + day * 24 * 60;
+		return total / MINUTE_TIME_FACTOR;
+	}
+	
 }

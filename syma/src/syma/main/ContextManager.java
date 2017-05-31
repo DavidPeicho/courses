@@ -41,6 +41,8 @@ public class ContextManager implements ContextBuilder<GridElement> {
 		
 		String pathToMap = RunEnvironment.getInstance().getParameters().getString("mapPath");
 		int nbAgents = RunEnvironment.getInstance().getParameters().getInteger("maxNbAgents");
+		Const.MINUTE_TIME_FACTOR = RunEnvironment.getInstance().getParameters().getInteger("timeFactor");
+		
 		try {
 			map = GridParser.instance().parse(pathToMap);
 			width = map.getWidth();
@@ -159,7 +161,7 @@ public class ContextManager implements ContextBuilder<GridElement> {
 			WorkPlace workplace = getEmptyGeography(WorkPlace.globalList);
 			
 			boolean gender = Math.random() >= 0.5f;
-			int age = (int)(Math.random() * 50.0d + 18.0d);
+			int age = (int)(Math.random() * 12.0d + 18.0d);
 			
 			HumanAgent agent = env.createAgent(grid, age, gender, home, workplace);
 		
@@ -167,14 +169,16 @@ public class ContextManager implements ContextBuilder<GridElement> {
 			context.add(agent);
 			grid.moveTo(agent, x, y);
 
-			if (i == nbAgents - 1) {
-				HumanAgent child = env.createAgent(grid, 10, gender, home, null/*workplace*/);
+			// DEBUG
+			/*if (i == nbAgents - 1) {
+				HumanAgent child = env.createAgent(grid, 10, gender, home, null);
 				home.addAgent(child);
 				context.add(child);
 				grid.moveTo(child, x, y);
 				Network n = (Network)context.getProjection("genealogy");
 				n.addEdge(agent, child, Const.PARENTOF);
-			}
+			}*/
+			// END DEBUG
 		}
 		
 	}

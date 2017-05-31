@@ -4,16 +4,19 @@ import syma.agent.AAgent;
 import syma.events.IUpdateListener;
 
 public class Wait extends AGoal {
-	private int time_;
+	private int tickNb_;
 
-	public Wait(AAgent target, IUpdateListener callback, int time) {
+	public Wait(AAgent target, IUpdateListener callback, int tickNb) {
 		super(target, callback);
-		time_ = time;
+		tickNb_ = tickNb;
 	}
 
 	@Override
 	public void update() {
-		time_--;
+		tickNb_--;
+		if (tickNb_ == 0) {
+			triggerCallback(null);
+		}
 	}
 
 }

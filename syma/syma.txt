@@ -24,3 +24,9 @@ Fonctionnement :
     - Journée au travail modulo quelques heures
     - Nuit généralement dans la maison
     - Nuit dans les loisirs aussi
+    
+ TODO :
+ 	- Change time at which actors go to work. Use random to make small differences
+ 	- Level of food in house, and when it is too low, go to the shopping center
+ 	- Child change other icon
+ 	- Married 
