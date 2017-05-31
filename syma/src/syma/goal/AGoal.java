@@ -42,5 +42,9 @@ public abstract class AGoal implements IGoal {
 	public void setAutoremoveWhenReached(boolean v) {
 		autoRemoveWhenReached_ = v;
 	}
+	
+	public IUpdateListener getCallback() {
+		return callback_;
+	}
 
 }
