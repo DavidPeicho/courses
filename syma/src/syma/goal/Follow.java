@@ -10,16 +10,31 @@ public class Follow extends AGoal {
 
 	private final AAgent dest_;
 	private final Grid<GridElement> grid_;
+	private boolean continue_;
 
 	public Follow(AAgent target, IUpdateListener callback, AAgent dest, Grid<GridElement> grid) {
 		super(target, callback);
 		dest_ = dest;
 		grid_ = grid;
+		continue_ = true;
 	}
 
 	@Override
 	public void update() {
 		target_.setPos(dest_.getX(), dest_.getY());
+	}
+
+	@Override
+	public boolean success() {
+		return !continue_;
+	}
+
+	public void setContinue(boolean c) {
+		continue_ = c;
+	}
+
+	public boolean getContinue() {
+		return continue_;
 	}
 
 	public AAgent getDest() {
