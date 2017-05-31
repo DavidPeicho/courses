@@ -26,8 +26,13 @@ public class AAgent extends GridElement implements IAgent {
 		goals_ = new LinkedList<AGoal>();
 		listeners_ = new CopyOnWriteArrayList<IUpdateListener>();
 	}
+
+	public static void resetID() {
+		ID = -1;
+	}
 	
 	/* GETTERS // SETTERS */
+
 	public long getID() {
 		return id_;
 	}
@@ -39,7 +44,9 @@ public class AAgent extends GridElement implements IAgent {
 	public void step() {
 		if (goals_.isEmpty())
 			return;
-		goals_.peek().update();
+		AGoal g = goals_.peek();
+		g.refresh();
+		g.update();
 	}
 	
 	public void setSpeed(int s) {
@@ -58,4 +65,12 @@ public class AAgent extends GridElement implements IAgent {
 		goals_.remove(behavior);
 	}
 	
+	public AGoal peekGoal() {
+		return goals_.peek();
+	}
+
+	public AGoal pollGoal() {
+		return goals_.poll();
+	}
+
 }

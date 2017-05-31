@@ -3,8 +3,8 @@ package syma.main;
 import syma.agent.*;
 import syma.environment.AFixedGeography;
 import syma.environment.Building;
+import syma.environment.School;
 import syma.environment.WorkPlace;
-import syma.goal.MoveTo;
 import syma.parsing.BaseMap;
 import syma.parsing.GridParser;
 import syma.utils.Const;
@@ -21,7 +21,6 @@ import repast.simphony.space.grid.WrapAroundBorders;
 import repast.simphony.space.graph.Network;
 import repast.simphony.space.grid.Grid;
 import repast.simphony.space.grid.GridBuilderParameters;
-import repast.simphony.space.grid.GridPoint;
 import repast.simphony.space.grid.SimpleGridAdder;
 import repast.simphony.engine.environment.RunEnvironment;
 
@@ -74,10 +73,10 @@ public class ContextManager implements ContextBuilder<GridElement> {
 	}
 	
 	private void init() {
-	
 		Building.globalList.clear();
 		WorkPlace.globalList.clear();
-		
+		School.globalList.clear();
+		AAgent.resetID();
 	}
 	
 	private void buildGrid(BaseMap map, int w, int h, Context<GridElement> context, Grid<GridElement> grid) {
@@ -137,14 +136,14 @@ public class ContextManager implements ContextBuilder<GridElement> {
 			boolean gender = Math.random() >= 0.5f;
 			int age = (int)(Math.random() * 50.0d + 18.0d);
 			
-			HumanAgent agent = env.createAgent(grid, i == nbAgents - 1 ? 40 : age, gender, home, workplace);
+			HumanAgent agent = env.createAgent(grid, age, gender, home, workplace);
 		
 			home.addAgent(agent);
 			context.add(agent);
 			grid.moveTo(agent, x, y);
 
 			if (i == nbAgents - 1) {
-				HumanAgent child = env.createAgent(grid, 20, gender, home, workplace);
+				HumanAgent child = env.createAgent(grid, 10, gender, home, null/*workplace*/);
 				home.addAgent(child);
 				context.add(child);
 				grid.moveTo(child, x, y);

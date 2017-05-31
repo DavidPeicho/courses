@@ -27,16 +27,18 @@ public class GodAgent extends AAgent {
 	public GodAgent(Grid<GridElement> grid) {
 		super(grid);
 		timeListeners_ = new ArrayList<IUpdateListener>();
-		day_ = 0;
-		hour_ = 0;
-		min_ = 0;
-		year_ = 0;
 	}
 	
 	public static void init(Grid<GridElement> grid) {
 		if (instance_ == null) {
 			instance_ = new GodAgent(grid);
 		}
+
+		instance_.timeListeners_.clear();
+		instance_.day_ = 0;
+		instance_.hour_ = 6;
+		instance_.min_ = 58;
+		instance_.year_ = 0;
 	}
 	
 	public static GodAgent instance() {
@@ -68,9 +70,7 @@ public class GodAgent extends AAgent {
 	
 	public HumanAgent createAgent(Grid<GridElement> grid, int age, boolean gender, Building home, WorkPlace workplace) {
 		
-		HumanAgent agent = new HumanAgent(grid, age, gender, workplace);
-		agent.setHome(home);
-		agent.setWorkPlace(workplace);
+		HumanAgent agent = new HumanAgent(grid, age, gender, home, workplace);
 	
 		timeListeners_.add(agent.getYearListener());
 		
