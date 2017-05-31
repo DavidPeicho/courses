@@ -4,13 +4,16 @@ import syma.agent.*;
 import syma.environment.AFixedGeography;
 import syma.environment.Building;
 import syma.environment.School;
+import syma.environment.BusStop;
 import syma.environment.WorkPlace;
 import syma.parsing.BaseMap;
 import syma.parsing.GridParser;
+import syma.parsing.Point;
 import syma.utils.Const;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 import repast.simphony.context.Context;
 import repast.simphony.context.space.graph.NetworkBuilder;
@@ -21,6 +24,7 @@ import repast.simphony.space.grid.WrapAroundBorders;
 import repast.simphony.space.graph.Network;
 import repast.simphony.space.grid.Grid;
 import repast.simphony.space.grid.GridBuilderParameters;
+import repast.simphony.space.grid.GridPoint;
 import repast.simphony.space.grid.SimpleGridAdder;
 import repast.simphony.engine.environment.RunEnvironment;
 
@@ -79,11 +83,30 @@ public class ContextManager implements ContextBuilder<GridElement> {
 		AAgent.resetID();
 	}
 	
+	private void parseBus(BaseMap map, Context<GridElement> context, Grid<GridElement> grid) {
+		ArrayList<BusStop> stops = parseBusStops(map, context, grid);
+		Tram t = new Tram(grid, stops);
+	}
+	
+	private ArrayList<BusStop> parseBusStops(BaseMap map, Context<GridElement> context, Grid<GridElement> grid) {
+		ArrayList<BusStop> busStops = new ArrayList<>();
+		for (List<Point> l : map.getBusPaths()) {
+			for (Point e : l) {
+				BusStop bs = new BusStop(grid);
+				context.add(bs);
+				busStops.add(bs);
+				GridPoint pos = getRelativePos(e, map.getHeight());
+				grid.moveTo(bs, pos.getX(), pos.getY());
+			}
+		}
+		return busStops;
+	}
+	
 	private void buildGrid(BaseMap map, int w, int h, Context<GridElement> context, Grid<GridElement> grid) {
 		
 		String mapStr = map.getRawMap();
 		
-		// Add grounds element in the brackground
+		// Add grounds element in the background
 		for (int i = 0; i < mapStr.length(); ++i) {
 			char val = mapStr.charAt(i);
 			String type = map.getType(val);
@@ -117,6 +140,8 @@ public class ContextManager implements ContextBuilder<GridElement> {
 			context.add(elt);
 			grid.moveTo(elt, relativeX, relativeY);
 		}
+		
+		parseBus(map, context, grid);
 		
 	}
 	
@@ -152,6 +177,18 @@ public class ContextManager implements ContextBuilder<GridElement> {
 			}
 		}
 		
+	}
+	
+	private GridPoint getRelativePos(GridPoint p, int height) {
+		int relativeX = p.getX();
+		int relativeY = height - 1 - p.getY();
+		return new GridPoint(relativeX, relativeY);
+	}
+	
+	private GridPoint getRelativePos(Point p, int height) {
+		int relativeX = p.x;
+		int relativeY = height - 1 - p.y;
+		return new GridPoint(relativeX, relativeY);
 	}
 	
 	/**

@@ -10,16 +10,11 @@ public class BaseMap {
 	
 	private MapObject mapObj_;
 	private HashMap<Character, String> keyToType_;
-	
-	private ArrayList<ArrayList<GridPoint>> busPaths_;
-	
+		
 	public BaseMap(MapObject m) {
 		mapObj_ = m;
-		keyToType_ = new HashMap<Character, String>();
-		busPaths_ = new ArrayList<ArrayList<GridPoint>>();
-		
+		keyToType_ = new HashMap<Character, String>();		
 		buildKeyToTypeMap();
-		computeBusPaths();
 	}
 	
 	public String getRawMap() {
@@ -38,8 +33,8 @@ public class BaseMap {
 		return mapObj_.size.height;
 	}
 	
-	public ArrayList<ArrayList<GridPoint>> getBusPaths() {
-		return busPaths_;
+	public List<List<Point>> getBusPaths() {
+		return mapObj_.busPaths;
 	}
 	
 	private void buildKeyToTypeMap() {
@@ -49,15 +44,4 @@ public class BaseMap {
 			keyToType_.put(key, type);
 		}
 	}
-	
-	private void computeBusPaths() {
-		for (List<Point> l : mapObj_.busPaths) {
-			ArrayList<GridPoint> points = new ArrayList<GridPoint>();
-			for (Point p : l) {
-				points.add(new GridPoint(p.x, p.y));
-			}
-			busPaths_.add(points);
-		}
-	}
-
 }
