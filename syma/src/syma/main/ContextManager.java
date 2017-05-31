@@ -81,8 +81,24 @@ public class ContextManager implements ContextBuilder<GridElement> {
 	}
 	
 	private void buildGrid(BaseMap map, int w, int h, Context<GridElement> context, Grid<GridElement> grid) {
-				
+		
 		String mapStr = map.getRawMap();
+		
+		// Add grounds element in the brackground
+		for (int i = 0; i < mapStr.length(); ++i) {
+			char val = mapStr.charAt(i);
+			String type = map.getType(val);
+			if (type != null && type.equals(Const.ROAD_TYPE)) {
+				continue;
+			}
+			
+			int relativeX = i % w;
+			int relativeY = h - 1 - (i / w);
+			AFixedGeography elt = GridParser.instance().typeToFixedGeography(Const.GROUND_TYPE, relativeX, relativeY, grid);
+			context.add(elt);
+			grid.moveTo(elt, relativeX, relativeY);
+		}
+		
 		for (int i = 0; i < mapStr.length(); ++i) {
 			char val = mapStr.charAt(i);
 			String type = map.getType(val);
@@ -145,6 +161,8 @@ public class ContextManager implements ContextBuilder<GridElement> {
 	 * @return The first building being empty after random search.
 	 */
 	private <T extends AFixedGeography> T getEmptyGeography(ArrayList<T> list) {
+		
+		if (list.size() == 0) return null;
 		
 		int nbGeography = list.size();
 		

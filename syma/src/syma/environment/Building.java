@@ -7,6 +7,9 @@ import syma.main.GridElement;
 
 public class Building extends AFixedGeography {
 	
+	public static int TILE_X = 2;
+	public static int TILE_Y = 2;
+	
 	/**
 	 * Contains every buildings that are on the grid.
 	 * It allows to access every building quickly without

@@ -18,6 +18,8 @@ public class MoveTo extends AGoal {
 		dest_ = dest;
 		grid_ = grid;
 		
+		if (dest == null) return;
+		
 		path_ = new PathSearch(grid_);
 		path_.search(target.getPos(), dest.getPos());
 		path_.computePath();
@@ -25,6 +27,12 @@ public class MoveTo extends AGoal {
 	
 	@Override
 	public void update() {
+		
+		if (dest_ == null) {
+			callCallback();
+			return;
+		}
+		
 		if (path_.getPath().isEmpty()) return;
 		
 		GridPoint dest = path_.getPath().pop();
@@ -33,6 +41,11 @@ public class MoveTo extends AGoal {
 	
 	public GridPoint getDest() {
 		return dest_.getPos();
+	}
+	
+	private void callCallback() {
+		if (callback_ == null) return;
+		callback_.updateEvent(null);
 	}
 
 }

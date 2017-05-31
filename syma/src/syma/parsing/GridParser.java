@@ -3,15 +3,14 @@ package syma.parsing;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
 
 import com.google.gson.Gson;
 
 import repast.simphony.space.grid.Grid;
-import repast.simphony.space.grid.GridPoint;
 import syma.environment.AFixedGeography;
 import syma.environment.Bar;
 import syma.environment.Building;
+import syma.environment.Ground;
 import syma.environment.Road;
 import syma.environment.School;
 import syma.environment.WorkPlace;
@@ -55,6 +54,9 @@ public class GridParser {
 	public AFixedGeography typeToFixedGeography(String type, int x, int y, Grid<GridElement> grid) {
 		AFixedGeography result = null;
 		switch (type) {
+			case Const.GROUND_TYPE:
+				result = new Ground(grid);
+				break;
 			case Const.BAR_TYPE:
 				result = new Bar(grid);
 				break;
@@ -74,6 +76,6 @@ public class GridParser {
 				break;
 		}
 		return result;
-	} 
+	}
 	
 }

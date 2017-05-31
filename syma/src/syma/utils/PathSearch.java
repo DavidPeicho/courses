@@ -1,5 +1,6 @@
 package syma.utils;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Stack;
@@ -150,15 +151,16 @@ public class PathSearch {
 		for (int h = 0; h < height; ++h) {
 			for (int w = 0; w < width; ++w) {
 				Iterable<GridElement> e = grid_.getObjectsAt(w, h);
+				Iterator<GridElement> it = e.iterator();
 				if (!e.iterator().hasNext()) {
 					setWeight(w, h, EMPTY);
 					continue;
 				}
-				Object x = e.iterator().next();
-				if (x instanceof AFixedGeography) {
-					AFixedGeography a = (AFixedGeography)x;
-					if (a instanceof Road) {
+				while (it.hasNext()) {
+					Object x = it.next();
+					if (x instanceof Road) {
 						setWeight(w, h, ROAD);
+						break;
 					}
 				}
 			}	
