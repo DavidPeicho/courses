@@ -10,6 +10,8 @@ import syma.environment.BusStop;
 import syma.environment.Road;
 import syma.events.AEventObject;
 import syma.events.IUpdateListener;
+import syma.events.SuccessEvent;
+import syma.goal.AGoal;
 import syma.goal.MoveTo;
 import syma.goal.Wait;
 import syma.main.GridElement;
@@ -62,6 +64,15 @@ public class Tram extends AAgent {
 	@ScheduledMethod(start = 1, interval = 1, priority = 1)
 	public void step() {
 		super.step();
+	}
+	
+	@Override
+	@ScheduledMethod(start = 1, interval = 1, priority = 2)
+	public void decide() {
+		AGoal g = peekGoal();
+		if (g != null && g.success()) {
+			g.triggerCallback(new SuccessEvent());
+		}
 	}
 	
 	private void computeCycle() {
