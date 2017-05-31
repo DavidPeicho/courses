@@ -101,10 +101,10 @@ public class HumanAgent extends AAgent {
 		maxAge_ = Const.MAX_AGE + (int)((Math.random() * 30) - 15);
 		workplace_ = workplace;
 		order_ = false;
-		
+
 		home_ = home;
 		home_.addAgent(this);
-		
+
 		PathSearch ps = new PathSearch(grid_);
 		school_ = School.globalList.stream().sorted(
 				(School s1, School s2) -> {
@@ -113,7 +113,7 @@ public class HumanAgent extends AAgent {
 					int d2 = ps.search(h, s2.getPos()).length;
 					return d2 - d1;
 				}).findFirst();
-		
+
 		Random rand = new Random();
 		searchPartnerAge_ = rand.nextInt(Const.MAX_SEARCH_PARTNER_AGE + 1 - 18) + 18;
 	}
@@ -123,7 +123,7 @@ public class HumanAgent extends AAgent {
 	public void decide() {
 		AGoal g = peekGoal();
 		if (g != null && g.success()) {
-			g.triggerCallback(new SuccessEvent());
+			g.triggerCallback(null);
 			if (order_) {
 				order_ = false;
 			}
@@ -145,9 +145,9 @@ public class HumanAgent extends AAgent {
 
 	private void die() {
 		LOGGER.log(Level.INFO, "Agent " + id_ + " died at " + age_);
-		
+
 		GodAgent env = GodAgent.instance();
-		
+
 		// Removes link between companion
 		Optional<AAgent> partner = this.getCompanions().findFirst();
 		if (partner.isPresent()) {
@@ -157,19 +157,19 @@ public class HumanAgent extends AAgent {
 				n.removeEdge((RepastEdge)e);
 			});
 		}
-		
+
 		// Removes agent from home
 		home_.removeAgent(this);
 		if (home_.isEmpty()) {
 			LOGGER.log(Level.INFO, "A new house is now available and living.");
 		}
-		
+
 		env.timeListeners_.remove(this.yearListener_);
-		
+
 		Context<HumanAgent> context = ContextUtils.getContext(this);
 		context.remove(this);
 	}
-	
+
 	/**
 	 * Searches through every agents to find
 	 * a partner to live with.
@@ -178,55 +178,60 @@ public class HumanAgent extends AAgent {
 		Context<HumanAgent> context = ContextUtils.getContext(this);
 		Stream<HumanAgent> agents = context.stream().filter((GridElement e) -> {
 			if (!(e instanceof HumanAgent)) return false;
-			
+
 			HumanAgent a = (HumanAgent)e;
 			if (a.getID() == id_) return false;
-			
-			return a.gender_ != gender_ && !a.hasCompanion() && a.getParents().anyMatch(p -> p != e);
+
+			return a.gender_ != gender_ && !a.hasCompanion() && !a.getParents().anyMatch(p -> p == e);
 		});
-		
+
 		Optional<HumanAgent> opt = agents.findFirst(); 
 		if (opt.isPresent()) {
 			HumanAgent partner = opt.get();
 			Network n = (Network)context.getProjection("genealogy");
 			n.addEdge(partner, this, Const.MARRIEDTO);
 			n.addEdge(this, partner, Const.MARRIEDTO);
-			
+
 			partner.setHome(this.home_);
-			
+
 			// Spawns a child agent
 			GodAgent env = GodAgent.instance();
 			HumanAgent child = env.createChildAgent(grid_, home_);
 			context.add(child);
 			grid_.moveTo(child, home_.getX(), home_.getY());
 			n.addEdge(this, child, Const.PARENTOF);
-			
+
 			LOGGER.log(Level.INFO, "Agent " + id_ + " get married with Agent " + partner.getID());
 			LOGGER.log(Level.INFO, "A new agent is born from " + id_ + " and " + partner.getID());
 		}
-		
+
 	}
-	
+
 	@Watch(watcheeClassName="syma.agent.HumanAgent",
 			watcheeFieldNames="order_",
 			query="linked_from 'genealogy'",
-			whenToTrigger=WatcherTriggerSchedule.LATER,
+			whenToTrigger=WatcherTriggerSchedule.IMMEDIATE,
 			triggerCondition="$watcher.getAge() < 18 && $watcher.isParent($watchee)")
 	public void react() {
 		Stream<AAgent> ps = getParents().filter((AAgent a) -> ((HumanAgent)a).getOrder());
 		Optional<AAgent> p = ps.findFirst();
 		if (p.isPresent()) {
-			LOGGER.log(Level.INFO, "Agent " + id_ + " should follow its parent " + p.get().getID());
 			IUpdateListener clbk = (AEventObject o) -> {
 				HumanAgent.this.pollGoal();
 			};
 			addGoal(new Follow(this, clbk, p.get(), grid_));
 		} else {
-			LOGGER.log(Level.INFO, "Agent " + id_ + " should not follow its parent.");
-			peekGoal().triggerCallback(new SuccessEvent());
+			AGoal g = peekGoal();
+			if (g != null) {
+				if (g instanceof Follow) {
+					((Follow)g).setContinue(false);
+				}
+			} else {
+				LOGGER.log(Level.INFO, "Agent " + id_ + "react twice to parent!");
+			}
 		}
 	}
-	
+
 	public void addGoalMoveToWork() {
 		IUpdateListener callback = new IUpdateListener() {
 
@@ -235,12 +240,12 @@ public class HumanAgent extends AAgent {
 				HumanAgent.this.pollGoal();
 				HumanAgent.this.addGoalWaitAtWork();
 			}
-			
+
 		};
 		MoveTo moveToWork = new MoveTo(HumanAgent.this, callback, workplace_, grid_); 
 		this.addGoal(moveToWork);
 	}
-	
+
 	public void addGoalWaitAtWork() {
 		IUpdateListener callback = new IUpdateListener() {
 
@@ -251,14 +256,14 @@ public class HumanAgent extends AAgent {
 				moveToHouse.setAutoremoveWhenReached(true);
 				HumanAgent.this.addGoal(moveToHouse);
 			}
-			
+
 		};
 		Wait waitAtWork = new Wait(HumanAgent.this, callback, Const.timeToTick(0, 3, 0));
 		this.addGoal(waitAtWork);
 	}
 
 	/* GETTERS // SETTERS */
-	
+
 	public boolean getGender() {
 		return gender_;
 	}
@@ -297,7 +302,7 @@ public class HumanAgent extends AAgent {
 	public Stream<AAgent> getCompanions() {
 		return getRelatedAgent(Const.MARRIEDTO, true);
 	}
-	
+
 	public boolean hasCompanion() {
 		return getCompanions().findFirst().isPresent();
 	}
@@ -305,7 +310,7 @@ public class HumanAgent extends AAgent {
 	public Stream<AAgent> getParents() {
 		return getRelatedAgent(Const.PARENTOF, true);
 	}
-	
+
 	public boolean isParent(HumanAgent a) {
 		return this.getParents().anyMatch((e) -> e == a);
 	}

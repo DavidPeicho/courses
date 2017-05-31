@@ -72,7 +72,6 @@ public class ContextManager implements ContextBuilder<GridElement> {
 		}
 		
 		spawnDefaultAgents(nbAgents, context, grid);
-		
 		return context;
 	}
 	
@@ -151,7 +150,7 @@ public class ContextManager implements ContextBuilder<GridElement> {
 		int w = grid.getDimensions().getWidth();
 		int h = grid.getDimensions().getHeight();
 		GodAgent env = GodAgent.instance();
-		
+
 		for (int i = 0; i < nbAgents; ++i) {
 			// Finds a house for the newly created agent
 			Building home = getEmptyGeography(Building.globalList);
@@ -164,19 +163,9 @@ public class ContextManager implements ContextBuilder<GridElement> {
 			int age = (int)(Math.random() * 50.0d + 18.0d);
 			
 			HumanAgent agent = env.createAgent(grid, age, gender, home, workplace);
-		
-			//home.addAgent(agent);
+
 			context.add(agent);
 			grid.moveTo(agent, x, y);
-
-			if (i == nbAgents - 1) {
-				HumanAgent child = env.createAgent(grid, 10, gender, home, null/*workplace*/);
-				home.addAgent(child);
-				context.add(child);
-				grid.moveTo(child, x, y);
-				Network n = (Network)context.getProjection("genealogy");
-				n.addEdge(agent, child, Const.PARENTOF);
-			}
 		}
 		
 	}
