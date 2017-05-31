@@ -11,7 +11,10 @@ import syma.environment.WorkPlace;
 public class Const {
 	
 	/* TIME */
-	public static int MINUTE_TIME_FACTOR = 5;
+	public static int INITIAL_MIN_TIME_FACTOR = 1;
+	public static int MINUTE_TIME_FACTOR = INITIAL_MIN_TIME_FACTOR;
+	
+	public static long YEAR_IN_MIN = 525600l;
 	
 	/* GOD AGENT */
 	public static final int MORNING_HOUR = 7;
@@ -57,6 +60,14 @@ public class Const {
 			res = Const.WORK_ICON;
 		}
 		return res;
+	}
+	
+	public static long yearToMin(int y) {
+		return y * 365 * 24 * 60;
+	}
+	
+	public static long dayToMin(long d) {
+		return d * 24 * 60;
 	}
 	
 	public static int timeToTick(int day, int h, int min) {

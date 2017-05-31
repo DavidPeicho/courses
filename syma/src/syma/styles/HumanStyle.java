@@ -14,10 +14,15 @@ public class HumanStyle extends DefaultStyleOGL2D {
 	public Color getColor(Object o) {
 		if (o instanceof HumanAgent) {
 			HumanAgent a = (HumanAgent)o;
+			
 			float rate = (float)a.getAge() / (float)Const.MAX_AGE;
 			int value = 255 - Math.min((int)(rate * 255.0f), 255);
-
-			return a.getID() == 11 ? new Color(0, 0, 255) : new Color(255, value, value);
+			
+			if (a.getAge() < 18) return new Color(value, value, 255);
+			
+			if (a.getGender()) new Color(value, value, 255);
+		
+			return new Color(255, value, value);
 		}
 		return null;
 	}
@@ -26,7 +31,6 @@ public class HumanStyle extends DefaultStyleOGL2D {
 	public VSpatial getVSpatial(Object agent, VSpatial spatial) {
 		if (spatial == null) {
 			spatial = shapeFactory.createCircle(6, 10);
-			//shapeFactory.createRectangle(8, 8);
 		}
 		return spatial;
 	}
