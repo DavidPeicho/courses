@@ -54,7 +54,7 @@ public class HumanAgent extends AAgent {
 			} else if (obj.type == EventTimeObject.Type.MORNING_HOUR) {
 				Stream<AAgent> c = getChildren(); 
 				if (c != null && !c.findFirst().isPresent() && workplace_ != null) {
-					//HumanAgent.this.addGoal(new MoveTo(HumanAgent.this, workplace_, grid_));
+					HumanAgent.this.addGoal(new MoveTo(HumanAgent.this, workplace_, grid_));
 				}
 			}	
 		}

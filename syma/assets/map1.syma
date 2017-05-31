@@ -6,26 +6,26 @@
     },
 
     "map": "
+        HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH
+        hHhHhHhHhHhHhHhHhHhHhHhHhHhHhHhHhHhHhHhHhH
+        rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr
+        SSS------HH--------r-HHHHHHHHHH-r-HHHHHH-r
+        SsS------hH--------r-hHhHhHhHhH-r-hHhHhH-r
+        rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr
+        ----------r--------r----r-----r-----r-----
+        ----------r--------r----r-----r-----r-----
+        ----------r--------r-HH-r--CC-r--HH-r--CC-
+        ----------r--------r-hH-r--cC-r--hH-r--cC-
+        ----------r--SSS---rrrrrrrrrrrrrrrrrrrrrrr
+        ----------r--SsS---r----------r-----------
+        WWW-WWW---rrrrrrrrrr----------r-----------
+        WWW-WWW---r--------r----------r-----------
+        WwW-WwW---r--------r----------r-----------
         rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr-----------
-        r-----------------r-----------r-----------
-        r-----------------r-----------r-----------
-        r-----------------r-----------r-----------
-        r-----------------r-----------r----BBBBB--
-        rrrrrrrrrrrrrrrrrrr-----------r----BBbBB--
-        r-----------------rrrrrrrrrrrrrrrrrrrrrrrr
-        r----------------hrh----------------------
-        r----------------hrh----------------------
-        r----------------hrh----------------------
-        r----------------hrh----------------------
-        r----------------hrh----------------------
-        r----------------hrh----------------------
-        r----------------hrh----------------------
-        r----------------hrh----------------------
-        r----------------hrh----------------------
-        r--------AAA-----hr-----------------------
-        r--------AAA-----hrh----------------------
-        r-------AAaAA----hrh----------------------
-        rrrrrrrrrrrrrrrrrrr-----------------------
+        WWW------------WWW-r----------------------
+        WWW------------WWW-r----------------------
+        WwW------------WwW-r----------------------
+        rrrrrrrrrrrrrrrrrrrr----------------------
     ",
 
     "busPaths": [
@@ -39,24 +39,24 @@
 
     "props": [
         {
-            "key": "-",
-            "type": "NONE"
-        },
-        {
             "key": "h",
             "type": "HOUSE"
         },
         {
-            "key": "a",
-            "type": "WORKPLACE"
+            "key": "s",
+            "type": "SCHOOL"
         },
         {
-            "key": "b",
-            "type": "WORKPLACE"
+            "key": "c",
+            "type": "BAR"
         },
         {
             "key": "r",
             "type": "ROAD"
+        },
+        {
+            "key": "w",
+            "type": "WORKPLACE"
         }
     ]
 

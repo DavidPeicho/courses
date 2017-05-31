@@ -3,38 +3,62 @@
   <type>2D</type>
   <styles>
     <entry>
+      <string>syma.environment.Bar</string>
+      <string>syma.styles.GeographyStyle</string>
+    </entry>
+    <entry>
+      <string>syma.environment.Ground</string>
+      <string>syma.styles.GeographyStyle</string>
+    </entry>
+    <entry>
       <string>syma.environment.Building</string>
-      <string>repast.simphony.visualization.editedStyle.EditedStyle2D</string>
+      <string>syma.styles.GeographyStyle</string>
     </entry>
     <entry>
       <string>syma.environment.WorkPlace</string>
-      <string>repast.simphony.visualization.editedStyle.EditedStyle2D</string>
+      <string>syma.styles.GeographyStyle</string>
     </entry>
     <entry>
       <string>syma.agent.HumanAgent</string>
       <string>syma.styles.HumanStyle</string>
     </entry>
     <entry>
+      <string>syma.environment.School</string>
+      <string>syma.styles.GeographyStyle</string>
+    </entry>
+    <entry>
       <string>syma.environment.Road</string>
-      <string>repast.simphony.visualization.editedStyle.EditedStyle2D</string>
+      <string>syma.styles.GeographyStyle</string>
     </entry>
   </styles>
   <editedStyles>
     <entry>
+      <string>syma.environment.Bar</string>
+      <null/>
+    </entry>
+    <entry>
+      <string>syma.environment.Ground</string>
+      <null/>
+    </entry>
+    <entry>
       <string>syma.environment.Building</string>
-      <string>syma.environment.Building.style_2.xml</string>
+      <null/>
     </entry>
     <entry>
       <string>syma.environment.WorkPlace</string>
-      <string>syma.environment.WorkPlace.style_1.xml</string>
+      <null/>
     </entry>
     <entry>
       <string>syma.agent.HumanAgent</string>
       <null/>
     </entry>
     <entry>
+      <string>syma.environment.School</string>
+      <null/>
+    </entry>
+    <entry>
       <string>syma.environment.Road</string>
-      <string>syma.environment.Road.style_2.xml</string>
+      <null/>
     </entry>
   </editedStyles>
   <netStyles/>
@@ -47,27 +71,39 @@
     <pType>LAST</pType>
     <duration>-1.0</duration>
     <frequency>REPEAT</frequency>
-    <hashCode>1954908263</hashCode>
+    <hashCode>-1417649149</hashCode>
   </schedParams>
   <layoutClassName>foo.bar.baz</layoutClassName>
   <layoutProjection>grid</layoutProjection>
   <layoutInterval>0</layoutInterval>
   <layerOrder>
     <entry>
-      <string>syma.environment.Building</string>
+      <string>syma.environment.Bar</string>
       <int>2</int>
     </entry>
     <entry>
-      <string>syma.environment.WorkPlace</string>
-      <int>0</int>
+      <string>syma.environment.Ground</string>
+      <int>1</int>
     </entry>
     <entry>
-      <string>syma.agent.HumanAgent</string>
+      <string>syma.environment.Building</string>
+      <int>4</int>
+    </entry>
+    <entry>
+      <string>syma.environment.WorkPlace</string>
       <int>3</int>
     </entry>
     <entry>
+      <string>syma.agent.HumanAgent</string>
+      <int>6</int>
+    </entry>
+    <entry>
+      <string>syma.environment.School</string>
+      <int>5</int>
+    </entry>
+    <entry>
       <string>syma.environment.Road</string>
-      <int>1</int>
+      <int>0</int>
     </entry>
   </layerOrder>
   <projections>
@@ -78,7 +114,7 @@
     </repast.simphony.scenario.data.ProjectionData>
   </projections>
   <visualizationProperties class="repast.simphony.visualization.UnitSizeLayoutProperties">
-    <unitSize>15.0</unitSize>
+    <unitSize>16.0</unitSize>
   </visualizationProperties>
   <projectionDescriptors>
     <entry>
@@ -95,7 +131,7 @@
               </entry>
               <entry>
                 <string>UNIT_SIZE</string>
-                <float>15.0</float>
+                <float>16.0</float>
               </entry>
               <entry>
                 <string>SHOW</string>
