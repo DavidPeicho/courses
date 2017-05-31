@@ -34,16 +34,23 @@ public class MoveTo extends AGoal {
 
 	@Override
 	public void update() {
-		
 		if (dest_ == null) {
-			callCallback();
+			triggerCallback(null);
 			return;
 		}
 		
 		if (path_.getPath().isEmpty()) return;
-
+		
 		GridPoint dest = path_.getPath().pop();
 		target_.setPos(dest.getX(), dest.getY());
+		
+		if (dest.getX() == dest_.getX() && dest.getY() == dest_.getY()) {
+			triggerCallback(null);
+			if (autoRemoveWhenReached_) {
+				target_.pollGoal();
+			}
+		}
+
 	}
 
 	@Override
@@ -53,11 +60,6 @@ public class MoveTo extends AGoal {
 
 	public GridPoint getDest() {
 		return dest_.getPos();
-	}
-	
-	private void callCallback() {
-		if (callback_ == null) return;
-		callback_.updateEvent(null);
 	}
 
 }

@@ -9,9 +9,12 @@ public abstract class AGoal implements IGoal {
 	protected final AAgent target_;
 	protected IUpdateListener callback_;
 	
+	protected boolean autoRemoveWhenReached_;
+	
 	public AGoal(AAgent target, IUpdateListener callback) {
 		target_ = target;
 		callback_ = callback;
+		autoRemoveWhenReached_ = false;
 	}
 	
 	@Override
@@ -34,6 +37,10 @@ public abstract class AGoal implements IGoal {
 		if (callback_ != null) {
 			callback_.updateEvent(o);
 		}
+	}
+	
+	public void setAutoremoveWhenReached(boolean v) {
+		autoRemoveWhenReached_ = v;
 	}
 
 }

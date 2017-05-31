@@ -48,19 +48,19 @@ public class GodAgent extends AAgent {
 	@Override
 	@ScheduledMethod(start = 1, interval = 1)
 	public void step() {
-		++min_;
-		if (min_ == 60) {
+		min_ += Const.MINUTE_TIME_FACTOR;
+		if (min_ >= 60) {
 			min_ = 0;
 			++hour_;
 			if (hour_ == Const.MORNING_HOUR) {
 				callEvt(new EventTimeObject(EventTimeObject.Type.MORNING_HOUR));
 			}
 		}
-		if (hour_ == 24) {
+		if (hour_ >= 24) {
 			++day_;
 			hour_ = 0;
 		}
-		if (day_ == 365) {
+		if (day_ >= 365) {
 			day_ = 0;
 			++year_;
 			callEvt(new EventTimeObject(EventTimeObject.Type.YEAR));
