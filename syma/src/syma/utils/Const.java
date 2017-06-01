@@ -11,7 +11,9 @@ import syma.environment.WorkPlace;
 public class Const {
 	
 	/* INITIALIZATION */
+	public static int INIT_NB_AGENTS = 1;
 	public static float INIT_CHILD_PROBA = 0.25f;
+	public static float SPARE_TIME_RATE = 0.5f;
 	
 	/* TIME */
 	public static int INITIAL_YEAR_FACTOR = 1;
@@ -20,8 +22,11 @@ public class Const {
 	public static long YEAR_IN_MIN = 525600l;
 	public static long DAY_IN_MIN = 1440l;
 	
-	/* GOD AGENT */
+	public static int NIGHT_BEGIN_HOUR = 22;
 	public static final int MORNING_HOUR = 7;
+	
+	public static int MIN_NB_MIN_HANG_OUT = 150;
+	public static int MAX_NB_MIN_HANG_OUT = 300;
 	
 	/* HUMAN CONST */
 	public static final int MAX_AGE = 90;
@@ -52,6 +57,10 @@ public class Const {
 	public static final String ROAD_ICON = ICON_FOLDER + "road.png";
 	public static final String SCHOOL_ICON = ICON_FOLDER + "school.png";
 	public static final String WORK_ICON = ICON_FOLDER + "workplace.png";
+	
+	/* LOGGING */
+	public static final String WORK_TAG = "[ WORK ]";
+	public static final String HANG_OUT_TAG = "[ HANG_OUT ]";
 	
 	public static final String getIconFromType(AFixedGeography a) {
 		String res = null;

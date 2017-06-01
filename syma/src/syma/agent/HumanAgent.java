@@ -19,6 +19,7 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.Stack;
 
+import syma.environment.Bar;
 import syma.environment.Building;
 import syma.environment.BusStop;
 import syma.environment.School;
@@ -79,27 +80,42 @@ public class HumanAgent extends AAgent {
 		@Override
 		public void updateEvent(AEventObject e) {
 			if (e == null) return;
-
+			
 			EventTimeObject obj = (EventTimeObject)e;
-			if (obj.type == EventTimeObject.Type.YEAR) {
-				++age_;
-				if (age_ == 18) {
-					turnAdult();
-				} else if (age_ == searchPartnerAge_) {
-					if (!HumanAgent.this.hasCompanion()) findPartner();
-				}
-			} else if (obj.type == EventTimeObject.Type.MORNING_HOUR) {
-				if (age_ >= 18 && hasToWork()) {
-					// FIXME they won't go to school if it doesn't have a job!!!!!
-					if (hasToBringToSchool()) {
-						System.out.println("GO = " + school_.get().getX() + " | " + school_.get().getY());
-						MoveTo moveToSchool = computeBusTraject(school_.get(), bringToSchoolListener_, false);
-						addGoal(moveToSchool);
-						order_ = true;
-					} else {
-						HumanAgent.this.addGoalMoveToWork();
+			switch (obj.type) {
+				case YEAR:
+					++age_;
+					if (age_ == 18) {
+						turnAdult();
+					} else if (age_ == searchPartnerAge_) {
+						if (!HumanAgent.this.hasCompanion()) findPartner();
 					}
-				}
+					break;
+				case MORNING_HOUR:
+					if (age_ >= 18 && hasToWork()) {
+						// FIXME they won't go to school if it doesn't have a job!!!!!
+						if (hasToBringToSchool()) {
+							addGoal(new MoveTo(HumanAgent.this, bringToSchoolListener_, school_.get(), grid_));
+							order_ = true;
+						} else {
+							HumanAgent.this.addGoalMoveToWork();
+						}
+					}
+					break;
+				case CHILL_HOUR:
+					if (age_ < 18 || HumanAgent.this.getChildren().findFirst().isPresent()) {
+						break;
+					}
+					if (Math.random() <= Const.SPARE_TIME_RATE) {
+						GodAgent env = GodAgent.instance();
+						Bar b = env.getClosestGeography(Bar.globalList, pathSearch_, HumanAgent.this.getPos());
+						if (b != null) {
+							HumanAgent.this.addGoalHangOut(b);
+						}
+					}
+					break;
+			default:
+				break;
 			}
 		}
 	};
@@ -232,6 +248,8 @@ public class HumanAgent extends AAgent {
 	}
 
 	public void addGoalMoveToWork() {
+		GodAgent env = GodAgent.instance();
+		
 		MoveTo moveToWork = computeBusTraject(workplace_, e -> {
 			HumanAgent.this.pollGoal();
 			HumanAgent.this.addGoalWaitAtWork(); 
@@ -239,14 +257,21 @@ public class HumanAgent extends AAgent {
 		
 		int randomMin = rand_.nextInt(Const.MAX_DELAY_BEFORE_WORK);
 		Wait waitBeforeWork = new Wait(this, e -> {
+			
 			HumanAgent.this.pollGoal();
 			HumanAgent.this.addGoal(moveToWork);
+			
+			String logMsg = Const.WORK_TAG + "\n";
+			logMsg += "Agent " + id_ + " is moving to work on " + env.getFormattedTime();
+			LOGGER.log(Level.INFO, logMsg);
+
 		}, Const.timeToTick(0, 0, randomMin));
 		
 		this.addGoal(waitBeforeWork);
 	}
 
 	public void addGoalWaitAtWork() {
+		GodAgent env = GodAgent.instance();
 		int workHour = workplace_.getEndHour() - workplace_.getStartHour();
 		
 		Wait waitAtWork = new Wait(HumanAgent.this, e -> {
@@ -265,6 +290,11 @@ public class HumanAgent extends AAgent {
 			HumanAgent.this.pollGoal();
 			MoveTo moveToHouse = computeBusTraject(home_, null, true);
 			HumanAgent.this.addGoal(moveToHouse);
+			
+			String logMsg = Const.WORK_TAG + "\n";
+			logMsg += "Agent " + id_ + " is coming home on " + env.getFormattedTime();
+			LOGGER.log(Level.INFO, logMsg);
+			
 		}, Const.timeToTick(0, workHour, 0));
 		
 		this.addGoal(waitAtWork);
@@ -279,6 +309,45 @@ public class HumanAgent extends AAgent {
 		}, school_.get(), grid_);
 		
 		this.addGoal(moveToSchool);
+	}
+	
+	public void addGoalHangOut(Bar bar) {
+		GodAgent env = GodAgent.instance();
+		int minBeforeGo = rand_.nextInt(Const.MAX_DELAY_BEFORE_WORK);
+		int minTimeToSpend = rand_.nextInt(Const.MAX_NB_MIN_HANG_OUT) + Const.MIN_NB_MIN_HANG_OUT;
+		
+		Wait waitBeforeGo = new Wait(this, eInit -> {
+			
+			HumanAgent.this.pollGoal();
+			
+			MoveTo moveToBar = computeBusTraject(bar, e2 -> {
+				
+				HumanAgent.this.pollGoal();
+				
+				Wait waitAtBar = new Wait(HumanAgent.this, f -> {
+					
+					HumanAgent.this.pollGoal();
+					MoveTo moveToHouse = computeBusTraject(home_, null, true);
+					HumanAgent.this.addGoal(moveToHouse);
+					
+					String logMsg = Const.HANG_OUT_TAG + "\n";
+					logMsg += "Agent " + id_ + " is coming home on " + env.getFormattedTime();
+					LOGGER.log(Level.INFO, logMsg);
+					
+				}, Const.timeToTick(0, 0, minTimeToSpend)); 
+				HumanAgent.this.addGoal(waitAtBar);
+				
+			}, false);
+			
+			HumanAgent.this.addGoal(moveToBar);
+			
+			String logMsg = Const.HANG_OUT_TAG + "\n";
+			logMsg += "Agent " + id_ + " is hanging out on " + env.getFormattedTime();
+			LOGGER.log(Level.INFO, logMsg);
+			
+		}, Const.timeToTick(0, 0, minBeforeGo));
+		
+		this.addGoal(waitBeforeGo);
 	}
 
 	/* GETTERS // SETTERS */

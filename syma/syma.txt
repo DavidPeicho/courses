@@ -33,3 +33,4 @@ Fonctionnement :
  	- Parent dying when bringing child to school causes an exception
 	- Go to the bar on Friday / Saturday (one of the two parent)
 	- Take the bus to go to work
+	- Add birth rate to increase nb of child by agent

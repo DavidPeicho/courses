@@ -4,6 +4,7 @@ public class EventTimeObject extends AEventObject {
 	
 	public enum Type {
 		MORNING_HOUR,
+		CHILL_HOUR,
 		HOUR,
 		YEAR
 	};

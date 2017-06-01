@@ -63,6 +63,7 @@ public class GridParser {
 				break;
 			case Const.BAR_TYPE:
 				result = new Bar(grid);
+				Bar.globalList.add((Bar)result);
 				break;
 			case Const.ROAD_TYPE:
 				result = new Road(grid);
