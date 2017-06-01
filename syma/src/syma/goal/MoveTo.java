@@ -3,6 +3,7 @@ package syma.goal;
 import repast.simphony.space.grid.Grid;
 import repast.simphony.space.grid.GridPoint;
 import syma.agent.AAgent;
+import syma.agent.HumanAgent;
 import syma.events.IUpdateListener;
 import syma.main.GridElement;
 import syma.utils.PathSearch;
@@ -44,7 +45,12 @@ public class MoveTo extends AGoal {
 		GridPoint dest = path_.getPath().pop();
 		target_.setPos(dest.getX(), dest.getY());
 		
-		if (success() && autoRemoveWhenReached_) target_.pollGoal();
+		if (success() && autoRemoveWhenReached_) {
+			target_.pollGoal();
+			if (target_ instanceof HumanAgent) {
+				((HumanAgent)target_).deactivateOrder();
+			}
+		}
 
 	}
 
