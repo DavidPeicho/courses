@@ -19,9 +19,25 @@ import syma.utils.Const;
 
 public class Tram extends AAgent {
 	ArrayList<AAgent> passengers;
-	private ArrayList<BusStop> stops;
-	private ArrayList<GridElement> roadStops;
+	public static ArrayList<BusStop> stops;
+	public static ArrayList<GridElement> roadStops;
+	public static Tram instance = null; // TODO: either singleton or wrap grid and get rid of all static containers
 	private GridPoint start;
+	
+	public static BusStop getNearestStop(GridPoint p) {
+		int minDist = Integer.MAX_VALUE;
+		BusStop minBusStop = null;
+		for (BusStop e : stops) {
+			int candidateDist = (e.getX() - p.getX()) * (e.getX() - p.getX())
+					+ (e.getY() - p.getY()) * (e.getY() - p.getY());
+			if (candidateDist < minDist) {
+				minBusStop = e;
+				minDist = candidateDist;
+			}
+		}
+		return minBusStop;
+	}
+	
 
 	public Tram(Grid<GridElement> grid, ArrayList<BusStop> busStops) {
 		super(grid);
@@ -29,6 +45,7 @@ public class Tram extends AAgent {
 		roadStops = new ArrayList<>();
 		computeRoadStops();
 		computeCycle();
+		instance = this;
 	}
 	
 	private void computeRoadStops() {
@@ -49,7 +66,8 @@ public class Tram extends AAgent {
 					while (it.hasNext()) {
 						Object o = it.next();
 						if (o instanceof Road) {
-							roadStops.add(((Road)o));
+							roadStops.add((Road)o);
+							e.setRoadStop((Road)o);
 							found = true;
 							break;
 						}
