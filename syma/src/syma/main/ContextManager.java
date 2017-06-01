@@ -41,7 +41,8 @@ public class ContextManager implements ContextBuilder<GridElement> {
 		
 		String pathToMap = RunEnvironment.getInstance().getParameters().getString("mapPath");
 		int nbAgents = RunEnvironment.getInstance().getParameters().getInteger("maxNbAgents");
-		Const.MINUTE_TIME_FACTOR = RunEnvironment.getInstance().getParameters().getInteger("timeFactor");
+		Const.YEAR_FACTOR = RunEnvironment.getInstance().getParameters().getInteger("yearFactor");
+		Const.INIT_CHILD_PROBA = RunEnvironment.getInstance().getParameters().getFloat("childProbability");
 
 		try {
 			map = GridParser.instance().parse(pathToMap);
@@ -152,19 +153,27 @@ public class ContextManager implements ContextBuilder<GridElement> {
 		int w = grid.getDimensions().getWidth();
 		int h = grid.getDimensions().getHeight();
 		GodAgent env = GodAgent.instance();
+		env.setAgentsNb(nbAgents);
 
 		for (int i = 0; i < nbAgents; ++i) {
 			// Finds a house for the newly created agent
-			Building home = getEmptyGeography(Building.globalList);
+			Building home = env.getEmptyGeography(Building.globalList);
 			int x = home.getX();
 			int y = home.getY();
 			// Finds a workplace for the newly created agent
-			WorkPlace workplace = getEmptyGeography(WorkPlace.globalList);
+			WorkPlace workplace = env.getEmptyGeography(WorkPlace.globalList);
 			
 			boolean gender = Math.random() >= 0.5f;
 			int age = (int)(Math.random() * 50.0d + 18.0d);
 			
 			HumanAgent agent = env.createAgent(grid, age, gender, home, workplace);
+			
+			// Spawns a child agent according
+			// to a given probability
+			if (Math.random() <= Const.INIT_CHILD_PROBA) {
+				HumanAgent child = env.createChildAgent(context, agent, grid, home);
+				grid.moveTo(child, home.getX(), home.getY());
+			}
 
 			context.add(agent);
 			grid.moveTo(agent, x, y);
@@ -182,32 +191,5 @@ public class ContextManager implements ContextBuilder<GridElement> {
 		int relativeX = p.x;
 		int relativeY = height - 1 - p.y;
 		return new GridPoint(relativeX, relativeY);
-	}
-	
-	/**
-	 * Loops through every registered building to find an empty one,
-	 * after applying a random selection.
-	 * @return The first building being empty after random search.
-	 */
-	private <T extends AFixedGeography> T getEmptyGeography(ArrayList<T> list) {
-		
-		if (list.size() == 0) return null;
-		
-		int nbGeography = list.size();
-		
-		int initialIdx = (int)(Math.random() * (nbGeography - 1)); 
-		int idx = initialIdx;
-		
-		T elt = list.get(idx);
-		while (!elt.isEmpty()) {
-			idx = (idx + 1) % nbGeography;
-			if (idx == initialIdx) {
-				return null;
-			}
-			elt = list.get(idx);
-		}
-		
-		return elt;
-		
 	}
 }

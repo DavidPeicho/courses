@@ -12,6 +12,12 @@
 						converter="repast.simphony.parameter.StringConverterFactory$IntConverter"
 									
 		/>
+				<parameter name="yearFactor" displayName="Year Factor" type="int" 
+						defaultValue="1" 
+						isReadOnly="false" 
+						converter="repast.simphony.parameter.StringConverterFactory$IntConverter"
+									
+		/>
 				<parameter name="mapPath" displayName="Map Path" type="java.lang.String" 
 						defaultValue="assets/map1.syma" 
 						isReadOnly="false" 
