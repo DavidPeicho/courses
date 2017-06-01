@@ -17,20 +17,25 @@ import repast.simphony.util.ContextUtils;
 
 import java.util.Optional;
 import java.util.Random;
+import java.util.Stack;
 
 import syma.environment.Building;
+import syma.environment.BusStop;
 import syma.environment.School;
 import syma.environment.WorkPlace;
 import syma.goal.AGoal;
+import syma.goal.DriveTo;
 import syma.goal.Follow;
 import syma.goal.MoveTo;
 import syma.goal.Wait;
+import syma.goal.WaitForBus;
 import syma.events.AEventObject;
 import syma.events.EventTimeObject;
 import syma.events.IUpdateListener;
 import syma.main.GridElement;
 import syma.utils.Const;
 import syma.utils.PathSearch;
+import syma.vehicles.Bus;
 
 public class HumanAgent extends AAgent {
 
@@ -87,8 +92,9 @@ public class HumanAgent extends AAgent {
 				if (age_ >= 18 && hasToWork()) {
 					// FIXME they won't go to school if it doesn't have a job!!!!!
 					if (hasToBringToSchool()) {
-						addGoal(new MoveTo(HumanAgent.this, bringToSchoolListener_, school_.get(), grid_));
 						System.out.println("GO = " + school_.get().getX() + " | " + school_.get().getY());
+						MoveTo moveToSchool = computeBusTraject(school_.get(), bringToSchoolListener_, false);
+						addGoal(moveToSchool);
 						order_ = true;
 					} else {
 						HumanAgent.this.addGoalMoveToWork();
@@ -197,12 +203,39 @@ public class HumanAgent extends AAgent {
 			}
 		}
 	}
+	
+	private MoveTo computeBusTraject(GridElement dest, IUpdateListener callback, boolean autoremove) {
+		BusStop busStart = Tram.getNearestStop(getPos());
+		BusStop busEnd = Tram.getNearestStop(dest.getPos());
+		MoveTo moveToBusStart = new MoveTo(HumanAgent.this, null, busStart, grid_);
+		WaitForBus waitForBus = new WaitForBus(HumanAgent.this, null, busStart.getRoadStop(), grid_);
+		DriveTo driveTo = new DriveTo(HumanAgent.this, null, busEnd.getRoadStop(), Tram.instance, grid_);
+		MoveTo moveToEnd = new MoveTo(HumanAgent.this, null, dest, grid_);
+		IUpdateListener l1 = (AEventObject o) -> {
+			HumanAgent.this.pollGoal();
+			HumanAgent.this.addGoal(waitForBus);
+		};
+		moveToBusStart.addCallback(l1);
+		IUpdateListener l2 = (AEventObject o) -> {
+			HumanAgent.this.pollGoal();
+			HumanAgent.this.addGoal(driveTo);
+		};
+		waitForBus.addCallback(l2);
+		IUpdateListener l3 = (AEventObject o) -> {
+			HumanAgent.this.pollGoal();
+			HumanAgent.this.addGoal(moveToEnd);
+		};
+		driveTo.addCallback(l3);
+		moveToEnd.addCallback(callback);
+		moveToEnd.setAutoremoveWhenReached(autoremove);
+		return moveToBusStart;
+	}
 
 	public void addGoalMoveToWork() {
-		MoveTo moveToWork = new MoveTo(this, e -> {
+		MoveTo moveToWork = computeBusTraject(workplace_, e -> {
 			HumanAgent.this.pollGoal();
-			HumanAgent.this.addGoalWaitAtWork();
-		}, workplace_, grid_);
+			HumanAgent.this.addGoalWaitAtWork(); 
+		}, false);
 		
 		int randomMin = rand_.nextInt(Const.MAX_DELAY_BEFORE_WORK);
 		Wait waitBeforeWork = new Wait(this, e -> {
@@ -217,7 +250,7 @@ public class HumanAgent extends AAgent {
 		int workHour = workplace_.getEndHour() - workplace_.getStartHour();
 		
 		Wait waitAtWork = new Wait(HumanAgent.this, e -> {
-			HumanAgent.this.pollGoal();
+			/*HumanAgent.this.pollGoal();
 			if (HumanAgent.this.hasToBringToSchool()) {
 				Optional<AAgent> childOption = HumanAgent.this.getChildren().findFirst(); 
 				if (childOption.isPresent()) {
@@ -228,9 +261,9 @@ public class HumanAgent extends AAgent {
 						return;
 					}
 				}
-			}
-			MoveTo moveToHouse = new MoveTo(HumanAgent.this, null, home_, grid_);
-			moveToHouse.setAutoremoveWhenReached(true);
+			}*/
+			HumanAgent.this.pollGoal();
+			MoveTo moveToHouse = computeBusTraject(home_, null, true);
 			HumanAgent.this.addGoal(moveToHouse);
 		}, Const.timeToTick(0, workHour, 0));
 		
