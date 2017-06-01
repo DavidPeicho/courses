@@ -23,6 +23,7 @@ public class Tram extends AAgent {
 	public static ArrayList<GridElement> roadStops;
 	public static Tram instance = null; // TODO: either singleton or wrap grid and get rid of all static containers
 	private GridPoint start;
+	public static int currentStop = 0;
 	
 	public static BusStop getNearestStop(GridPoint p) {
 		int minDist = Integer.MAX_VALUE;
@@ -111,6 +112,7 @@ public class Tram extends AAgent {
 			IUpdateListener l2 = (AEventObject o) -> {
 				Tram.this.pollGoal();
 				Tram.this.addGoal(w);
+				Tram.currentStop = (Tram.currentStop + 1) % Tram.stops.size();
 			};
 			mt.addCallback(l2);
 			lastW = w;
@@ -128,5 +130,5 @@ public class Tram extends AAgent {
 	public GridPoint getStart() {
 		return start;
 	}
-	
+
 }
