@@ -26,6 +26,6 @@ public class DriveTo extends AGoal {
 	
 	@Override
 	public boolean success() {
-		return (dest_.getX() == tram_.getX() && dest_.getY() == tram_.getY());
+		return dest_.getPos().equals(tram_.getPos());
 	}
 }

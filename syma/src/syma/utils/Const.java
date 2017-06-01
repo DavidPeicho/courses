@@ -40,6 +40,7 @@ public class Const {
 	public static final int MIN_DEATH_AGE = 52;
 	public static final int MAX_AGE = 90;
 	public static final int MAX_SEARCH_PARTNER_AGE = 45;
+	public static final int MAJOR_AGE = 18;
 	
 	public static final int MAX_NB_CHILDREN = 4; 
 	

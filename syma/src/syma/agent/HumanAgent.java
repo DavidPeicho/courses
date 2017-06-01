@@ -17,8 +17,6 @@ import repast.simphony.util.ContextUtils;
 
 import java.util.Optional;
 import java.util.Random;
-import java.util.Stack;
-
 import syma.environment.Bar;
 import syma.environment.Building;
 import syma.environment.BusStop;
@@ -57,19 +55,13 @@ public class HumanAgent extends AAgent {
 	
 	Random rand_;
 
-	private IUpdateListener bringToSchoolListener_ = (AEventObject o) -> {
-		HumanAgent.this.pollGoal();
-		HumanAgent.this.addGoalMoveToWork();
-	};
-
 	private boolean hasToWork() { return workplace_ != null; }
 
 	private boolean hasToBringToSchool() {
 		Stream<AAgent> c = getChildren();
 
 		if (school_.isPresent() && c != null) {
-			Optional<AAgent> child = c.findFirst();
-			return child.isPresent() && child.get().getPos().equals(getPos());
+			return c.findFirst().isPresent();
 		}
 
 		return false;
@@ -85,20 +77,19 @@ public class HumanAgent extends AAgent {
 			switch (obj.type) {
 				case YEAR:
 					++age_;
-					if (age_ == 18) {
+					if (age_ == Const.MAJOR_AGE) {
 						turnAdult();
 					} else if (age_ == searchPartnerAge_) {
 						if (!HumanAgent.this.hasCompanion()) findPartner();
 					}
 					break;
 				case MORNING_HOUR:
-					if (age_ >= 18 && hasToWork()) {
+					if (age_ >= Const.MAJOR_AGE && hasToWork()) {
 						// FIXME they won't go to school if it doesn't have a job!!!!!
 						if (hasToBringToSchool()) {
-							addGoal(new MoveTo(HumanAgent.this, bringToSchoolListener_, school_.get(), grid_));
-							order_ = true;
+							HumanAgent.this.addGoalGoToSchoolAndWork();
 						} else {
-							HumanAgent.this.addGoalMoveToWork();
+							HumanAgent.this.addGoalMoveToWork(true);
 						}
 					}
 					break;
@@ -106,7 +97,7 @@ public class HumanAgent extends AAgent {
 					if (!goals_.isEmpty()) {
 						break;
 					}
-					if (age_ < 18 || HumanAgent.this.getChildren().findFirst().isPresent()) {
+					if (age_ < Const.MAJOR_AGE || HumanAgent.this.getChildren().findFirst().isPresent()) {
 						break;
 					}
 					if (Math.random() <= Const.SPARE_TIME_RATE) {
@@ -149,10 +140,8 @@ public class HumanAgent extends AAgent {
 	public void decide() {
 		AGoal g = peekGoal();
 		if (g != null && g.success()) {
+			deactivateOrder();
 			g.triggerCallback(null);
-			if (order_) {
-				order_ = false;
-			}
 		}
 		
 		GodAgent env = GodAgent.instance();
@@ -221,20 +210,19 @@ public class HumanAgent extends AAgent {
 			watcheeFieldNames="order_",
 			query="linked_from 'genealogy'",
 			whenToTrigger=WatcherTriggerSchedule.IMMEDIATE,
-			triggerCondition="$watcher.getAge() < 18 && $watcher.isParent($watchee)")
+			triggerCondition="$watcher.getAge() < syma.utils.Const.MAJOR_AGE && $watcher.isParent($watchee)")
 	public void react() {
 		Stream<AAgent> ps = getParents().filter((AAgent a) -> ((HumanAgent)a).getOrder());
 		Optional<AAgent> p = ps.findFirst();
+
 		if (p.isPresent()) {
-			IUpdateListener clbk = (AEventObject o) -> {
-				HumanAgent.this.pollGoal();
-			};
-			addGoal(new Follow(this, clbk, p.get(), grid_));
+			addGoal(new Follow(this, ((o) -> HumanAgent.this.pollGoal()), p.get(), grid_));
 		} else {
 			AGoal g = peekGoal();
 			if (g != null) {
 				if (g instanceof Follow) {
 					((Follow)g).setContinue(false);
+					g.update();
 				}
 			} else {
 				LOGGER.log(Level.INFO, "Agent " + id_ + "react twice to parent!");
@@ -242,7 +230,7 @@ public class HumanAgent extends AAgent {
 		}
 	}
 	
-	private MoveTo computeTraject(GridElement dest, IUpdateListener callback, boolean autoremove) {
+	private MoveTo computeTraject(GridElement dest, IUpdateListener callback, boolean autoremove, boolean child) {
 		BusStop busStart = Tram.getNearestStop(getPos());
 		BusStop busEnd = Tram.getNearestStop(dest.getPos());
 		int busDist =
@@ -265,16 +253,26 @@ public class HumanAgent extends AAgent {
 			IUpdateListener l1 = (AEventObject o) -> {
 				HumanAgent.this.pollGoal();
 				HumanAgent.this.addGoal(waitForBus);
+				if (child) {
+				    activateOrder();
+		                }
 			};
 			moveToBusStart.addCallback(l1);
 			IUpdateListener l2 = (AEventObject o) -> {
 				HumanAgent.this.pollGoal();
 				HumanAgent.this.addGoal(driveTo);
+				if (child) {
+				    activateOrder();
+		                }
+
 			};
 			waitForBus.addCallback(l2);
 			IUpdateListener l3 = (AEventObject o) -> {
 				HumanAgent.this.pollGoal();
 				HumanAgent.this.addGoal(moveToEnd);
+				if (child) {
+				    activateOrder();
+		                }
 			};
 			driveTo.addCallback(l3);
 			moveToEnd.addCallback(callback);
@@ -286,16 +284,60 @@ public class HumanAgent extends AAgent {
 			moveTo.setAutoremoveWhenReached(autoremove);
 			return moveTo;
 		}
+	/*private MoveTo computeBusTraject(GridElement dest, IUpdateListener callback, boolean autoremove, boolean child) {
+		BusStop busStart = Tram.getNearestStop(getPos());
+		BusStop busEnd = Tram.getNearestStop(dest.getPos());
+		MoveTo moveToBusStart = new MoveTo(HumanAgent.this, null, busStart, grid_);
+		WaitForBus waitForBus = new WaitForBus(HumanAgent.this, null, busStart.getRoadStop(), grid_);
+		DriveTo driveTo = new DriveTo(HumanAgent.this, null, busEnd.getRoadStop(), Tram.instance, grid_);
+		MoveTo moveToEnd = new MoveTo(HumanAgent.this, null, dest, grid_);
+
+		IUpdateListener l1 = (AEventObject o) -> {
+			HumanAgent.this.pollGoal();
+			HumanAgent.this.addGoal(waitForBus);
+			if (child) {
+				activateOrder();
+			}
+		};
+		moveToBusStart.addCallback(l1);
+
+		IUpdateListener l2 = (AEventObject o) -> {
+			HumanAgent.this.pollGoal();
+			HumanAgent.this.addGoal(driveTo);
+			if (child) {
+				activateOrder();
+			}
+		};
+		waitForBus.addCallback(l2);
+
+		IUpdateListener l3 = (AEventObject o) -> {
+			HumanAgent.this.pollGoal();
+			HumanAgent.this.addGoal(moveToEnd);
+			if (child) {
+				activateOrder();
+			}
+		};
+		driveTo.addCallback(l3);
+
+		moveToEnd.addCallback(callback);
+		moveToEnd.setAutoremoveWhenReached(autoremove);
+
+		return moveToBusStart;*/
 	}
 
-	public void addGoalMoveToWork() {
+	public void addGoalMoveToWork(boolean wait) {
 		GodAgent env = GodAgent.instance();
 		
 		MoveTo moveToWork = computeTraject(workplace_, e -> {
 			HumanAgent.this.pollGoal();
 			HumanAgent.this.addGoalWaitAtWork(); 
-		}, false);
+		}, false, false);
 		
+		if (!wait) {
+			addGoal(moveToWork);
+			return;
+		}
+
 		int randomMin = rand_.nextInt(Const.MAX_DELAY_BEFORE_WORK);
 		Wait waitBeforeWork = new Wait(this, e -> {
 			
@@ -312,34 +354,44 @@ public class HumanAgent extends AAgent {
 	}
 
 	public void addGoalWaitAtWork() {
+
 		GodAgent env = GodAgent.instance();
 		int workHour = workplace_.getEndHour() - workplace_.getStartHour();
 		
 		Wait waitAtWork = new Wait(HumanAgent.this, e -> {
 			HumanAgent.this.pollGoal();
+/*
 			MoveTo moveToHouse = computeTraject(home_, null, true);
 			HumanAgent.this.addGoal(moveToHouse);
+*/
+			if (HumanAgent.this.hasToBringToSchool()) {
+				HumanAgent child = (HumanAgent)HumanAgent.this.getChildren().findFirst().get();
+				if (child.getPos().equals(school_.get().getPos())) {
+					HumanAgent.this.addGoalGoToSchoolAndHome();
+					return;
+				}
+			}
+
+			HumanAgent.this.addGoal(computeTraject(home_, null, true, false));
 			
 			String logMsg = Const.WORK_TAG + "\n";
 			logMsg += "Agent " + id_ + " is coming home on " + env.getFormattedTime();
 			LOGGER.log(Level.INFO, logMsg);
-			
 		}, Const.timeToTick(0, workHour, 0));
 		
 		this.addGoal(waitAtWork);
 	}
 	
-	public void addGoalGetChildren() {
-		MoveTo moveToSchool = new MoveTo(this, e -> {
-			HumanAgent.this.pollGoal();
-			MoveTo moveToHouse = new MoveTo(HumanAgent.this, null, home_, grid_);
-			moveToHouse.setAutoremoveWhenReached(true);
-			HumanAgent.this.order_ = true;
-		}, school_.get(), grid_);
-		
+	public void addGoalGoToSchoolAndHome() {
+		MoveTo moveToSchool = computeTraject(school_.get(), e -> {
+				HumanAgent.this.pollGoal();
+				HumanAgent.this.addGoal(computeTraject(home_, null, true, true));
+				HumanAgent.this.activateOrder();
+			}, false, false);
+
 		this.addGoal(moveToSchool);
 	}
-	
+
 	public void addGoalAfterWait(int min, AGoal nextGoal, String logMsg) {
 		
 		Wait waitAt = new Wait(HumanAgent.this, e -> {
@@ -354,7 +406,17 @@ public class HumanAgent extends AAgent {
 		this.addGoal(waitAt);
 		
 	}
-	
+
+	public void addGoalGoToSchoolAndWork() {
+		MoveTo moveToSchool = computeTraject(school_.get(), e -> {
+				HumanAgent.this.pollGoal();
+				HumanAgent.this.addGoalMoveToWork(false);
+			}, false, true);
+
+		this.addGoal(moveToSchool);
+		activateOrder();
+	}
+
 	public void addGoalShopping(ShoppingCentre shoppingCentre) {
 		GodAgent env = GodAgent.instance();
 		
@@ -369,12 +431,12 @@ public class HumanAgent extends AAgent {
 			logMsg += "Agent " + id_ + " is coming home on " + env.getFormattedTime() + "\n";
 			logMsg += "Building " + home_.getID() + " is now filled!";
 			
-			MoveTo moveToHouse = computeTraject(home_, null, true);
+			MoveTo moveToHouse = computeTraject(home_, null, true, false);
 			HumanAgent.this.addGoalAfterWait(timeAtShop, moveToHouse, logMsg);
 			
 			home_.upFoodLevel();
 			
-		}, false);
+		}, false, false);
 		
 		String logMsg = Const.SHOPPING_TAG + "\n";
 		logMsg += "Agent " + id_ + " is going to shop on " + env.getFormattedTime();
@@ -399,7 +461,7 @@ public class HumanAgent extends AAgent {
 				Wait waitAtBar = new Wait(HumanAgent.this, f -> {
 					
 					HumanAgent.this.pollGoal();
-					MoveTo moveToHouse = computeTraject(home_, null, true);
+					MoveTo moveToHouse = computeTraject(home_, null, true, false);
 					HumanAgent.this.addGoal(moveToHouse);
 					
 					String logMsg = Const.HANG_OUT_TAG + "\n";
@@ -409,7 +471,7 @@ public class HumanAgent extends AAgent {
 				}, Const.timeToTick(0, 0, minTimeToSpend)); 
 				HumanAgent.this.addGoal(waitAtBar);
 				
-			}, false);
+			}, false, false);
 			
 			HumanAgent.this.addGoal(moveToBar);
 			
@@ -453,6 +515,18 @@ public class HumanAgent extends AAgent {
 
 	public boolean getOrder() {
 		return order_;
+	}
+
+	public void deactivateOrder() {
+		if (order_) {
+			order_ = false;
+		}
+	}
+
+	public void activateOrder() {
+		if (!order_) {
+			order_ = true;
+		}
 	}
 
 	public IUpdateListener getYearListener() {
