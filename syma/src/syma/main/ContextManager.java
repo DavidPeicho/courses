@@ -2,8 +2,10 @@ package syma.main;
 
 import syma.agent.*;
 import syma.environment.AFixedGeography;
+import syma.environment.Bar;
 import syma.environment.Building;
 import syma.environment.School;
+import syma.environment.ShoppingCentre;
 import syma.environment.BusStop;
 import syma.environment.WorkPlace;
 import syma.parsing.BaseMap;
@@ -47,6 +49,7 @@ public class ContextManager implements ContextBuilder<GridElement> {
 		Const.YEAR_FACTOR = RunEnvironment.getInstance().getParameters().getInteger("yearFactor");
 		Const.INIT_CHILD_PROBA = RunEnvironment.getInstance().getParameters().getFloat("childProbability");
 		Const.SPARE_TIME_RATE = RunEnvironment.getInstance().getParameters().getFloat("spareTimeRate");
+		Const.MEAN_NB_CHILD = RunEnvironment.getInstance().getParameters().getInteger("meanChildByCouple");
 
 		logInit();
 		
@@ -61,14 +64,12 @@ public class ContextManager implements ContextBuilder<GridElement> {
 		GridFactory gfac = GridFactoryFinder.createGridFactory(null);
 		GridBuilderParameters<GridElement> gbp = new GridBuilderParameters<GridElement>(new WrapAroundBorders(), new SimpleGridAdder<GridElement>(), true, width, height);
 		Grid<GridElement> grid = gfac.createGrid("grid", context, gbp);
-		
+
 		if (map == null) return context;
 		
 		init();
 		
 		GodAgent.init(grid);
-		context.add(GodAgent.instance());
-		grid.moveTo(GodAgent.instance(), 0, 0);
 		
 		buildGrid(map, width, height, context, grid);
 		NetworkBuilder<Object> netBuilder = new NetworkBuilder<Object>("genealogy", (Context)context, true);
@@ -80,7 +81,7 @@ public class ContextManager implements ContextBuilder<GridElement> {
 			return context;
 		}
 		
-		spawnDefaultAgents(context, grid);
+		spawnDefaultAgents(map, context, grid);
 		return context;
 	}
 	
@@ -88,6 +89,16 @@ public class ContextManager implements ContextBuilder<GridElement> {
 		Building.globalList.clear();
 		WorkPlace.globalList.clear();
 		School.globalList.clear();
+		Bar.globalList.clear();
+		ShoppingCentre.globalList.clear();
+
+		if (Tram.stops != null) {
+			Tram.stops.clear();
+		}
+		if (Tram.roadStops != null) {
+			Tram.roadStops.clear();
+		}
+
 		AAgent.resetID();
 	}
 	
@@ -113,9 +124,9 @@ public class ContextManager implements ContextBuilder<GridElement> {
 	}
 	
 	private void buildGrid(BaseMap map, int w, int h, Context<GridElement> context, Grid<GridElement> grid) {
-		
+
 		String mapStr = map.getRawMap();
-		
+
 		// Add grounds element in the background
 		for (int i = 0; i < mapStr.length(); ++i) {
 			char val = mapStr.charAt(i);
@@ -130,7 +141,7 @@ public class ContextManager implements ContextBuilder<GridElement> {
 			context.add(elt);
 			grid.moveTo(elt, relativeX, relativeY);
 		}
-		
+
 		for (int i = 0; i < mapStr.length(); ++i) {
 			char val = mapStr.charAt(i);
 			String type = map.getType(val);
@@ -152,11 +163,26 @@ public class ContextManager implements ContextBuilder<GridElement> {
 		
 	}
 	
-	private void spawnDefaultAgents(Context<GridElement> context, Grid<GridElement> grid) {
+	private void spawnDefaultAgents(BaseMap map, Context<GridElement> context, Grid<GridElement> grid) {
 		int w = grid.getDimensions().getWidth();
 		int h = grid.getDimensions().getHeight();
+
 		GodAgent env = GodAgent.instance();
 		env.setAgentsNb(Const.INIT_NB_AGENTS);
+
+		// Add GodAgent to the grid
+		String mapStr = map.getRawMap();
+		for (int i = 0; i < mapStr.length(); ++i) {
+			char val = mapStr.charAt(i);
+			String type = map.getType(val);
+			if (type != null && type.equals(Const.CLOCK_TYPE)) {
+				int relativeX = i % w;
+				int relativeY = h - 1 - (i / w);
+				context.add(GodAgent.instance());
+				grid.moveTo(GodAgent.instance(), relativeX, relativeY);
+				break;
+			}
+		}
 
 		for (int i = 0; i < Const.INIT_NB_AGENTS; ++i) {
 			// Finds a house for the newly created agent

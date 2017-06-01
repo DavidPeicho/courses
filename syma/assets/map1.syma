@@ -6,8 +6,8 @@
     },
 
     "map": "
-        HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH
-        hHhHhHhHhHhHhHhHhHhHhHhHhHhHhHhHhHhHhHhHhH
+        HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH-a
+        hHhHhHhHhHhHhHhHhHhHhHhHhHhHhHhHhHhHhHhH--
         rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr
         SSS--r---HH--------r-HHHHHHHHHH-r-HHHHHH-r
         SsS--r---hH--------r-hHhHhHhHhH-r-hHhHhH-r
@@ -18,9 +18,9 @@
         ----------r--------r-hH-r--cC-r--hH-r--cC-
         ----------r--SSS---rrrrrrrrrrrrrrrrrrrrrrr
         ----------r--SsS---r----------r-----------
-        WWW-WWW---rrrrrrrrrr----------r----KKK----
-        WWW-WWW---r--------r----------r----KKK----
-        WwW-WwW---r--------r----------r----KkK----
+        WWW-WWW---rrrrrrrrrr----------r----KKKK---
+        WWW-WWW---r--------r----------r----KKKK---
+        WwW-WwW---r--------r----------r----KkKK---
         rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr-----
         WWW------------WWW-r----------------------
         WWW------------WWW-r----------------------
@@ -61,6 +61,10 @@
         {
             "key": "w",
             "type": "WORKPLACE"
+        },
+        {
+            "key": "a",
+            "type": "CLOCK"
         }
     ]
 
