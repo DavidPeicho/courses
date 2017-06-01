@@ -6,6 +6,12 @@
 						converter="repast.simphony.parameter.StringConverterFactory$IntConverter"
 									
 		/>
+				<parameter name="spareTimeRate" displayName="Spare Time Rate" type="float" 
+						defaultValue="0.5" 
+						isReadOnly="false" 
+						converter="repast.simphony.parameter.StringConverterFactory$FloatConverter"
+									
+		/>
 				<parameter name="childProbability" displayName="Child Probability" type="float" 
 						defaultValue="1.0" 
 						isReadOnly="false" 

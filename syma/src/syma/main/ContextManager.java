@@ -14,6 +14,8 @@ import syma.utils.Const;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import repast.simphony.context.Context;
 import repast.simphony.context.space.graph.NetworkBuilder;
@@ -30,6 +32,8 @@ import repast.simphony.engine.environment.RunEnvironment;
 
 public class ContextManager implements ContextBuilder<GridElement> {
 
+	private static Logger LOGGER = Logger.getLogger(HumanAgent.class.getName());
+	
 	@Override
 	public Context build(Context<GridElement> context) {
 		context.clear();
@@ -40,10 +44,13 @@ public class ContextManager implements ContextBuilder<GridElement> {
 		BaseMap map = null;
 		
 		String pathToMap = RunEnvironment.getInstance().getParameters().getString("mapPath");
-		int nbAgents = RunEnvironment.getInstance().getParameters().getInteger("maxNbAgents");
+		Const.INIT_NB_AGENTS = RunEnvironment.getInstance().getParameters().getInteger("maxNbAgents");
 		Const.YEAR_FACTOR = RunEnvironment.getInstance().getParameters().getInteger("yearFactor");
 		Const.INIT_CHILD_PROBA = RunEnvironment.getInstance().getParameters().getFloat("childProbability");
+		Const.SPARE_TIME_RATE = RunEnvironment.getInstance().getParameters().getFloat("spareTimeRate");
 
+		logInit();
+		
 		try {
 			map = GridParser.instance().parse(pathToMap);
 			width = map.getWidth();
@@ -69,12 +76,12 @@ public class ContextManager implements ContextBuilder<GridElement> {
 		netBuilder.buildNetwork();
 		
 		// Checks whether the given map matches the parameters
-		if (nbAgents > Building.globalList.size()) {
+		if (Const.INIT_NB_AGENTS > Building.globalList.size()) {
 			System.err.println("Number of default agents is greater than number of houses.");
 			return context;
 		}
 		
-		spawnDefaultAgents(nbAgents, context, grid);
+		spawnDefaultAgents(context, grid);
 		return context;
 	}
 	
@@ -146,13 +153,13 @@ public class ContextManager implements ContextBuilder<GridElement> {
 		
 	}
 	
-	private void spawnDefaultAgents(int nbAgents, Context<GridElement> context, Grid<GridElement> grid) {
+	private void spawnDefaultAgents(Context<GridElement> context, Grid<GridElement> grid) {
 		int w = grid.getDimensions().getWidth();
 		int h = grid.getDimensions().getHeight();
 		GodAgent env = GodAgent.instance();
-		env.setAgentsNb(nbAgents);
+		env.setAgentsNb(Const.INIT_NB_AGENTS);
 
-		for (int i = 0; i < nbAgents; ++i) {
+		for (int i = 0; i < Const.INIT_NB_AGENTS; ++i) {
 			// Finds a house for the newly created agent
 			Building home = env.getEmptyGeography(Building.globalList);
 			int x = home.getX();
@@ -170,12 +177,24 @@ public class ContextManager implements ContextBuilder<GridElement> {
 			if (Math.random() <= Const.INIT_CHILD_PROBA) {
 				HumanAgent child = env.createChildAgent(context, agent, grid, home);
 				grid.moveTo(child, home.getX(), home.getY());
+				env.incChildNb();
+				env.incAgentNb();
 			}
 
 			context.add(agent);
 			grid.moveTo(agent, x, y);
 		}
 		
+	}
+	
+	private void logInit() {
+		String logMsg = "-------------------------------------------\n";
+			   logMsg = "---------------INITIALIZATION--------------\n";
+			   logMsg = "- Init Child Probability:" + Const.INIT_CHILD_PROBA + "\n";
+			   logMsg = "- Init Number Agents:" + Const.INIT_NB_AGENTS + "\n";
+			   logMsg = "- Birth Rate: " + 0 + "\n";
+			   logMsg = "- Year Factor: " + Const.YEAR_FACTOR + "\n";
+		LOGGER.log(Level.INFO, logMsg);
 	}
 	
 	private GridPoint getRelativePos(GridPoint p, int height) {

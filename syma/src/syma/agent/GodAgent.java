@@ -1,6 +1,8 @@
 package syma.agent;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Optional;
 import java.util.Random;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
@@ -10,18 +12,52 @@ import repast.simphony.context.Context;
 import repast.simphony.engine.schedule.ScheduledMethod;
 import repast.simphony.space.graph.Network;
 import repast.simphony.space.grid.Grid;
+import repast.simphony.space.grid.GridPoint;
 import repast.simphony.util.ContextUtils;
 import syma.environment.AFixedGeography;
 import syma.environment.Building;
+import syma.environment.School;
 import syma.environment.WorkPlace;
 import syma.events.AEventObject;
 import syma.events.EventTimeObject;
 import syma.events.IUpdateListener;
 import syma.main.GridElement;
 import syma.utils.Const;
+import syma.utils.PathSearch;
 
 public class GodAgent extends AAgent {
 
+	public enum Day {
+		MONDAY,
+		TUESDAY,
+		WEDNESDAY,
+		THURSDAY,
+		FRIDAY,
+		SATURDAY,
+		SUNDAY
+	};
+	
+	public static final HashMap<Integer, Day> TO_DAY = new HashMap<Integer, Day>();
+	public static final HashMap<Day, String> TO_DAY_STR = new HashMap<Day, String>();
+	
+	{
+		TO_DAY.put(0, Day.MONDAY);
+		TO_DAY.put(1, Day.TUESDAY);
+		TO_DAY.put(2, Day.WEDNESDAY);
+		TO_DAY.put(3, Day.THURSDAY);
+		TO_DAY.put(4, Day.FRIDAY);
+		TO_DAY.put(5, Day.SATURDAY);
+		TO_DAY.put(6, Day.SUNDAY);
+		
+		TO_DAY_STR.put(Day.MONDAY, "Monday");
+		TO_DAY_STR.put(Day.TUESDAY, "Tuesday");
+		TO_DAY_STR.put(Day.WEDNESDAY, "Wednesday");
+		TO_DAY_STR.put(Day.THURSDAY, "Thursday");
+		TO_DAY_STR.put(Day.FRIDAY, "Friday");
+		TO_DAY_STR.put(Day.SATURDAY, "Saturday");
+		TO_DAY_STR.put(Day.SUNDAY, "Sunday");
+	}
+	
 	private static Logger LOGGER = Logger.getLogger(HumanAgent.class.getName());
 	
 	private static GodAgent instance_ = null;
@@ -36,9 +72,12 @@ public class GodAgent extends AAgent {
 	private int hour_;
 	private int min_;
 	
+	private int weekDay_;
+	
 	public GodAgent(Grid<GridElement> grid) {
 		super(grid);
 		timeListeners_ = new CopyOnWriteArrayList<IUpdateListener>();
+		weekDay_ = 0;
 	}
 	
 	public static void init(Grid<GridElement> grid) {
@@ -64,14 +103,19 @@ public class GodAgent extends AAgent {
 		if (min_ >= 60) {
 			min_ = 0;
 			++hour_;
-			if (hour_ == Const.MORNING_HOUR) {
+			if (hour_ == Const.MORNING_HOUR && !isWeekend()) {
 				callEvt(new EventTimeObject(EventTimeObject.Type.MORNING_HOUR));
+			} else if (hour_ == Const.NIGHT_BEGIN_HOUR &&
+					(getCurrentDay() == Day.FRIDAY || getCurrentDay() == Day.SATURDAY)) {
+				callEvt(new EventTimeObject(EventTimeObject.Type.CHILL_HOUR));
 			}
-			System.out.println("Clock: Hour = " + hour_);
+			//System.out.println("Clock: Hour = " + hour_);
 		}
 		
 		if (hour_ >= 24) {
 			++day_;
+			weekDay_ = (++weekDay_ % 7);
+			System.out.println("WEEK DAY = " + getCurrentDayStr());
 			hour_ = 0;
 		}
 		
@@ -113,6 +157,31 @@ public class GodAgent extends AAgent {
 		return a;
 	}
 	
+	public <T extends AFixedGeography> T getClosestGeography(ArrayList<T> list, PathSearch pathSearch,
+															 GridPoint pos) {
+		
+		if (list.size() == 0) return null;
+		
+		int nbGeography = list.size();
+		
+		int minIdx = 0;
+		int minVal = Integer.MAX_VALUE;
+		for (int i = 0; i < nbGeography; ++i) {
+			AFixedGeography s = list.get(i);
+				
+			pathSearch.search(pos, s.getPos());
+			pathSearch.computePath();
+			int d1 = pathSearch.getPath().size();
+			
+			if (d1 < minVal) {
+				minVal = d1;
+				minIdx = i;
+			}
+		}
+		
+		return list.get(minIdx);
+	}
+	
 	/**
 	 * Loops through every registered building to find an empty one,
 	 * after applying a random selection.
@@ -142,6 +211,10 @@ public class GodAgent extends AAgent {
 	}
 	
 	/* GETTERS // SETTERS */
+	public String getFormattedTime() {
+		return getCurrentDayStr() + " at " + hour_ + "h " + min_ + "min";
+	}
+	
 	public int getHour() {
 		return hour_;
 	}
@@ -168,6 +241,18 @@ public class GodAgent extends AAgent {
 	
 	public void setAgentsNb(int nb) {
 		nbAgents_ = nb;
+	}
+	
+	public Day getCurrentDay() {
+		return TO_DAY.get(weekDay_);
+	}
+	
+	public String getCurrentDayStr() {
+		return TO_DAY_STR.get(getCurrentDay());
+	}
+	
+	public boolean isWeekend() {
+		return getCurrentDay() == Day.SATURDAY || getCurrentDay() == Day.SUNDAY;
 	}
 	
 	private void callEvt(AEventObject o) {
