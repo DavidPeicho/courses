@@ -220,37 +220,56 @@ public class HumanAgent extends AAgent {
 		}
 	}
 	
-	private MoveTo computeBusTraject(GridElement dest, IUpdateListener callback, boolean autoremove) {
+	private MoveTo computeTraject(GridElement dest, IUpdateListener callback, boolean autoremove) {
 		BusStop busStart = Tram.getNearestStop(getPos());
 		BusStop busEnd = Tram.getNearestStop(dest.getPos());
-		MoveTo moveToBusStart = new MoveTo(HumanAgent.this, null, busStart, grid_);
-		WaitForBus waitForBus = new WaitForBus(HumanAgent.this, null, busStart.getRoadStop(), grid_);
-		DriveTo driveTo = new DriveTo(HumanAgent.this, null, busEnd.getRoadStop(), Tram.instance, grid_);
-		MoveTo moveToEnd = new MoveTo(HumanAgent.this, null, dest, grid_);
-		IUpdateListener l1 = (AEventObject o) -> {
-			HumanAgent.this.pollGoal();
-			HumanAgent.this.addGoal(waitForBus);
-		};
-		moveToBusStart.addCallback(l1);
-		IUpdateListener l2 = (AEventObject o) -> {
-			HumanAgent.this.pollGoal();
-			HumanAgent.this.addGoal(driveTo);
-		};
-		waitForBus.addCallback(l2);
-		IUpdateListener l3 = (AEventObject o) -> {
-			HumanAgent.this.pollGoal();
-			HumanAgent.this.addGoal(moveToEnd);
-		};
-		driveTo.addCallback(l3);
-		moveToEnd.addCallback(callback);
-		moveToEnd.setAutoremoveWhenReached(autoremove);
-		return moveToBusStart;
+		int busDist =
+				(getX() - busStart.getX()) * (getX() - busStart.getX())
+				+ (getY() - busStart.getY()) * (getY() - busStart.getY())
+				+ ((busStart.getX() - busEnd.getX()) * (busStart.getX() - busEnd.getX())
+				+ (busStart.getY() - busEnd.getY()) * (busStart.getY() - busEnd.getY())) / 2
+				+ (busEnd.getX() - dest.getX()) * (busEnd.getX() - dest.getX())
+				+ (busEnd.getY() - dest.getY()) * (busEnd.getY() - dest.getY())
+				+ Const.BUS_WAITING_TIME / 2;
+		int walkDist = (getX() - dest.getX()) * (getX() - dest.getX())
+				+ (getY() - dest.getY()) * (getY() - dest.getY());
+		if (busDist <= walkDist && busStart.getNumber_() - Tram.currentStop >= 0
+				&& busStart.getNumber_() - Tram.currentStop < 3
+				&& !busStart.getPos().equals(busEnd.getPos())) {
+			MoveTo moveToBusStart = new MoveTo(HumanAgent.this, null, busStart, grid_);
+			WaitForBus waitForBus = new WaitForBus(HumanAgent.this, null, busStart.getRoadStop(), grid_);
+			DriveTo driveTo = new DriveTo(HumanAgent.this, null, busEnd.getRoadStop(), Tram.instance, grid_);
+			MoveTo moveToEnd = new MoveTo(HumanAgent.this, null, dest, grid_);
+			IUpdateListener l1 = (AEventObject o) -> {
+				HumanAgent.this.pollGoal();
+				HumanAgent.this.addGoal(waitForBus);
+			};
+			moveToBusStart.addCallback(l1);
+			IUpdateListener l2 = (AEventObject o) -> {
+				HumanAgent.this.pollGoal();
+				HumanAgent.this.addGoal(driveTo);
+			};
+			waitForBus.addCallback(l2);
+			IUpdateListener l3 = (AEventObject o) -> {
+				HumanAgent.this.pollGoal();
+				HumanAgent.this.addGoal(moveToEnd);
+			};
+			driveTo.addCallback(l3);
+			moveToEnd.addCallback(callback);
+			moveToEnd.setAutoremoveWhenReached(autoremove);
+			return moveToBusStart;
+		}
+		else {
+			MoveTo moveTo = new MoveTo(HumanAgent.this, callback, dest, grid_);
+			moveTo.setAutoremoveWhenReached(autoremove);
+			return moveTo;
+		}
 	}
 
 	public void addGoalMoveToWork() {
 		GodAgent env = GodAgent.instance();
 		
-		MoveTo moveToWork = computeBusTraject(workplace_, e -> {
+		MoveTo moveToWork = computeTraject(workplace_, e -> {
 			HumanAgent.this.pollGoal();
 			HumanAgent.this.addGoalWaitAtWork(); 
 		}, false);
@@ -288,7 +307,7 @@ public class HumanAgent extends AAgent {
 				}
 			}*/
 			HumanAgent.this.pollGoal();
-			MoveTo moveToHouse = computeBusTraject(home_, null, true);
+			MoveTo moveToHouse = computeTraject(home_, null, true);
 			HumanAgent.this.addGoal(moveToHouse);
 			
 			String logMsg = Const.WORK_TAG + "\n";
@@ -320,14 +339,14 @@ public class HumanAgent extends AAgent {
 			
 			HumanAgent.this.pollGoal();
 			
-			MoveTo moveToBar = computeBusTraject(bar, e2 -> {
+			MoveTo moveToBar = computeTraject(bar, e2 -> {
 				
 				HumanAgent.this.pollGoal();
 				
 				Wait waitAtBar = new Wait(HumanAgent.this, f -> {
 					
 					HumanAgent.this.pollGoal();
-					MoveTo moveToHouse = computeBusTraject(home_, null, true);
+					MoveTo moveToHouse = computeTraject(home_, null, true);
 					HumanAgent.this.addGoal(moveToHouse);
 					
 					String logMsg = Const.HANG_OUT_TAG + "\n";
