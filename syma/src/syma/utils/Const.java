@@ -1,5 +1,6 @@
 package syma.utils;
 
+import java.awt.Color;
 import java.util.Random;
 
 import syma.environment.AFixedGeography;
@@ -29,6 +30,7 @@ public class Const {
 	public static int END_AFTERNOON = 19; // In virtual hours
 	
 	public static final int MORNING_HOUR = 7;
+	public static final int NOON_HOUR = 12;
 	
 	public static int MIN_NB_MIN_HANG_OUT = 120;
 	public static int MAX_NB_MIN_HANG_OUT = 200;
@@ -42,7 +44,9 @@ public class Const {
 	public static final int MAX_SEARCH_PARTNER_AGE = 45;
 	public static final int MAJOR_AGE = 18;
 	
-	public static final int MAX_NB_CHILDREN = 4; 
+	
+	public static int MEAN_NB_CHILD = 2;
+	public static final int MAX_NB_CHILDREN = 3;
 	
 	public static final int MAX_DELAY_BEFORE_WORK = 80; // In virtual minutes
 	
@@ -58,6 +62,7 @@ public class Const {
 	
 	/* GRID TYPE */
 	public static final String NONE_TYPE = "NONE";
+	public static final String CLOCK_TYPE = "CLOCK";
 	public static final String BAR_TYPE = "BAR";
 	public static final String GROUND_TYPE = "GROUND";
 	public static final String HOUSE_TYPE = "HOUSE";
@@ -77,11 +82,19 @@ public class Const {
 	public static final String SHOPPING_ICON = ICON_FOLDER + "shopping-centre.png";
 	
 	/* LOGGING */
+	public static final String AGENT_TAG = "[ AGENT ]";
 	public static final String WORK_TAG = "[ WORK ]";
 	public static final String HANG_OUT_TAG = "[ HANG_OUT ]";
 	public static final String HOUSE_TAG = "[ HOUSE ]";
 	public static final String SHOPPING_TAG = "[ SHOPPING ]";
 	
+	/* GOD AGENT */
+	public static final Color COLOR_BEFORE_MORNING = new Color(52, 73, 94);
+	public static final Color COLOR_MORNING = new Color(241, 196, 15);
+	public static final Color COLOR_NOON = new Color(41, 128, 185);
+	public static final Color COLOR_END_DAY = new Color(211, 84, 0);
+	public static final Color COLOR_NIGHT = new Color(94, 109, 110);
+
 	public static final String getIconFromType(AFixedGeography a) {
 		String res = null;
 		if (a instanceof Bar) {

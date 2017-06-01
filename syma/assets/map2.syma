@@ -6,7 +6,7 @@
     },
 
     "map": "
-    	------------------------------------------------------------------------------------
+    	-----------------------------------------------------------------------------------l
     	--------------------------WWW---WWW---WWW---WWW-------------------------------------
     	HHHHHHHHHHHHHH----------hHWWWHH-WWWHH-WWW---WWWHHCC-HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH
     	hHhHhHhHhHhHhH----------hHWwWhH-WwWhH-WwW-2-WwWhHcC-hHhHhHhHhHhHhHhHhHhHhHhHhHhHhHhH
@@ -67,6 +67,10 @@
         {
             "key": "w",
             "type": "WORKPLACE"
+        },
+        {
+            "key": "l",
+            "type": "CLOCK"
         }
     ]
 

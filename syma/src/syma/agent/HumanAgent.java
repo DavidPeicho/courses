@@ -79,6 +79,9 @@ public class HumanAgent extends AAgent {
 			switch (obj.type) {
 			case YEAR:
 				++age_;
+				if (age_ < 18) {
+					System.out.println("AGGGGGGGGGGGGGGGGGGGGGGE = " + age_);
+				}
 				if (age_ == Const.MAJOR_AGE) {
 					turnAdult();
 				} else if (age_ == searchPartnerAge_) {
@@ -181,12 +184,22 @@ public class HumanAgent extends AAgent {
 	}
 
 	private void die() {
-		LOGGER.log(Level.INFO, "Agent " + id_ + " died at " + age_);
-
 		GodAgent env = GodAgent.instance();
 		env.decAgentNb();
 
-		// Removes link between companion
+		String logMsg = Const.AGENT_TAG + "\n";
+		logMsg += "Agent " + id_ + " died at " + age_ + " on " + env.getFormattedTime();
+		LOGGER.log(Level.INFO, logMsg);
+
+		// Kills all children that are minor
+		// if parent die.
+		if (this.hasChildren()) {
+			this.getChildren().forEach(a -> {
+				((HumanAgent)a).die();
+			});
+		}
+
+		// Removes link between companion and children
 		Optional<AAgent> partner = this.getCompanions().findFirst();
 		if (partner.isPresent()) {
 			Context<HumanAgent> context = ContextUtils.getContext(this);
@@ -290,45 +303,6 @@ public class HumanAgent extends AAgent {
 			moveTo.setAutoremoveWhenReached(autoremove);
 			return moveTo;
 		}
-		/*private MoveTo computeBusTraject(GridElement dest, IUpdateListener callback, boolean autoremove, boolean child) {
-		BusStop busStart = Tram.getNearestStop(getPos());
-		BusStop busEnd = Tram.getNearestStop(dest.getPos());
-		MoveTo moveToBusStart = new MoveTo(HumanAgent.this, null, busStart, grid_);
-		WaitForBus waitForBus = new WaitForBus(HumanAgent.this, null, busStart.getRoadStop(), grid_);
-		DriveTo driveTo = new DriveTo(HumanAgent.this, null, busEnd.getRoadStop(), Tram.instance, grid_);
-		MoveTo moveToEnd = new MoveTo(HumanAgent.this, null, dest, grid_);
-
-		IUpdateListener l1 = (AEventObject o) -> {
-			HumanAgent.this.pollGoal();
-			HumanAgent.this.addGoal(waitForBus);
-			if (child) {
-				activateOrder();
-			}
-		};
-		moveToBusStart.addCallback(l1);
-
-		IUpdateListener l2 = (AEventObject o) -> {
-			HumanAgent.this.pollGoal();
-			HumanAgent.this.addGoal(driveTo);
-			if (child) {
-				activateOrder();
-			}
-		};
-		waitForBus.addCallback(l2);
-
-		IUpdateListener l3 = (AEventObject o) -> {
-			HumanAgent.this.pollGoal();
-			HumanAgent.this.addGoal(moveToEnd);
-			if (child) {
-				activateOrder();
-			}
-		};
-		driveTo.addCallback(l3);
-
-		moveToEnd.addCallback(callback);
-		moveToEnd.setAutoremoveWhenReached(autoremove);
-
-		return moveToBusStart;*/
 	}
 
 	public void addGoalMoveToWork(boolean wait) {
@@ -653,6 +627,13 @@ public class HumanAgent extends AAgent {
 			house.addAgent(this);
 			home_ = house;
 		}
+
+		// Removes link with parent
+		Context<HumanAgent> context = ContextUtils.getContext(this);
+		Network n = (Network)context.getProjection("genealogy");
+		n.getEdges(this).forEach(e -> {
+			n.removeEdge((RepastEdge)e);
+		});
 
 		LOGGER.log(Level.INFO, "Agent " + id_ + " is now major!");
 		LOGGER.log(Level.INFO, "Agent " + id_ + " has now a new job and a house");

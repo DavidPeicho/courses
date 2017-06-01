@@ -195,7 +195,7 @@ public class GodAgent extends AAgent {
 		int nbGeography = list.size();
 		
 		Random rand = new Random();
-		int initialIdx = rand.nextInt(nbGeography - 1); 
+		int initialIdx = rand.nextInt(nbGeography); 
 		int idx = initialIdx;
 		
 		T elt = list.get(idx);

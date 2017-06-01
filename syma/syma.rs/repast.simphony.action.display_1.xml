@@ -3,6 +3,10 @@
   <type>2D</type>
   <styles>
     <entry>
+      <string>syma.environment.ShoppingCentre</string>
+      <string>syma.styles.GeographyStyle</string>
+    </entry>
+    <entry>
       <string>syma.environment.Bar</string>
       <string>syma.styles.GeographyStyle</string>
     </entry>
@@ -11,12 +15,12 @@
       <string>syma.styles.GeographyStyle</string>
     </entry>
     <entry>
-      <string>syma.environment.ShoppingCentre</string>
+      <string>syma.environment.Building</string>
       <string>syma.styles.GeographyStyle</string>
     </entry>
     <entry>
-      <string>syma.environment.Building</string>
-      <string>syma.styles.GeographyStyle</string>
+      <string>syma.agent.GodAgent</string>
+      <string>syma.styles.GodStyle</string>
     </entry>
     <entry>
       <string>syma.environment.WorkPlace</string>
@@ -45,6 +49,10 @@
   </styles>
   <editedStyles>
     <entry>
+      <string>syma.environment.ShoppingCentre</string>
+      <null/>
+    </entry>
+    <entry>
       <string>syma.environment.Bar</string>
       <null/>
     </entry>
@@ -53,11 +61,11 @@
       <null/>
     </entry>
     <entry>
-      <string>syma.environment.ShoppingCentre</string>
+      <string>syma.environment.Building</string>
       <null/>
     </entry>
     <entry>
-      <string>syma.environment.Building</string>
+      <string>syma.agent.GodAgent</string>
       <null/>
     </entry>
     <entry>
@@ -95,7 +103,7 @@
     <pType>LAST</pType>
     <duration>-1.0</duration>
     <frequency>REPEAT</frequency>
-    <hashCode>-729410271</hashCode>
+    <hashCode>1939342059</hashCode>
   </schedParams>
   <layoutClassName>foo.bar.baz</layoutClassName>
   <layoutProjection>grid</layoutProjection>
@@ -116,6 +124,10 @@
     <entry>
       <string>syma.environment.Building</string>
       <int>7</int>
+    </entry>
+    <entry>
+      <string>syma.agent.GodAgent</string>
+      <int>10</int>
     </entry>
     <entry>
       <string>syma.environment.WorkPlace</string>

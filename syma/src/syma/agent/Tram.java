@@ -18,9 +18,8 @@ import syma.main.GridElement;
 import syma.utils.Const;
 
 public class Tram extends AAgent {
-	ArrayList<AAgent> passengers;
 	public static ArrayList<BusStop> stops;
-	public static ArrayList<GridElement> roadStops;
+	public static ArrayList<GridElement> roadStops = new ArrayList<>();
 	public static Tram instance = null; // TODO: either singleton or wrap grid and get rid of all static containers
 	private GridPoint start;
 	public static int currentStop = 0;
@@ -43,7 +42,6 @@ public class Tram extends AAgent {
 	public Tram(Grid<GridElement> grid, ArrayList<BusStop> busStops) {
 		super(grid);
 		stops = busStops;
-		roadStops = new ArrayList<>();
 		computeRoadStops();
 		computeCycle();
 		instance = this;
