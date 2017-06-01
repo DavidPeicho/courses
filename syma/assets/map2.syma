@@ -1,0 +1,73 @@
+{
+
+    "size": {
+        "width": "84",
+        "height": "24"
+    },
+
+    "map": "
+    	------------------------------------------------------------------------------------
+    	--------------------------WWW---WWW---WWW---WWW-------------------------------------
+    	HHHHHHHHHHHHHH----------hHWWWHH-WWWHH-WWW---WWWHHCC-HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH
+    	hHhHhHhHhHhHhH----------hHWwWhH-WwWhH-WwW-2-WwWhHcC-hHhHhHhHhHhHhHhHhHhHhHhHhHhHhHhH
+    	rrrrrrrrrrrrrr---------rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr
+    	-------------r---------r----------------------------------------------r3------------
+    	-------------r---------r---------------------------------KKKK---------r-WWW---WWW---
+    	-------------r---SSS-HHrHHHHHHHHHHHHHHHHHH-CC-HH-HHCCHH--KKKK-HHSSSHH-r-WWWHH-WWWHH-
+    	-------------r-1-SsS-hHrhHhHhHhHhHhHhHhHhH-cC-hH-hHcChH--KkKK-hHSsShH-r-WwWhH-WwWhH-
+    	-------------rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr
+    	-------------r---------r------------------------r---------------------r-------------
+    	-------------r---KKKK--r--WWW---WWW---WWW---WWW-r---------------------r-------------
+    	HHHHHHHHHHHH-r---KKKK--rHHWWWHH-WWW---WWWHH-WWW-r---------------------r-------------
+    	hHhHhHhHhHhH-r-6-KkKK--rhHWwWhH-WwW-5-WwWhH-WwW-r---------------------r-------------
+    	rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr---------------------r-------------
+    	-------------r---------r------------------------r---------------------r-------------
+    	-------KKKK--r---------r-------------WWW--WWW---r---KKKK--------------r-------------
+    	-CCHH--KKKK--r---------rHHCCHH-SSSHH-WWWHHWWWHH-r---KKKK--CCHHHHSSS---rHHHHHHHHHHHH-
+    	-cChH--KkKK--r---------rhHcChH-SsShH-WwWhHWwWhH-r---KkKK--cChHhHSsS-4-rhHhHhHhHhHhH-
+    	rrrrrrrrrrrrrr---------rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr
+    	------------------------------------------------------------------------------------
+    	------------------------------------------------------------------------------------
+    	------------------------------------------------------------------------------------
+    	------------------------------------------------------------------------------------
+    	",
+
+    "busPaths": [
+        [
+            {"x": "15", "y": "8"},
+            {"x": "42", "y": "3"},
+            {"x": "71", "y": "5"},
+            {"x": "68", "y": "18"},
+            {"x": "36", "y": "13"},
+            {"x": "15", "y": "13"}
+        ]
+    ],
+
+    "props": [
+        {
+            "key": "h",
+            "type": "HOUSE"
+        },
+        {
+            "key": "s",
+            "type": "SCHOOL"
+        },
+        {
+            "key": "c",
+            "type": "BAR"
+        },
+        {
+            "key": "r",
+            "type": "ROAD"
+        },
+        {
+            "key": "k",
+            "type": "SHOPPING_CENTRE"
+        },
+        {
+            "key": "w",
+            "type": "WORKPLACE"
+        }
+    ]
+
+}

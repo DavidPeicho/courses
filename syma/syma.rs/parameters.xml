@@ -31,7 +31,7 @@
 									
 		/>
 				<parameter name="mapPath" displayName="Map Path" type="java.lang.String" 
-						defaultValue="assets/map1.syma" 
+						defaultValue="assets/map2.syma" 
 						isReadOnly="false" 
 						converter="repast.simphony.parameter.StringConverterFactory$StringStringConverter"
 									
