@@ -26,11 +26,10 @@ Fonctionnement :
     - Nuit dans les loisirs aussi
     
  TODO :
- 	- Change time at which actors go to work. Use random to make small differences
+ 	- Change time at which actors go to work. Use random to make small differences  | SHOULD BE TESTED
  	- Level of food in house, and when it is too low, go to the shopping center
- 	- Child change other icon
- 	- Child when 18, should take randomly a work, and a house
- 	- Child should be brought to house after parent work
+ 	- Child when 18, should take randomly a work, and a house                       | SHOULD BE TESTED
+ 	- Child should be brought to house after parent work							
  	- Parent dying when bringing child to school causes an exception
 	- Go to the bar on Friday / Saturday (one of the two parent)
 	- Take the bus to go to work

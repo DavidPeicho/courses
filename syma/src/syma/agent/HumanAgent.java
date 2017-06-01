@@ -47,6 +47,8 @@ public class HumanAgent extends AAgent {
 
 	private boolean order_;
 	private float maxAge_;
+	
+	Random rand_;
 
 	private IUpdateListener bringToSchoolListener_ = (AEventObject o) -> {
 		HumanAgent.this.pollGoal();
@@ -75,9 +77,10 @@ public class HumanAgent extends AAgent {
 			EventTimeObject obj = (EventTimeObject)e;
 			if (obj.type == EventTimeObject.Type.YEAR) {
 				++age_;
-				System.out.println("Age is " + age_ + " Married at " + searchPartnerAge_);
-				if (age_ == searchPartnerAge_ && !HumanAgent.this.hasCompanion()) {
-					findPartner();
+				if (age_ == 18) {
+					turnAdult();
+				} else if (age_ == searchPartnerAge_) {
+					if (!HumanAgent.this.hasCompanion()) findPartner();
 				}
 			} else if (obj.type == EventTimeObject.Type.MORNING_HOUR) {
 				if (age_ >= 18 && hasToWork()) {
@@ -95,9 +98,13 @@ public class HumanAgent extends AAgent {
 
 	public HumanAgent(Grid<GridElement> grid, int age, boolean gender, Building home, WorkPlace workplace) {
 		super(grid);
+		
+		rand_ = new Random();
+		
 		age_ = age;
 		gender_ = gender;
-		maxAge_ = Const.MAX_AGE + (int)((Math.random() * 30) - 15);
+		//maxAge_ = Const.MAX_AGE + (int)((Math.random() * 30) - 15);
+		maxAge_ = (rand_.nextInt(30) - 15) + Const.MAX_AGE; 
 		workplace_ = workplace;
 		order_ = false;
 
@@ -105,16 +112,44 @@ public class HumanAgent extends AAgent {
 		home_.addAgent(this);
 
 		PathSearch ps = new PathSearch(grid_);
-		school_ = School.globalList.stream().sorted(
+
+		System.out.println("SCHOOL NB = " + School.globalList.size());
+		/*school_ = School.globalList.stream().sorted(
 				(School s1, School s2) -> {
 					GridPoint h = home_.getPos();
-					int d1 = ps.search(h, s1.getPos()).length;
-					int d2 = ps.search(h, s2.getPos()).length;
+					ps.search(h, s1.getPos());
+					ps.computePath();
+					int d1 = ps.getPath().size();
+					
+					ps.search(h, s2.getPos());
+					ps.computePath();
+					int d2 = ps.getPath().size();
+					
+					System.out.println("D1 = " + d1 + " | D2 = " + d2);
+					
 					return d2 - d1;
-				}).findFirst();
+				}).findFirst();*/
 
-		Random rand = new Random();
-		searchPartnerAge_ = rand.nextInt(Const.MAX_SEARCH_PARTNER_AGE + 1 - 18) + 18;
+		int minIdx = 0;
+		int minVal = Integer.MAX_VALUE;
+		GridPoint h = home_.getPos();
+		for (int i = 0; i < School.globalList.size(); ++i) {
+			School s = School.globalList.get(i);
+			
+			ps.search(h, s.getPos());
+			ps.computePath();		
+			int d1 = ps.getPath().size();
+			System.out.println(s.getX() + " | " + s.getY());
+			
+			if (d1 < minVal) {
+				d1 = minVal;
+				minIdx = i;
+			}
+		}
+		
+		school_ = Optional.of(School.globalList.get(minIdx));
+
+		searchPartnerAge_ = rand_.nextInt(Const.MAX_SEARCH_PARTNER_AGE + 1 - 18) + 18;
 	}
 
 	@Override
@@ -146,6 +181,7 @@ public class HumanAgent extends AAgent {
 		LOGGER.log(Level.INFO, "Agent " + id_ + " died at " + age_);
 
 		GodAgent env = GodAgent.instance();
+		env.decAgentNb();
 
 		// Removes link between companion
 		Optional<AAgent> partner = this.getCompanions().findFirst();
@@ -167,43 +203,6 @@ public class HumanAgent extends AAgent {
 
 		Context<HumanAgent> context = ContextUtils.getContext(this);
 		context.remove(this);
-	}
-
-	/**
-	 * Searches through every agents to find
-	 * a partner to live with.
-	 */
-	private void findPartner() {
-		Context<HumanAgent> context = ContextUtils.getContext(this);
-		Stream<HumanAgent> agents = context.stream().filter((GridElement e) -> {
-			if (!(e instanceof HumanAgent)) return false;
-
-			HumanAgent a = (HumanAgent)e;
-			if (a.getID() == id_) return false;
-
-			return a.gender_ != gender_ && !a.hasCompanion() && !a.getParents().anyMatch(p -> p == e);
-		});
-
-		Optional<HumanAgent> opt = agents.findFirst(); 
-		if (opt.isPresent()) {
-			HumanAgent partner = opt.get();
-			Network n = (Network)context.getProjection("genealogy");
-			n.addEdge(partner, this, Const.MARRIEDTO);
-			n.addEdge(this, partner, Const.MARRIEDTO);
-
-			partner.setHome(this.home_);
-
-			// Spawns a child agent
-			GodAgent env = GodAgent.instance();
-			HumanAgent child = env.createChildAgent(grid_, home_);
-			context.add(child);
-			grid_.moveTo(child, home_.getX(), home_.getY());
-			n.addEdge(this, child, Const.PARENTOF);
-
-			LOGGER.log(Level.INFO, "Agent " + id_ + " get married with Agent " + partner.getID());
-			LOGGER.log(Level.INFO, "A new agent is born from " + id_ + " and " + partner.getID());
-		}
-
 	}
 
 	@Watch(watcheeClassName="syma.agent.HumanAgent",
@@ -232,34 +231,53 @@ public class HumanAgent extends AAgent {
 	}
 
 	public void addGoalMoveToWork() {
-		IUpdateListener callback = new IUpdateListener() {
-
-			@Override
-			public void updateEvent(AEventObject e) {
-				HumanAgent.this.pollGoal();
-				HumanAgent.this.addGoalWaitAtWork();
-			}
-
-		};
-		MoveTo moveToWork = new MoveTo(HumanAgent.this, callback, workplace_, grid_); 
-		this.addGoal(moveToWork);
+		MoveTo moveToWork = new MoveTo(this, e -> {
+			HumanAgent.this.pollGoal();
+			HumanAgent.this.addGoalWaitAtWork();
+		}, workplace_, grid_);
+		
+		int randomMin = rand_.nextInt(Const.MAX_DELAY_BEFORE_WORK);
+		Wait waitBeforeWork = new Wait(this, e -> {
+			HumanAgent.this.pollGoal();
+			HumanAgent.this.addGoal(moveToWork);
+		}, Const.timeToTick(0, 0, randomMin));
+		
+		this.addGoal(waitBeforeWork);
 	}
 
 	public void addGoalWaitAtWork() {
-		IUpdateListener callback = new IUpdateListener() {
-
-			@Override
-			public void updateEvent(AEventObject e) {
-				HumanAgent.this.pollGoal();
-				MoveTo moveToHouse = new MoveTo(HumanAgent.this, null, home_, grid_);
-				moveToHouse.setAutoremoveWhenReached(true);
-				HumanAgent.this.addGoal(moveToHouse);
-			}
-
-		};
 		int workHour = workplace_.getEndHour() - workplace_.getStartHour();
-		Wait waitAtWork = new Wait(HumanAgent.this, callback, Const.timeToTick(0, workHour, 0));
+		
+		Wait waitAtWork = new Wait(HumanAgent.this, e -> {
+			HumanAgent.this.pollGoal();
+			if (HumanAgent.this.hasToBringToSchool()) {
+				Optional<AAgent> childOption = HumanAgent.this.getChildren().findFirst(); 
+				if (childOption.isPresent()) {
+					HumanAgent child = (HumanAgent)childOption.get();
+					School school = child.school_.get();
+					if (child.getPos().getX() == school.getX() && child.getPos().getY() == school.getY()) {
+						HumanAgent.this.addGoalGetChildren();
+						return;
+					}
+				}
+			}
+			MoveTo moveToHouse = new MoveTo(HumanAgent.this, null, home_, grid_);
+			moveToHouse.setAutoremoveWhenReached(true);
+			HumanAgent.this.addGoal(moveToHouse);
+		}, Const.timeToTick(0, workHour, 0));
+		
 		this.addGoal(waitAtWork);
+	}
+	
+	public void addGoalGetChildren() {
+		MoveTo moveToSchool = new MoveTo(this, e -> {
+			HumanAgent.this.pollGoal();
+			MoveTo moveToHouse = new MoveTo(HumanAgent.this, null, home_, grid_);
+			moveToHouse.setAutoremoveWhenReached(true);
+			HumanAgent.this.order_ = true;
+		}, school_.get(), grid_);
+		
+		this.addGoal(moveToSchool);
 	}
 
 	/* GETTERS // SETTERS */
@@ -336,5 +354,60 @@ public class HumanAgent extends AAgent {
 
 	public boolean hasCompanions() {
 		return getCompanions().findFirst().isPresent();
+	}
+	
+	/**
+	 * Searches through every agents to find
+	 * a partner to live with.
+	 */
+	private void findPartner() {
+		Context context = ContextUtils.getContext(this);
+		Stream<HumanAgent> agents = context.stream().filter((Object e) -> {
+			if (!(e instanceof HumanAgent)) return false;
+
+			HumanAgent a = (HumanAgent)e;
+			if (a.getID() == id_) return false;
+
+			return a.gender_ != gender_ && !a.hasCompanion() && !a.getParents().anyMatch(p -> p == e);
+		});
+
+		Optional<HumanAgent> opt = agents.findFirst();
+		if (opt.isPresent()) {
+			HumanAgent partner = opt.get();
+			Network n = (Network)context.getProjection("genealogy");
+			n.addEdge(partner, this, Const.MARRIEDTO);
+			n.addEdge(this, partner, Const.MARRIEDTO);
+
+			partner.setHome(this.home_);
+
+			GodAgent env = GodAgent.instance();
+			env.incAgentNb();
+			env.incChildNb();
+			
+			// Spawns a child agent
+			HumanAgent child = env.createChildAgent(context, this, grid_, home_);
+			grid_.moveTo(child, home_.getX(), home_.getY());
+
+			LOGGER.log(Level.INFO, "Agent " + id_ + " get married with Agent " + partner.getID());
+			LOGGER.log(Level.INFO, "A new agent is born from " + id_ + " and " + partner.getID());
+		}
+
+	}
+
+	private void turnAdult() {
+		GodAgent env = GodAgent.instance();
+		env.decChildNb();
+		
+		WorkPlace work = env.getEmptyGeography(WorkPlace.globalList);
+		Building house = env.getEmptyGeography(Building.globalList);
+		
+		this.workplace_ = work;
+		if (house != null) {
+			house.addAgent(this);
+			home_ = house;
+		}
+
+		LOGGER.log(Level.INFO, "Agent " + id_ + " is now major!");
+		LOGGER.log(Level.INFO, "Agent " + id_ + " has now a new job and a house");
 	}
 }
