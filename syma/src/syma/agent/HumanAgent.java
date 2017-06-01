@@ -28,7 +28,6 @@ import syma.goal.Wait;
 import syma.events.AEventObject;
 import syma.events.EventTimeObject;
 import syma.events.IUpdateListener;
-import syma.events.SuccessEvent;
 import syma.main.GridElement;
 import syma.utils.Const;
 import syma.utils.PathSearch;
@@ -47,6 +46,8 @@ public class HumanAgent extends AAgent {
 
 	private boolean order_;
 	private float maxAge_;
+	
+	private PathSearch pathSearch_;
 	
 	Random rand_;
 
@@ -87,6 +88,7 @@ public class HumanAgent extends AAgent {
 					// FIXME they won't go to school if it doesn't have a job!!!!!
 					if (hasToBringToSchool()) {
 						addGoal(new MoveTo(HumanAgent.this, bringToSchoolListener_, school_.get(), grid_));
+						System.out.println("GO = " + school_.get().getX() + " | " + school_.get().getY());
 						order_ = true;
 					} else {
 						HumanAgent.this.addGoalMoveToWork();
@@ -111,43 +113,9 @@ public class HumanAgent extends AAgent {
 		home_ = home;
 		home_.addAgent(this);
 
-		PathSearch ps = new PathSearch(grid_);
-
-		System.out.println("SCHOOL NB = " + School.globalList.size());
-		/*school_ = School.globalList.stream().sorted(
-				(School s1, School s2) -> {
-					GridPoint h = home_.getPos();
-					ps.search(h, s1.getPos());
-					ps.computePath();
-					int d1 = ps.getPath().size();
-					
-					ps.search(h, s2.getPos());
-					ps.computePath();
-					int d2 = ps.getPath().size();
-					
-					System.out.println("D1 = " + d1 + " | D2 = " + d2);
-					
-					return d2 - d1;
-				}).findFirst();*/
-
-		int minIdx = 0;
-		int minVal = Integer.MAX_VALUE;
-		GridPoint h = home_.getPos();
-		for (int i = 0; i < School.globalList.size(); ++i) {
-			School s = School.globalList.get(i);
-			
-			ps.search(h, s.getPos());
-			ps.computePath();		
-			int d1 = ps.getPath().size();
-			System.out.println(s.getX() + " | " + s.getY());
-			
-			if (d1 < minVal) {
-				d1 = minVal;
-				minIdx = i;
-			}
-		}
+		pathSearch_ = new PathSearch(grid_);
 		
-		school_ = Optional.of(School.globalList.get(minIdx));
+		school_ = getClosestSchool();
 
 		searchPartnerAge_ = rand_.nextInt(Const.MAX_SEARCH_PARTNER_AGE + 1 - 18) + 18;
 	}
@@ -392,6 +360,31 @@ public class HumanAgent extends AAgent {
 			LOGGER.log(Level.INFO, "A new agent is born from " + id_ + " and " + partner.getID());
 		}
 
+	}
+	
+	private Optional<School> getClosestSchool() {
+		
+		if (School.globalList.size() == 0) {
+			return Optional.ofNullable(null);
+		}
+		
+		int minIdx = 0;
+		int minVal = Integer.MAX_VALUE;
+		GridPoint h = home_.getPos();
+		for (int i = 0; i < School.globalList.size(); ++i) {
+			School s = School.globalList.get(i);
+				
+			pathSearch_.search(h, s.getPos());
+			pathSearch_.computePath();
+			int d1 = pathSearch_.getPath().size();
+			
+			if (d1 < minVal) {
+				minVal = d1;
+				minIdx = i;
+			}
+		}
+		
+		return Optional.of(School.globalList.get(minIdx));
 	}
 
 	private void turnAdult() {
