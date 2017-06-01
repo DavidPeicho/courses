@@ -131,11 +131,8 @@ public class ContextManager implements ContextBuilder<GridElement> {
 			
 			if (type == null) continue;
 			
-			int x = i % w;
-			int y = i / w;
-			
-			int relativeX = x;
-			int relativeY = h - 1 - y;
+			int relativeX = i % w;
+			int relativeY = h - 1 - (i / w);
 
 			AFixedGeography elt = GridParser.instance().typeToFixedGeography(type, relativeX, relativeY, grid);
 			
