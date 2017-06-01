@@ -1,11 +1,14 @@
 package syma.utils;
 
+import java.util.Random;
+
 import syma.environment.AFixedGeography;
 import syma.environment.Bar;
 import syma.environment.Building;
 import syma.environment.Ground;
 import syma.environment.Road;
 import syma.environment.School;
+import syma.environment.ShoppingCentre;
 import syma.environment.WorkPlace;
 
 public class Const {
@@ -22,20 +25,32 @@ public class Const {
 	public static long YEAR_IN_MIN = 525600l;
 	public static long DAY_IN_MIN = 1440l;
 	
-	public static int NIGHT_BEGIN_HOUR = 22;
+	public static int NIGHT_BEGIN_HOUR = 22; // In virtual hours
+	public static int END_AFTERNOON = 19; // In virtual hours
+	
 	public static final int MORNING_HOUR = 7;
 	
-	public static int MIN_NB_MIN_HANG_OUT = 150;
-	public static int MAX_NB_MIN_HANG_OUT = 300;
+	public static int MIN_NB_MIN_HANG_OUT = 120;
+	public static int MAX_NB_MIN_HANG_OUT = 200;
+	
+	public static int MIN_NB_MIN_SHOPPING = 80;
+	public static int MAX_NB_MIN_SHOPPING = 130;
 	
 	/* HUMAN CONST */
+	public static final int MIN_DEATH_AGE = 52;
 	public static final int MAX_AGE = 90;
 	public static final int MAX_SEARCH_PARTNER_AGE = 45;
+	
+	public static final int MAX_NB_CHILDREN = 4; 
 	
 	public static final int MAX_DELAY_BEFORE_WORK = 80; // In virtual minutes
 	
 	public static final double MARRIEDTO = 1;
 	public static final double PARENTOF = 2;
+	
+	/* HOUSES */
+	public static final int MIN_HOUSE_FOOD_LVL = 5000;
+	public static final int MAX_HOUSE_FOOD_LVL = 15000;
 	
 	/* BUS */
 	public static final int BUS_WAITING_TIME = 10;
@@ -47,6 +62,7 @@ public class Const {
 	public static final String HOUSE_TYPE = "HOUSE";
 	public static final String ROAD_TYPE = "ROAD";
 	public static final String SCHOOL_TYPE = "SCHOOL";
+	public static final String SHOPPING_TYPE = "SHOPPING_CENTRE";
 	public static final String WORKPLACE_TYPE = "WORKPLACE";
 	
 	/* STYLES */
@@ -57,10 +73,13 @@ public class Const {
 	public static final String ROAD_ICON = ICON_FOLDER + "road.png";
 	public static final String SCHOOL_ICON = ICON_FOLDER + "school.png";
 	public static final String WORK_ICON = ICON_FOLDER + "workplace.png";
+	public static final String SHOPPING_ICON = ICON_FOLDER + "shopping-centre.png";
 	
 	/* LOGGING */
 	public static final String WORK_TAG = "[ WORK ]";
 	public static final String HANG_OUT_TAG = "[ HANG_OUT ]";
+	public static final String HOUSE_TAG = "[ HOUSE ]";
+	public static final String SHOPPING_TAG = "[ SHOPPING ]";
 	
 	public static final String getIconFromType(AFixedGeography a) {
 		String res = null;
@@ -76,6 +95,8 @@ public class Const {
 				res = Const.SCHOOL_ICON;
 		} else if (a instanceof WorkPlace) {
 			res = Const.WORK_ICON;
+		} else if (a instanceof ShoppingCentre) {
+			res = Const.SHOPPING_ICON;
 		}
 		return res;
 	}
@@ -97,4 +118,7 @@ public class Const {
 		return total;
 	}
 	
+	public static int randBetween(int min, int max, Random rand) {
+		return rand.nextInt(max - min + 1) + min;
+	}
 }

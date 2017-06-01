@@ -23,7 +23,6 @@ import repast.simphony.context.space.grid.GridFactory;
 import repast.simphony.context.space.grid.GridFactoryFinder;
 import repast.simphony.dataLoader.ContextBuilder;
 import repast.simphony.space.grid.WrapAroundBorders;
-import repast.simphony.space.graph.Network;
 import repast.simphony.space.grid.Grid;
 import repast.simphony.space.grid.GridBuilderParameters;
 import repast.simphony.space.grid.GridPoint;
@@ -32,7 +31,7 @@ import repast.simphony.engine.environment.RunEnvironment;
 
 public class ContextManager implements ContextBuilder<GridElement> {
 
-	private static Logger LOGGER = Logger.getLogger(HumanAgent.class.getName());
+	private static Logger LOGGER = Logger.getLogger(ContextManager.class.getName());
 	
 	@Override
 	public Context build(Context<GridElement> context) {
@@ -124,7 +123,7 @@ public class ContextManager implements ContextBuilder<GridElement> {
 			if (type != null && type.equals(Const.ROAD_TYPE)) {
 				continue;
 			}
-			
+
 			int relativeX = i % w;
 			int relativeY = h - 1 - (i / w);
 			AFixedGeography elt = GridParser.instance().typeToFixedGeography(Const.GROUND_TYPE, relativeX, relativeY, grid);

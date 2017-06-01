@@ -1,36 +1,11 @@
-Lieux :
-    - Quartier
-        - Habitations
-    - Loisirs
-    - Travail
-    - Centre commercial
-    - Arrêt de bus
 
-Time system : 
-    - Jour / Nuit, avec une échelle à choisir
-
-Mouvements :
-    - Bus
-    - Voiture
-
-Activité :
-    - Aller au Travail
-    - Rester au Travail
-    - Accompagner enfant à l'école
-    - Shopping
-
-Fonctionnement :
-    - Matin : Ceux qui ont des enfants les emmènent à l'école
-    - Journée au travail modulo quelques heures
-    - Nuit généralement dans la maison
-    - Nuit dans les loisirs aussi
-    
- TODO :
+    TODO :
  	- Change time at which actors go to work. Use random to make small differences  | SHOULD BE TESTED
- 	- Level of food in house, and when it is too low, go to the shopping center
+ 	- Level of food in house, and when it is too low, go to the shopping center		| SHOULD BE TESTED
  	- Child when 18, should take randomly a work, and a house                       | SHOULD BE TESTED
- 	- Child should be brought to house after parent work							
- 	- Parent dying when bringing child to school causes an exception
-	- Go to the bar on Friday / Saturday (one of the two parent)
-	- Take the bus to go to work
-	- Add birth rate to increase nb of child by agent
+ 	- Child should be brought to house after parent work							| NOT IMPLEM			
+ 	- Parent dying when bringing child to school causes an exception				| NOT IMPLEM
+	- Go to the bar on Friday / Saturday (one of the two parent)					| SHOULD BE TESTED
+	- Take the bus to go to work													| SHOULD BE TESTED
+	- Add birth rate to increase nb of child by agent								| NOT IMPLEM
+	- Recompute path to school when child turn adult								| NOT IMPLEM

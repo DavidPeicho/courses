@@ -17,6 +17,7 @@ import syma.environment.BusStop;
 import syma.environment.Ground;
 import syma.environment.Road;
 import syma.environment.School;
+import syma.environment.ShoppingCentre;
 import syma.environment.WorkPlace;
 import syma.main.GridElement;
 import syma.utils.Const;
@@ -79,6 +80,10 @@ public class GridParser {
 			case Const.WORKPLACE_TYPE:
 				result = new WorkPlace(grid);
 				WorkPlace.globalList.add((WorkPlace)result);
+				break;
+			case Const.SHOPPING_TYPE:
+				result = new ShoppingCentre(grid);
+				ShoppingCentre.globalList.add((ShoppingCentre)result);
 				break;
 		}
 		return result;

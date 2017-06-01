@@ -23,6 +23,7 @@ import syma.environment.Bar;
 import syma.environment.Building;
 import syma.environment.BusStop;
 import syma.environment.School;
+import syma.environment.ShoppingCentre;
 import syma.environment.WorkPlace;
 import syma.goal.AGoal;
 import syma.goal.DriveTo;
@@ -36,7 +37,6 @@ import syma.events.IUpdateListener;
 import syma.main.GridElement;
 import syma.utils.Const;
 import syma.utils.PathSearch;
-import syma.vehicles.Bus;
 
 public class HumanAgent extends AAgent {
 
@@ -103,6 +103,9 @@ public class HumanAgent extends AAgent {
 					}
 					break;
 				case CHILL_HOUR:
+					if (!goals_.isEmpty()) {
+						break;
+					}
 					if (age_ < 18 || HumanAgent.this.getChildren().findFirst().isPresent()) {
 						break;
 					}
@@ -127,8 +130,7 @@ public class HumanAgent extends AAgent {
 		
 		age_ = age;
 		gender_ = gender;
-		//maxAge_ = Const.MAX_AGE + (int)((Math.random() * 30) - 15);
-		maxAge_ = (rand_.nextInt(30) - 15) + Const.MAX_AGE; 
+		maxAge_ = Const.randBetween(Const.MIN_DEATH_AGE, Const.MAX_AGE, rand_);
 		workplace_ = workplace;
 		order_ = false;
 
@@ -139,7 +141,7 @@ public class HumanAgent extends AAgent {
 		
 		school_ = getClosestSchool();
 
-		searchPartnerAge_ = rand_.nextInt(Const.MAX_SEARCH_PARTNER_AGE + 1 - 18) + 18;
+		searchPartnerAge_ = Const.randBetween(18, Const.MAX_SEARCH_PARTNER_AGE, rand_);
 	}
 
 	@Override
@@ -152,7 +154,24 @@ public class HumanAgent extends AAgent {
 				order_ = false;
 			}
 		}
-
+		
+		GodAgent env = GodAgent.instance();
+		
+		// Checks whether there are food
+		// in its house.
+		// If the house is empty, it should fill
+		// the house whenever it is possible.
+		if (home_.isFoodEmpty() && age_ >= 18 && goals_.isEmpty()) {
+			
+			if (env.isHourInRange(Const.END_AFTERNOON, Const.NIGHT_BEGIN_HOUR) ||
+				env.isWeekend()) {
+				ShoppingCentre s = env.getClosestGeography(ShoppingCentre.globalList, pathSearch_, HumanAgent.this.getPos());
+				if (s != null) {
+					this.addGoalShopping(s);
+				}	
+			}
+		}
+		
 	}
 
 	@Override
@@ -165,6 +184,9 @@ public class HumanAgent extends AAgent {
 		if (deathRate >= 0.85) {
 			die();
 		}
+		
+		// Updates house food level
+		this.home_.consumeFood();
 	}
 
 	private void die() {
@@ -294,18 +316,6 @@ public class HumanAgent extends AAgent {
 		int workHour = workplace_.getEndHour() - workplace_.getStartHour();
 		
 		Wait waitAtWork = new Wait(HumanAgent.this, e -> {
-			/*HumanAgent.this.pollGoal();
-			if (HumanAgent.this.hasToBringToSchool()) {
-				Optional<AAgent> childOption = HumanAgent.this.getChildren().findFirst(); 
-				if (childOption.isPresent()) {
-					HumanAgent child = (HumanAgent)childOption.get();
-					School school = child.school_.get();
-					if (child.getPos().getX() == school.getX() && child.getPos().getY() == school.getY()) {
-						HumanAgent.this.addGoalGetChildren();
-						return;
-					}
-				}
-			}*/
 			HumanAgent.this.pollGoal();
 			MoveTo moveToHouse = computeTraject(home_, null, true);
 			HumanAgent.this.addGoal(moveToHouse);
@@ -330,11 +340,54 @@ public class HumanAgent extends AAgent {
 		this.addGoal(moveToSchool);
 	}
 	
+	public void addGoalAfterWait(int min, AGoal nextGoal, String logMsg) {
+		
+		Wait waitAt = new Wait(HumanAgent.this, e -> {
+			HumanAgent.this.pollGoal();
+			
+			HumanAgent.this.addGoal(nextGoal);
+			
+			if (logMsg != null) LOGGER.log(Level.INFO, logMsg);	
+			
+		}, Const.timeToTick(0, 0, min));
+		
+		this.addGoal(waitAt);
+		
+	}
+	
+	public void addGoalShopping(ShoppingCentre shoppingCentre) {
+		GodAgent env = GodAgent.instance();
+		
+		MoveTo moveTo = computeTraject(shoppingCentre, e -> {
+			
+			HumanAgent.this.pollGoal();
+			
+			int timeAtShop = Const.randBetween(Const.MIN_NB_MIN_SHOPPING, Const.MAX_NB_MIN_SHOPPING, rand_);
+			System.out.println(timeAtShop);
+			
+			String logMsg = Const.SHOPPING_TAG + "\n";
+			logMsg += "Agent " + id_ + " is coming home on " + env.getFormattedTime() + "\n";
+			logMsg += "Building " + home_.getID() + " is now filled!";
+			
+			MoveTo moveToHouse = computeTraject(home_, null, true);
+			HumanAgent.this.addGoalAfterWait(timeAtShop, moveToHouse, logMsg);
+			
+			home_.upFoodLevel();
+			
+		}, false);
+		
+		String logMsg = Const.SHOPPING_TAG + "\n";
+		logMsg += "Agent " + id_ + " is going to shop on " + env.getFormattedTime();
+		LOGGER.log(Level.INFO, logMsg);
+		
+		this.addGoal(moveTo);
+	}
+	
 	public void addGoalHangOut(Bar bar) {
 		GodAgent env = GodAgent.instance();
-		int minBeforeGo = rand_.nextInt(Const.MAX_DELAY_BEFORE_WORK);
-		int minTimeToSpend = rand_.nextInt(Const.MAX_NB_MIN_HANG_OUT) + Const.MIN_NB_MIN_HANG_OUT;
-		
+		int minBeforeGo = Const.randBetween(0, Const.MAX_DELAY_BEFORE_WORK, rand_);
+		int minTimeToSpend = Const.randBetween(Const.MIN_NB_MIN_HANG_OUT, Const.MAX_NB_MIN_HANG_OUT, rand_); 
+	
 		Wait waitBeforeGo = new Wait(this, eInit -> {
 			
 			HumanAgent.this.pollGoal();

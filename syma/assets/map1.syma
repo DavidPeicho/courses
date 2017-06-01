@@ -18,10 +18,10 @@
         ----------r--------r-hH-r--cC-r--hH-r--cC-
         ----------r--SSS---rrrrrrrrrrrrrrrrrrrrrrr
         ----------r--SsS---r----------r-----------
-        WWW-WWW---rrrrrrrrrr----------r-----------
-        WWW-WWW---r--------r----------r-----------
-        WwW-WwW---r--------r----------r-----------
-        rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr-----------
+        WWW-WWW---rrrrrrrrrr----------r----KKK----
+        WWW-WWW---r--------r----------r----KKK----
+        WwW-WwW---r--------r----------r----KkK----
+        rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr-----
         WWW------------WWW-r----------------------
         WWW------------WWW-r----------------------
         WwW------------WwW-r----------------------
@@ -53,6 +53,10 @@
         {
             "key": "r",
             "type": "ROAD"
+        },
+        {
+            "key": "k",
+            "type": "SHOPPING_CENTRE"
         },
         {
             "key": "w",
