@@ -233,23 +233,24 @@ public class HumanAgent extends AAgent {
 	private MoveTo computeTraject(GridElement dest, IUpdateListener callback, boolean autoremove, boolean child) {
 		BusStop busStart = Tram.getNearestStop(getPos());
 		BusStop busEnd = Tram.getNearestStop(dest.getPos());
-		int busDist =
-				(getX() - busStart.getX()) * (getX() - busStart.getX())
-				+ (getY() - busStart.getY()) * (getY() - busStart.getY())
-				+ ((busStart.getX() - busEnd.getX()) * (busStart.getX() - busEnd.getX())
-				+ (busStart.getY() - busEnd.getY()) * (busStart.getY() - busEnd.getY())) / 2
-				+ (busEnd.getX() - dest.getX()) * (busEnd.getX() - dest.getX())
-				+ (busEnd.getY() - dest.getY()) * (busEnd.getY() - dest.getY())
-				+ Const.BUS_WAITING_TIME / 2;
-		int walkDist = (getX() - dest.getX()) * (getX() - dest.getX())
-				+ (getY() - dest.getY()) * (getY() - dest.getY());
-		if (busDist <= walkDist && busStart.getNumber_() - Tram.currentStop >= 0
-				&& busStart.getNumber_() - Tram.currentStop < 3
-				&& !busStart.getPos().equals(busEnd.getPos())) {
-			MoveTo moveToBusStart = new MoveTo(HumanAgent.this, null, busStart, grid_);
+		PathSearch p = new PathSearch(grid_);
+		p.search(getPos(), busStart.getPos());
+		Stack<GridPoint> s1 = p.computePath();
+		int d1 = (s1 == null) ? 0 : s1.size();
+		p.search(busStart.getPos(), busEnd.getPos());
+		Stack<GridPoint> s2 = p.computePath();
+		p.search(busEnd.getPos(), dest.getPos());
+		int d2 = (s2 == null) ? 0 : s2.size() / 2;;
+		Stack<GridPoint> s3 = p.computePath();
+		p.search(getPos(), dest.getPos());
+		int d3 = (s3 == null) ? 0 : s3.size();
+		Stack<GridPoint> s4 = p.computePath();
+		int d4= (s4 == null) ? 0 : s4.size();
+		int busDist = d1 + d2 + d3;
+		int walkDist = d4;
+		if (busDist <= walkDist && !busStart.getPos().equals(busEnd.getPos())) {
 			WaitForBus waitForBus = new WaitForBus(HumanAgent.this, null, busStart.getRoadStop(), grid_);
 			DriveTo driveTo = new DriveTo(HumanAgent.this, null, busEnd.getRoadStop(), Tram.instance, grid_);
-			MoveTo moveToEnd = new MoveTo(HumanAgent.this, null, dest, grid_);
 			IUpdateListener l1 = (AEventObject o) -> {
 				HumanAgent.this.pollGoal();
 				HumanAgent.this.addGoal(waitForBus);
@@ -257,6 +258,7 @@ public class HumanAgent extends AAgent {
 				    activateOrder();
 		                }
 			};
+			MoveTo moveToBusStart = new MoveTo(HumanAgent.this, null, busStart, grid_);
 			moveToBusStart.addCallback(l1);
 			IUpdateListener l2 = (AEventObject o) -> {
 				HumanAgent.this.pollGoal();
@@ -266,6 +268,8 @@ public class HumanAgent extends AAgent {
 		                }
 
 			};
+			MoveTo moveToEnd = new MoveTo(HumanAgent.this, null, dest, grid_);
+
 			waitForBus.addCallback(l2);
 			IUpdateListener l3 = (AEventObject o) -> {
 				HumanAgent.this.pollGoal();
