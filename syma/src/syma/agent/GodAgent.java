@@ -100,6 +100,7 @@ public class GodAgent extends AAgent {
 	@ScheduledMethod(start = 1, interval = 1)
 	public void step() {
 		++min_;
+
 		if (min_ >= 60) {
 			min_ = 0;
 			++hour_;
@@ -221,6 +222,10 @@ public class GodAgent extends AAgent {
 	
 	public int getMin() {
 		return min_;
+	}
+	
+	public boolean isHourInRange(int min, int max) {
+		return hour_ > min && hour_ < max;
 	}
 	
 	public void incChildNb() {

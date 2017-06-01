@@ -11,31 +11,18 @@ import syma.main.GridElement;
 
 public class AAgent extends GridElement implements IAgent {
 	
-	private static long ID = -1;
-	 
 	protected int speed_;
 	
 	protected final Queue<AGoal> goals_;
 	protected final CopyOnWriteArrayList<IUpdateListener> listeners_;
-
-	protected long id_;
 	
 	public AAgent(Grid<GridElement> grid) {
 		super(grid);
-		id_ = ++ID;
 		goals_ = new LinkedList<AGoal>();
 		listeners_ = new CopyOnWriteArrayList<IUpdateListener>();
 	}
-
-	public static void resetID() {
-		ID = -1;
-	}
 	
 	/* GETTERS // SETTERS */
-
-	public long getID() {
-		return id_;
-	}
 	
 	@Override
 	public void decide() { }
