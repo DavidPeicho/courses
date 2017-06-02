@@ -79,8 +79,8 @@ public class HumanAgent extends AAgent {
 			switch (obj.type) {
 			case YEAR:
 				++age_;
-				if (age_ < 18) {
-					System.out.println("AGGGGGGGGGGGGGGGGGGGGGGE = " + age_);
+				if (age_ < Const.MAJOR_AGE) {
+					System.out.println("AGE = " + age_);
 				}
 				if (age_ == Const.MAJOR_AGE) {
 					turnAdult();
@@ -155,7 +155,7 @@ public class HumanAgent extends AAgent {
 		// in its house.
 		// If the house is empty, it should fill
 		// the house whenever it is possible.
-		if (home_.isFoodEmpty() && age_ >= 18 && goals_.isEmpty()) {
+		if (home_.isFoodEmpty() && age_ >= Const.MAJOR_AGE && goals_.isEmpty()) {
 
 			if (env.isHourInRange(Const.END_AFTERNOON, Const.NIGHT_BEGIN_HOUR) ||
 					env.isWeekend()) {
@@ -219,30 +219,6 @@ public class HumanAgent extends AAgent {
 
 		Context<HumanAgent> context = ContextUtils.getContext(this);
 		context.remove(this);
-	}
-
-	@Watch(watcheeClassName="syma.agent.HumanAgent",
-			watcheeFieldNames="order_",
-			query="linked_from 'genealogy'",
-			whenToTrigger=WatcherTriggerSchedule.IMMEDIATE,
-			triggerCondition="$watcher.getAge() < syma.utils.Const.MAJOR_AGE && $watcher.isParent($watchee)")
-	public void react() {
-		Stream<AAgent> ps = getParents().filter((AAgent a) -> ((HumanAgent)a).getOrder());
-		Optional<AAgent> p = ps.findFirst();
-
-		if (p.isPresent()) {
-			addGoal(new Follow(this, ((o) -> HumanAgent.this.pollGoal()), p.get(), grid_));
-		} else {
-			AGoal g = peekGoal();
-			if (g != null) {
-				if (g instanceof Follow) {
-					((Follow)g).setContinue(false);
-					g.update();
-				}
-			} else {
-				LOGGER.log(Level.INFO, "Agent " + id_ + "react twice to parent!");
-			}
-		}
 	}
 
 	private MoveTo computeTraject(GridElement dest, IUpdateListener callback, boolean autoremove, boolean child) {
@@ -497,12 +473,29 @@ public class HumanAgent extends AAgent {
 	public void deactivateOrder() {
 		if (order_) {
 			order_ = false;
+			getChildren().filter((AAgent a) ->
+				((HumanAgent)a).getAge() < Const.MAJOR_AGE)
+				.forEach(((AAgent c) -> {
+					AGoal g = c.peekGoal();
+					if (g != null) {
+						if (g instanceof Follow) {
+							g.update();
+						}
+						g.triggerCallback(null);
+					}
+				}));
 		}
 	}
 
 	public void activateOrder() {
 		if (!order_) {
 			order_ = true;
+			getChildren().filter((AAgent a) ->
+				((HumanAgent)a).getAge() < Const.MAJOR_AGE)
+				.forEach((AAgent c) -> {
+					c.addGoal(new Follow(c, ((o) -> c.pollGoal()),
+							  this, grid_));
+				});
 		}
 	}
 

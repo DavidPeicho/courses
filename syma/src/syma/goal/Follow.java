@@ -10,13 +10,11 @@ public class Follow extends AGoal {
 
 	private final AAgent dest_;
 	private final Grid<GridElement> grid_;
-	private boolean continue_;
 
 	public Follow(AAgent target, IUpdateListener callback, AAgent dest, Grid<GridElement> grid) {
 		super(target, callback);
 		dest_ = dest;
 		grid_ = grid;
-		continue_ = true;
 	}
 
 	@Override
@@ -26,15 +24,7 @@ public class Follow extends AGoal {
 
 	@Override
 	public boolean success() {
-		return !continue_;
-	}
-
-	public void setContinue(boolean c) {
-		continue_ = c;
-	}
-
-	public boolean getContinue() {
-		return continue_;
+		return false;
 	}
 
 	public AAgent getDest() {
@@ -43,7 +33,7 @@ public class Follow extends AGoal {
 
 	@Override
 	public String toString() {
-		return "Follow [dest_=" + dest_ + ", continue_=" + continue_ + ", target_=" + target_
+		return "Follow [dest_=" + dest_ + ", target_=" + target_
 				+ ", autoRemoveWhenReached_=" + autoRemoveWhenReached_ + "]";
 	}
 
