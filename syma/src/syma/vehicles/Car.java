@@ -10,4 +10,9 @@ public class Car extends AVehicle {
 		nbSeats_ = 4;
 	}
 
+	@Override
+	public String toString() {
+		return "Car [nbSeats_=" + nbSeats_ + ", id_=" + id_ + "]";
+	}
+
 }

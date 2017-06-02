@@ -23,9 +23,16 @@ public class DriveTo extends AGoal {
 	public void update() {
 		target_.setPos(tram_.getX(), tram_.getY());
 	}
-	
+
 	@Override
 	public boolean success() {
 		return dest_.getPos().equals(tram_.getPos());
 	}
+
+	@Override
+	public String toString() {
+		return "DriveTo [dest_=" + dest_ + ", target_=" + target_ + ", autoRemoveWhenReached_=" + autoRemoveWhenReached_
+				+ "]";
+	}
+
 }

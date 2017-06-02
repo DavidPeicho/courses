@@ -34,5 +34,10 @@ public class BusStop extends AFixedGeography {
 	public int getNumber_() {
 		return number_;
 	}
+
+	@Override
+	public String toString() {
+		return "BusStop [roadStop_=" + roadStop_ + ", number_=" + number_ + ", id_=" + id_ + "]";
+	}
 	
 }

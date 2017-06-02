@@ -638,4 +638,9 @@ public class HumanAgent extends AAgent {
 		LOGGER.log(Level.INFO, "Agent " + id_ + " is now major!");
 		LOGGER.log(Level.INFO, "Agent " + id_ + " has now a new job and a house");
 	}
+
+	@Override
+	public String toString() {
+		return "HumanAgent [age_=" + age_ + ", order_=" + order_ + ", id_=" + id_ + "]";
+	}
 }

@@ -129,4 +129,10 @@ public class Tram extends AAgent {
 		return start;
 	}
 
+
+	@Override
+	public String toString() {
+		return "Tram [start=" + start + ", id_=" + id_ + "]";
+	}
+
 }

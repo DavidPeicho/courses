@@ -40,4 +40,11 @@ public class Follow extends AGoal {
 	public AAgent getDest() {
 		return dest_;
 	}
+
+	@Override
+	public String toString() {
+		return "Follow [dest_=" + dest_ + ", continue_=" + continue_ + ", target_=" + target_
+				+ ", autoRemoveWhenReached_=" + autoRemoveWhenReached_ + "]";
+	}
+
 }

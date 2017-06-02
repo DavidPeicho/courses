@@ -18,4 +18,9 @@ public class ShoppingCentre extends AFixedGeography {
 		super(grid);
 	}
 
+	@Override
+	public String toString() {
+		return "ShoppingCentre [id_=" + id_ + "]";
+	}
+
 }
