@@ -12,44 +12,45 @@
         WWW-WWW-WWWrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr
         WwW-WwW-WwWr--------------r------------r------------
         rrrrrrrrrrrr--------------r------------r------------
-        ---WWW-----r--------------rHHHHHHHHHH--rHHHHHHHHHHH-
-        CC-WWW-HH--r--------------rhHhHhHhHhH--rHhHhHhHhHhH-
+        ---WWW-----r--HHHHHHHHHH--rHHHHHHHHHH--rHHHHHHHHHHH-
+        CC-WWW-HH--r--hHhHhHhHhH--rhHhHhHhHhH--rHhHhHhHhHhH-
         cC-WwW-hH--rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr
         rrrrrrrrrrrr--------------rHHHHHHHHHH--rHHHHHHHHHHH-
         ------r-------------------rhHhHhHhHhH--rHhHhHhHhHhH-
-        WWWWWWr-------------------rrrrrrrrrrrrrrrrrrrrrrrrrr
-        WWWWWWr-------------------rHHHHHHHHHH--rHHHHHHHHHHH-
-        WwWWwWr-------------------rhHhHhHhHhH--rHhHhHhHhHhH-
+        WWWWWWr----------SSS------rrrrrrrrrrrrrrrrrrrrrrrrrr
+        WWWWWWr--HHHHHH--SSS------rHHHHHHHHHH--rHHHHHHHHHHH-
+        WwWWwWr--hHhHhH--SsS------rhHhHhHhHhH--rHhHhHhHhHhH-
         rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr
-        ----------------------------------------------------
-        ----------------------------------------------------
-        ----------------------------------------------------
-        ----------------------------------------------------
-        ----------------------------------------------------
-        ----------------------------------------------------
-        ----------------------------------------------------
-        ----------------------------------------------------
-        ----------------------------------------------------
-        ----------------------------------------------------
-        ----------------------------------------------------
-        ----------------------------------------------------
-        ----------------------------------------------------
-        ----------------------------------------------------
-        ----------------------------------------------------
-        ----------------------------------------------------
-        ----------------------------------------------------
-        ----------------------------------------------------
-        ----------------------------------------------------
-        ----------------------------------------------------
-        ----------------------------------------------------
+        ------r---------r---------------rWWW-WWW--------r---
+        ------r---------r---------------rWWW-WWW--------r---
+        ------r---------r----CCCCCC-----rWwW-WwW--------r---
+        HHHHHHr---------r----cCcCcC-----rrrrrrrr--------r---
+        hHhHhHr---------r----rrrrrr-----r-------SSS-----r---
+        rrrrrrr---------rWWW-WWWrWWW-WWWr-------SSSHHHH-r---
+        HHHHHHr---------rWWW-WWWrWWW-WWWr-------SsShHhH-r---
+        hHhHhHr--WwW----rWwW-WwWrWwW-WwWr-------rrrrrrrrr---
+        rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr---------------rHH-
+        ---r-----r----------------------r---------------rhH-
+        ---r-----r----------------------r---------------rrrr
+        ---rHH-HHr----------------------r-HH-HH-HH------rHH-
+        ---rhH-hHr----------------------r-hH-hH-hH------rhH-
+        ---rrrrrrr-WWW-WWW-WWW--rrrrrrrrrrrrrrrrrrrr----rrrr
+        ---rHH-HHr-WWW-WWW-WWW--r------------------r----rHH-
+        ---rhH-hHr-WwW-WwW-WwW--r------------------r----rhH-
+        ---rrrrrrrrrrrrrrrrrrrrrr-KKKK---KKKK------rrrrrrrrr
+        ---r-SSS-r--------------r-KKKKCC-KKKKCCCCCCr--------
+        ---r-SSS-r--------------r-KkKKcC-KkKKcCcCcCr--------
+        ---r-SsS-r--------------rrrrrrrrrrrrrrrrrrrr--------
+        ---rrrrrrr------------------------------------------
     ",
 
     "busPaths": [
         [
-            {"x": "11", "y": "6"},
-            {"x": "23", "y": "6"},
-            {"x": "29", "y": "14"},
-            {"x": "11", "y": "13"}
+            {"x": "12", "y": "6"},
+            {"x": "7", "y": "20"},
+            {"x": "31", "y": "15"},
+            {"x": "28", "y": "22"},
+            {"x": "40", "y": "6"}
         ]
     ],
 
