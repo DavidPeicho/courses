@@ -86,6 +86,8 @@ public class Tram extends AAgent {
 	@Override
 	@ScheduledMethod(start = 1, interval = 1, priority = 2)
 	public void decide() {
+		if (Const.IS_SIMULATION_OVER) return;
+		
 		AGoal g = peekGoal();
 		if (g != null && g.success()) {
 			g.triggerCallback(new SuccessEvent());

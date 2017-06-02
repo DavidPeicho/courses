@@ -26,7 +26,6 @@ public class GeographyStyle extends DefaultStyleOGL2D {
 		if (agent instanceof Building) {
 			b = (Building)agent;
 			if (b.isBurnt() && !b.isBurntImgSet()) {
-				System.out.println("CALLED");
 				b.setBurntImg();
 				try {
 					spatial = shapeFactory.createImage(Const.HOUSE_BURNT_ICON);
