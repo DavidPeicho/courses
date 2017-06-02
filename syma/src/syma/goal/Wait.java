@@ -27,4 +27,10 @@ public class Wait extends AGoal {
 		return tickNb_ <= 0;
 	}
 
+	@Override
+	public String toString() {
+		return "Wait [maxTickNb_=" + maxTickNb_ + ", tickNb_=" + tickNb_ + ", target_=" + target_
+				+ ", autoRemoveWhenReached_=" + autoRemoveWhenReached_ + "]";
+	}
+
 }

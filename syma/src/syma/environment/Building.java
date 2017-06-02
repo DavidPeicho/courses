@@ -73,5 +73,10 @@ public class Building extends AFixedGeography {
 		foodLevel_ = Const.randBetween(Const.MIN_HOUSE_FOOD_LVL, Const.MAX_HOUSE_FOOD_LVL, rand_);
 		emptyCheck_ = false;
 	}
+
+	@Override
+	public String toString() {
+		return "Building [foodLevel_=" + foodLevel_ + ", emptyCheck_=" + emptyCheck_ + ", id_=" + id_ + "]";
+	}
 	
 }

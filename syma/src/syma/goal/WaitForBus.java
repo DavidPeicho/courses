@@ -38,4 +38,9 @@ public class WaitForBus extends AGoal {
 	public void update() {		
 	}
 
+	@Override
+	public String toString() {
+		return "WaitForBus [busStopPosition_=" + busStopPosition_ + ", target_=" + target_ + ", autoRemoveWhenReached_="
+				+ autoRemoveWhenReached_ + "]";
+	}
 }

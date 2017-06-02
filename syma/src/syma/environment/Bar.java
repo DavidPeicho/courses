@@ -13,4 +13,9 @@ public class Bar extends AFixedGeography {
 		super(grid);
 	}
 
+	@Override
+	public String toString() {
+		return "Bar [id_=" + id_ + "]";
+	}
+
 }

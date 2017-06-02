@@ -36,6 +36,7 @@ public class MoveTo extends AGoal {
 	@Override
 	public void update() {
 		if (dest_ == null) {
+			// Something to do here !
 			triggerCallback(null);
 			return;
 		}
@@ -61,6 +62,12 @@ public class MoveTo extends AGoal {
 
 	public GridPoint getDest() {
 		return dest_.getPos();
+	}
+
+	@Override
+	public String toString() {
+		return "MoveTo [dest_=" + dest_ + ", target_=" + target_ + ", autoRemoveWhenReached_=" + autoRemoveWhenReached_
+				+ "]";
 	}
 
 }

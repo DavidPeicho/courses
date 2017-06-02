@@ -9,5 +9,10 @@ public class Bus extends AVehicle {
 		super(grid);
 		nbSeats_ = 20;
 	}
+
+	@Override
+	public String toString() {
+		return "Bus [nbSeats_=" + nbSeats_ + ", id_=" + id_ + "]";
+	}
 	
 }

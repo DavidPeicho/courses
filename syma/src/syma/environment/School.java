@@ -18,4 +18,9 @@ public class School extends AFixedGeography {
 		super(grid);
 	}
 
+	@Override
+	public String toString() {
+		return "School [id_=" + id_ + "]";
+	}
+
 }

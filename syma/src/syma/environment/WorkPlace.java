@@ -34,4 +34,9 @@ public class WorkPlace extends AFixedGeography {
 		return endHour_;
 	}
 
+	@Override
+	public String toString() {
+		return "WorkPlace [startHour_=" + startHour_ + ", endHour_=" + endHour_ + ", id_=" + id_ + "]";
+	}
+
 }
