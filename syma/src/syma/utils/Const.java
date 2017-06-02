@@ -102,6 +102,10 @@ public class Const {
 	public static final Color COLOR_NOON = new Color(41, 128, 185);
 	public static final Color COLOR_END_DAY = new Color(211, 84, 0);
 	public static final Color COLOR_NIGHT = new Color(94, 109, 110);
+	
+	/* GEOGRAPHY */
+	public static int NB_SCHOOL = 0;
+	public static int NB_HOUSES = 0;
 
 	public static final String getIconFromType(AFixedGeography a) {
 		String res = null;

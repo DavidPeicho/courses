@@ -81,11 +81,21 @@ public class ContextManager implements ContextBuilder<GridElement> {
 		NetworkBuilder<Object> netBuilder = new NetworkBuilder<Object>("genealogy", (Context)context, true);
 		netBuilder.buildNetwork();
 		
+		boolean fail = false;
 		// Checks whether the given map matches the parameters
 		if (Const.INIT_NB_AGENTS > Building.globalList.size()) {
 			System.err.println("Number of default agents is greater than number of houses.");
-			return context;
+			fail = true;
 		}
+		
+		if (Const.NB_SCHOOL == 0) {
+			String msg = Const.ENV_TAG + "\n";
+			msg += "There is no school on the map.";
+			LOGGER.log(Level.SEVERE, msg);
+			fail = true;
+		}
+		
+		if (fail) return context;
 		
 		spawnDefaultAgents(map, context, grid);
 		return context;
@@ -97,7 +107,11 @@ public class ContextManager implements ContextBuilder<GridElement> {
 		School.globalList.clear();
 		Bar.globalList.clear();
 		ShoppingCentre.globalList.clear();
-
+		Tram.isValid = true;
+		
+		Const.NB_SCHOOL = 0;
+		Const.NB_HOUSES = 0;
+		
 		if (Tram.stops != null) {
 			Tram.stops.clear();
 		}
@@ -110,12 +124,20 @@ public class ContextManager implements ContextBuilder<GridElement> {
 	
 	private void parseBus(BaseMap map, Context<GridElement> context, Grid<GridElement> grid) {
 		ArrayList<BusStop> stops = parseBusStops(map, context, grid);
+		
+		if (stops == null) return;
+		
 		Tram t = new Tram(grid, stops);
+		
+		if (!Tram.isValid) return;
+		
 		context.add(t);
 		grid.moveTo(t, t.getStart().getX(), t.getStart().getY());
 	}
 	
 	private ArrayList<BusStop> parseBusStops(BaseMap map, Context<GridElement> context, Grid<GridElement> grid) {
+		if (map.getBusPaths() == null || map.getBusPaths().isEmpty()) return null;
+		
 		ArrayList<BusStop> busStops = new ArrayList<>();
 		for (List<Point> l : map.getBusPaths()) {
 			for (Point e : l) {
@@ -251,11 +273,14 @@ public class ContextManager implements ContextBuilder<GridElement> {
 	private void logInit() {
 		String logMsg = "-------------------------------------------\n";
 			  logMsg += "---------------INITIALIZATION--------------\n";
-			  logMsg += "- Init Child Probability:" + Const.INIT_CHILD_PROBA + "\n";
-			  logMsg += "- Init Number Agents:" + Const.INIT_NB_AGENTS + "\n";
-			  logMsg += "- Spare Time Rate: " + Const.SPARE_TIME_RATE + "\n";
-			  logMsg += "- Max Burn House: " + Const.MAX_HOUSE_BURN_WEEK + "\n";
-			  logMsg += "- Year Factor: " + Const.YEAR_FACTOR + "\n";
+			  logMsg += "- INIT CHILD PROBABILITY:" + Const.INIT_CHILD_PROBA + "\n";
+			  logMsg += "- INIT NUMBER AGENTS:" + Const.INIT_NB_AGENTS + "\n";
+			  logMsg += "- SPARE TIME RATE: " + Const.SPARE_TIME_RATE + "\n";
+			  logMsg += "- MAX BURN HOUSES: " + Const.MAX_HOUSE_BURN_WEEK + "\n";
+			  logMsg += "- YEAR FACTOR: " + Const.YEAR_FACTOR + "\n";
+			  logMsg += "- - - - - - - - - - - - - - - - - - - - - \n";
+			  logMsg += "- NUMBER HOUSES: " + Const.NB_HOUSES + "\n";
+			  logMsg += "- NUMBER SCHOOLS: " + Const.NB_SCHOOL + "\n";
 			  logMsg += "-------------------------------------------\n";
 		LOGGER.log(Level.INFO, logMsg);
 	}

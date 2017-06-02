@@ -257,6 +257,13 @@ public class HumanAgent extends AAgent {
 	}
 
 	private MoveTo computeTraject(GridElement dest, IUpdateListener callback, boolean autoremove, boolean child) {
+		
+		if (!Tram.isValid) {
+			MoveTo moveTo = new MoveTo(HumanAgent.this, callback, dest, grid_);
+			moveTo.setAutoremoveWhenReached(autoremove);
+			return moveTo;
+		}
+		
 		BusStop busStart = Tram.getNearestStop(getPos());
 		BusStop busEnd = Tram.getNearestStop(dest.getPos());
 		PathSearch p = new PathSearch(grid_);
