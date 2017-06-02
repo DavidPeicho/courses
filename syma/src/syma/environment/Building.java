@@ -43,6 +43,8 @@ public class Building extends AFixedGeography {
 	}
 	
 	public void consumeFood() {
+		if (burnt_) return;
+		
 		if (foodLevel_ <= 0) {
 			if (!emptyCheck_) {
 				
