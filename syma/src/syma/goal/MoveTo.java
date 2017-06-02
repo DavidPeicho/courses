@@ -36,7 +36,14 @@ public class MoveTo extends AGoal {
 	@Override
 	public void update() {
 		if (dest_ == null) {
-			// Something to do here !
+			if (autoRemoveWhenReached_) {
+				target_.pollGoal();
+			}
+
+			if (target_ instanceof HumanAgent) {
+				((HumanAgent)target_).deactivateOrder();
+			}
+
 			triggerCallback(null);
 			return;
 		}

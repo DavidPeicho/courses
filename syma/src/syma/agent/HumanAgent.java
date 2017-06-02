@@ -340,10 +340,7 @@ public class HumanAgent extends AAgent {
 
 		Wait waitAtWork = new Wait(HumanAgent.this, e -> {
 			HumanAgent.this.pollGoal();
-			/*
-			MoveTo moveToHouse = computeTraject(home_, null, true);
-			HumanAgent.this.addGoal(moveToHouse);
-			 */
+
 			if (HumanAgent.this.hasToBringToSchool()) {
 				HumanAgent child = (HumanAgent)HumanAgent.this.getChildren().findFirst().get();
 				if (child.getPos().equals(school_.get().getPos())) {
@@ -634,6 +631,9 @@ public class HumanAgent extends AAgent {
 		n.getEdges(this).forEach(e -> {
 			n.removeEdge((RepastEdge)e);
 		});
+
+		goals_.clear();
+		addGoal(computeTraject(home_, null, true, false));
 
 		LOGGER.log(Level.INFO, "Agent " + id_ + " is now major!");
 		LOGGER.log(Level.INFO, "Agent " + id_ + " has now a new job and a house");

@@ -18,7 +18,7 @@ public class HumanStyle extends DefaultStyleOGL2D {
 			float rate = (float)a.getAge() / (float)Const.MAX_AGE;
 			int value = 255 - Math.min((int)(rate * 255.0f), 255);
 			
-			if (a.getAge() < 18) return new Color(0, 255, 0);
+			if (a.getAge() < Const.MAJOR_AGE) return new Color(0, 255, 0);
 			
 			if (a.getGender()) return new Color(value, value, 255);
 		
