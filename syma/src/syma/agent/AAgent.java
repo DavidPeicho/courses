@@ -7,7 +7,9 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import repast.simphony.space.grid.Grid;
 import syma.events.IUpdateListener;
 import syma.goal.AGoal;
+import syma.goal.Follow;
 import syma.main.GridElement;
+import syma.utils.Const;
 
 public class AAgent extends GridElement implements IAgent {
 	
@@ -43,7 +45,7 @@ public class AAgent extends GridElement implements IAgent {
 	public int getSpeed() {
 		return speed_;
 	}
-	
+
 	public void addGoal(AGoal behavior) {
 		goals_.add(behavior);
 	}

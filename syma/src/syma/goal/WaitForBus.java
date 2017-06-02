@@ -35,7 +35,7 @@ public class WaitForBus extends AGoal {
 	}
 
 	@Override
-	public void update() {		
+	public void update() {
 	}
 
 	@Override
