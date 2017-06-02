@@ -72,10 +72,12 @@ public class GridParser {
 			case Const.HOUSE_TYPE:
 				result = new Building(grid);
 				Building.globalList.add((Building)result);
+				++Const.NB_HOUSES;
 				break;
 			case Const.SCHOOL_TYPE:
 				result = new School(grid);
 				School.globalList.add((School)result);
+				++Const.NB_SCHOOL;
 				break;
 			case Const.WORKPLACE_TYPE:
 				result = new WorkPlace(grid);

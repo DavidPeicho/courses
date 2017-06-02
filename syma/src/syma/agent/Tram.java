@@ -2,6 +2,8 @@ package syma.agent;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import repast.simphony.engine.schedule.ScheduledMethod;
 import repast.simphony.space.grid.Grid;
@@ -18,11 +20,16 @@ import syma.main.GridElement;
 import syma.utils.Const;
 
 public class Tram extends AAgent {
+	
+	private static Logger LOGGER = Logger.getLogger(HumanAgent.class.getName());
+	
 	public static ArrayList<BusStop> stops;
 	public static ArrayList<GridElement> roadStops = new ArrayList<>();
 	public static Tram instance = null; // TODO: either singleton or wrap grid and get rid of all static containers
 	private GridPoint start;
 	public static int currentStop = 0;
+	
+	public static boolean isValid = true;
 	
 	public static BusStop getNearestStop(GridPoint p) {
 		int minDist = Integer.MAX_VALUE;
@@ -62,6 +69,7 @@ public class Tram extends AAgent {
 					Iterator<GridElement> it = neighbor.iterator();
 					if (!neighbor.iterator().hasNext())
 						continue;
+					
 					while (it.hasNext()) {
 						Object o = it.next();
 						if (o instanceof Road) {
@@ -74,7 +82,14 @@ public class Tram extends AAgent {
 				}
 			}
 		}
-		start = roadStops.get(0).getPos();
+		if (roadStops.size() != stops.size()) {
+			String str = Const.ENV_TAG + "\n";
+			str += "The provided bus path contains stop that are not connected to the road.s";
+			LOGGER.log(Level.SEVERE, str);
+			Tram.isValid = false;
+		} else {
+			start = roadStops.get(0).getPos();
+		}
 	}
 	
 	@Override
@@ -95,6 +110,9 @@ public class Tram extends AAgent {
 	}
 	
 	private void computeCycle() {
+		
+		if (!Tram.isValid) return;
+		
 		Wait lastW = null;
 		MoveTo firstMt = null;
 		for (GridElement e : roadStops) {

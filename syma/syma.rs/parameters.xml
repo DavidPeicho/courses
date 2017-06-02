@@ -13,13 +13,13 @@
 									
 		/>
 				<parameter name="childProbability" displayName="Child Probability" type="float" 
-						defaultValue="1.0" 
+						defaultValue="0.55" 
 						isReadOnly="false" 
 						converter="repast.simphony.parameter.StringConverterFactory$FloatConverter"
 									
 		/>
 				<parameter name="maxNbAgents" displayName="Start Number Agents" type="int" 
-						defaultValue="1" 
+						defaultValue="20" 
 						isReadOnly="false" 
 						converter="repast.simphony.parameter.StringConverterFactory$IntConverter"
 									
@@ -31,13 +31,13 @@
 									
 		/>
 				<parameter name="mapPath" displayName="Map Path" type="java.lang.String" 
-						defaultValue="assets/map-small-ordered.syma" 
+						defaultValue="assets/map-big-ordered.syma" 
 						isReadOnly="false" 
 						converter="repast.simphony.parameter.StringConverterFactory$StringStringConverter"
 									
 		/>
 				<parameter name="nbHouseBurnPerWeek" displayName="Average Number of Houses Burning" type="int" 
-						defaultValue="4" 
+						defaultValue="1" 
 						isReadOnly="false" 
 						converter="repast.simphony.parameter.StringConverterFactory$IntConverter"
 									
