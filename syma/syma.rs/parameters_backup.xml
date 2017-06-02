@@ -13,7 +13,7 @@
 									
 		/>
 				<parameter name="childProbability" displayName="Child Probability" type="float" 
-						defaultValue="1.0" 
+						defaultValue="0.0" 
 						isReadOnly="false" 
 						converter="repast.simphony.parameter.StringConverterFactory$FloatConverter"
 									
@@ -31,7 +31,7 @@
 									
 		/>
 				<parameter name="mapPath" displayName="Map Path" type="java.lang.String" 
-						defaultValue="assets/map1.syma" 
+						defaultValue="assets/map-small-ordered.syma" 
 						isReadOnly="false" 
 						converter="repast.simphony.parameter.StringConverterFactory$StringStringConverter"
 									

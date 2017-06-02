@@ -13,11 +13,15 @@ import syma.parsing.GridParser;
 import syma.parsing.Point;
 import syma.utils.Const;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.FileHandler;
+import java.util.logging.Formatter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 
 import repast.simphony.context.Context;
 import repast.simphony.context.space.graph.NetworkBuilder;
@@ -33,7 +37,7 @@ import repast.simphony.engine.environment.RunEnvironment;
 
 public class ContextManager implements ContextBuilder<GridElement> {
 
-	private static Logger LOGGER = Logger.getLogger(ContextManager.class.getName());
+	private static Logger LOGGER = Logger.getLogger(HumanAgent.class.getName());
 	
 	@Override
 	public Context build(Context<GridElement> context) {
@@ -49,8 +53,10 @@ public class ContextManager implements ContextBuilder<GridElement> {
 		Const.YEAR_FACTOR = RunEnvironment.getInstance().getParameters().getInteger("yearFactor");
 		Const.INIT_CHILD_PROBA = RunEnvironment.getInstance().getParameters().getFloat("childProbability");
 		Const.SPARE_TIME_RATE = RunEnvironment.getInstance().getParameters().getFloat("spareTimeRate");
-		Const.MEAN_NB_CHILD = RunEnvironment.getInstance().getParameters().getInteger("meanChildByCouple");
+		Const.MAX_HOUSE_BURN_WEEK = RunEnvironment.getInstance().getParameters().getInteger("nbHouseBurnPerWeek");
+		Const.IS_SIMULATION_OVER = false;
 
+		loggerInit();
 		logInit();
 		
 		try {
@@ -212,13 +218,45 @@ public class ContextManager implements ContextBuilder<GridElement> {
 		
 	}
 	
+	private void loggerInit() {
+		if (Const.LOGGER_INITIALIZED) return;
+	
+		Const.LOGGER_INITIALIZED = true;
+		
+		try {
+
+			// Create handlers
+			File logFile = new File("simulation.txt");
+			if (logFile.exists()) logFile.delete();
+			
+			FileHandler fileHandler = new FileHandler(logFile.getAbsolutePath());
+			fileHandler.setLevel(Level.ALL); // Write everything to the file
+
+			// Create a formatters.
+			Formatter fileFormatter = new SimpleFormatter();
+
+			// Add the formatters to the handlers
+			fileHandler.setFormatter(fileFormatter);
+
+			// Add the handlers to the logger
+			LOGGER.addHandler(fileHandler);
+			
+		} catch (Exception e) {
+			String str = "[ INTERNAL ]\n";
+			str += "The Logger could not write to the file \"simulation.log\"\n";
+			LOGGER.log(Level.SEVERE, str);
+		}
+	}
+	
 	private void logInit() {
 		String logMsg = "-------------------------------------------\n";
-			   logMsg = "---------------INITIALIZATION--------------\n";
-			   logMsg = "- Init Child Probability:" + Const.INIT_CHILD_PROBA + "\n";
-			   logMsg = "- Init Number Agents:" + Const.INIT_NB_AGENTS + "\n";
-			   logMsg = "- Birth Rate: " + 0 + "\n";
-			   logMsg = "- Year Factor: " + Const.YEAR_FACTOR + "\n";
+			  logMsg += "---------------INITIALIZATION--------------\n";
+			  logMsg += "- Init Child Probability:" + Const.INIT_CHILD_PROBA + "\n";
+			  logMsg += "- Init Number Agents:" + Const.INIT_NB_AGENTS + "\n";
+			  logMsg += "- Spare Time Rate: " + Const.SPARE_TIME_RATE + "\n";
+			  logMsg += "- Max Burn House: " + Const.MAX_HOUSE_BURN_WEEK + "\n";
+			  logMsg += "- Year Factor: " + Const.YEAR_FACTOR + "\n";
+			  logMsg += "-------------------------------------------\n";
 		LOGGER.log(Level.INFO, logMsg);
 	}
 	

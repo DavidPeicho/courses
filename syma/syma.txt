@@ -4,8 +4,8 @@
  	- Level of food in house, and when it is too low, go to the shopping center		| GOOD
  	- Child when 18, should take randomly a work, and a house                       | GOOD
  	- Child should be brought to house after parent work							| GOOD			
- 	- Parent dying when bringing child to school causes an exception				| GOOD
+ 	- Parent dying when bringing child to school causes an exception				| NOT FIXED
 	- Go to the bar on Friday / Saturday (one of the two parent)					| GOOD
 	- Take the bus to go to work													| GOOD
-	- Add birth rate to increase nb of child by agent								| NOT IMPLEM
-	- Recompute path to school when child turn adult								| NOT IMPLEM
+	- Recompute path to school when child turn adult								| GOOD
+	- Add end of simulation of everyone is dead										| NOT IMPLEM

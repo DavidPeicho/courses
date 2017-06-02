@@ -14,6 +14,9 @@ import syma.environment.WorkPlace;
 
 public class Const {
 	
+	/* GLOBAL */
+	public static boolean IS_SIMULATION_OVER = false;
+	
 	/* INITIALIZATION */
 	public static int INIT_NB_AGENTS = 1;
 	public static float INIT_CHILD_PROBA = 0.25f;
@@ -43,7 +46,6 @@ public class Const {
 	public static final int MAX_AGE = 90;
 	public static final int MAX_SEARCH_PARTNER_AGE = 45;
 	public static final int MAJOR_AGE = 18;
-	
 	
 	public static int MEAN_NB_CHILD = 2;
 	public static final int MAX_NB_CHILDREN = 3;
@@ -76,19 +78,25 @@ public class Const {
 	public static final String BAR_ICON = ICON_FOLDER + "bar.png";
 	public static final String GROUND_ICON = ICON_FOLDER + "dirt.png";
 	public static final String HOUSE_ICON = ICON_FOLDER + "house.png";
+	public static final String HOUSE_BURNT_ICON = ICON_FOLDER + "house-burnt.png";
 	public static final String ROAD_ICON = ICON_FOLDER + "road.png";
 	public static final String SCHOOL_ICON = ICON_FOLDER + "school.png";
 	public static final String WORK_ICON = ICON_FOLDER + "workplace.png";
 	public static final String SHOPPING_ICON = ICON_FOLDER + "shopping-centre.png";
 	
 	/* LOGGING */
+	public static boolean LOGGER_INITIALIZED = false;
+	
 	public static final String AGENT_TAG = "[ AGENT ]";
 	public static final String WORK_TAG = "[ WORK ]";
 	public static final String HANG_OUT_TAG = "[ HANG_OUT ]";
 	public static final String HOUSE_TAG = "[ HOUSE ]";
 	public static final String SHOPPING_TAG = "[ SHOPPING ]";
+	public static final String ENV_TAG = "[ ENVIRONMENT ]";
 	
 	/* GOD AGENT */
+	public static int MAX_HOUSE_BURN_WEEK = 1; 
+	
 	public static final Color COLOR_BEFORE_MORNING = new Color(52, 73, 94);
 	public static final Color COLOR_MORNING = new Color(241, 196, 15);
 	public static final Color COLOR_NOON = new Color(41, 128, 185);

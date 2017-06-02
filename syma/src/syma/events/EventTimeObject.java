@@ -6,7 +6,8 @@ public class EventTimeObject extends AEventObject {
 		MORNING_HOUR,
 		CHILL_HOUR,
 		HOUR,
-		YEAR
+		YEAR,
+		BURNING_TIME
 	};
 	
 	public int hour;

@@ -13,7 +13,7 @@ import syma.utils.Const;
 
 public class Building extends AFixedGeography {
 	
-	private static Logger LOGGER = Logger.getLogger(Building.class.getName());
+	private static Logger LOGGER = Logger.getLogger(HumanAgent.class.getName());
 	
 	public static int TILE_X = 2;
 	public static int TILE_Y = 2;
@@ -27,7 +27,9 @@ public class Building extends AFixedGeography {
 	
 	private int foodLevel_;
 	private boolean emptyCheck_;
-	
+	private boolean burnt_;
+	private boolean isBurntImageSet_;
+
 	private Random rand_;
 
 	public Building(Grid<GridElement> grid) {
@@ -36,6 +38,8 @@ public class Building extends AFixedGeography {
 		foodLevel_ = Const.randBetween(Const.MIN_HOUSE_FOOD_LVL, Const.MAX_HOUSE_FOOD_LVL, rand_);
 		foodLevel_ = Const.MAX_HOUSE_FOOD_LVL;
 		emptyCheck_ = false;
+		burnt_ = false;
+		isBurntImageSet_ = false;
 	}
 	
 	public void consumeFood() {
@@ -61,6 +65,11 @@ public class Building extends AFixedGeography {
 		--foodLevel_;
 	}
 	
+	@Override
+	public boolean isEmpty() {
+		return agents_.isEmpty() && !burnt_;
+	}
+	
 	public boolean isFoodEmpty() {
 		return foodLevel_ <= 0;
 	}
@@ -79,4 +88,19 @@ public class Building extends AFixedGeography {
 		return "Building [foodLevel_=" + foodLevel_ + ", emptyCheck_=" + emptyCheck_ + ", id_=" + id_ + "]";
 	}
 	
+	public boolean isBurnt() {
+		return burnt_;
+	}
+	
+	public void setBurnt() {
+		burnt_ = true;
+	}
+	
+	public boolean isBurntImgSet() {
+		return isBurntImageSet_;
+	}
+	
+	public void setBurntImg() {
+		isBurntImageSet_ = true;
+	}
 }

@@ -19,7 +19,7 @@
 									
 		/>
 				<parameter name="maxNbAgents" displayName="Start Number Agents" type="int" 
-						defaultValue="1" 
+						defaultValue="30" 
 						isReadOnly="false" 
 						converter="repast.simphony.parameter.StringConverterFactory$IntConverter"
 									
@@ -31,13 +31,13 @@
 									
 		/>
 				<parameter name="mapPath" displayName="Map Path" type="java.lang.String" 
-						defaultValue="assets/map2.syma" 
+						defaultValue="assets/map-small-ordered.syma" 
 						isReadOnly="false" 
 						converter="repast.simphony.parameter.StringConverterFactory$StringStringConverter"
 									
 		/>
-				<parameter name="meanChildByCouple" displayName="Mean Child by Couple" type="int" 
-						defaultValue="2" 
+				<parameter name="nbHouseBurnPerWeek" displayName="Average Number of Houses Burning" type="int" 
+						defaultValue="4" 
 						isReadOnly="false" 
 						converter="repast.simphony.parameter.StringConverterFactory$IntConverter"
 									
