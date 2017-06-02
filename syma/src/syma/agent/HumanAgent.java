@@ -121,17 +121,18 @@ public class HumanAgent extends AAgent {
 				school_ = getClosestSchool(); 
 				if (hasChildren()) {
 					HumanAgent.this.getChildren().forEach(a -> {
-						((HumanAgent)a).school_ = school_;
+						HumanAgent child = ((HumanAgent)a);
+						child.setHome(HumanAgent.this.home_);
+						HumanAgent.this.home_.addAgent(child);
+						child.school_ = school_;
 						a.goals_.clear();
 					});
 				}
-				if (env.getHour() < Const.NIGHT_BEGIN_HOUR) {
-					if (HumanAgent.this.hasChildren()) {
-						HumanAgent.this.addGoalGoToSchoolAndHome();
-					} else {
-						MoveTo moveToHouse = computeTraject(home_, null, true, false);
-						HumanAgent.this.addGoal(moveToHouse);	
-					}
+				if (HumanAgent.this.hasChildren()) {
+					HumanAgent.this.addGoalGoToSchoolAndHome();
+				} else {
+					MoveTo moveToHouse = computeTraject(home_, null, true, false);
+					HumanAgent.this.addGoal(moveToHouse);	
 				}
 				break;
 			}
@@ -380,7 +381,17 @@ public class HumanAgent extends AAgent {
 	}
 
 	public void addGoalGoToSchoolAndHome() {
-		MoveTo moveToSchool = computeTraject(school_.get(), e -> {
+		
+		Stream<AAgent> children = getChildren();
+		HumanAgent c = (HumanAgent)children.findFirst().get();
+		boolean goTo = c.getPos().equals(c.school_.get().getPos());
+			
+		if (!goTo) {
+			this.addGoal(computeTraject(home_, null, true, false));
+			return;
+		}
+		
+		MoveTo moveToSchool = computeTraject(c.school_.get(), e -> {
 			HumanAgent.this.pollGoal();
 			HumanAgent.this.addGoal(computeTraject(home_, null, true, true));
 			HumanAgent.this.activateOrder();

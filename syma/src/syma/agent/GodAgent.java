@@ -114,6 +114,7 @@ public class GodAgent extends AAgent {
 		
 		instance_.nextDayToBurnHouse_ = Const.randBetween(0, 10000, instance_.rand_) % (Const.MAX_HOUSE_BURN_WEEK + 1);
 		instance_.nextHourToBurnHouse_ = Const.randBetween(1, 10000, instance_.rand_) % 24;
+
 	}
 	
 	public static GodAgent instance() {
@@ -142,8 +143,6 @@ public class GodAgent extends AAgent {
 				nextHourToBurnHouse_ == hour_) {
 				if (Const.MAX_HOUSE_BURN_WEEK > 0) this.probalityToBurnHouse();
 			}
-			
-			//System.out.println("Clock: Hour = " + hour_);
 		}
 		
 		if (hour_ >= 24) {
@@ -329,7 +328,12 @@ public class GodAgent extends AAgent {
 		Iterable randAgentIt = contextAgents.getRandomObjects(HumanAgent.class, 1);
 		
 		if (randAgentIt.iterator().hasNext()) {
+			
 			HumanAgent agent = (HumanAgent)randAgentIt.iterator().next();
+			if (agent.getAge() < Const.MAJOR_AGE) {
+				agent = (HumanAgent)agent.getParents().findFirst().get();
+			}
+			
 			Building oldHouse = agent.getHome();
 			Building newHouse = getEmptyGeography(Building.globalList);
 			
@@ -365,6 +369,8 @@ public class GodAgent extends AAgent {
 			LOGGER.log(Level.WARNING, logMsg);
 			
 			agent.setHome(newHouse);
+			agent.getHome().addAgent(agent);
+			
 			agent.getYearListener().updateEvent(new EventTimeObject(EventTimeObject.Type.BURNING_TIME));
 		}
 		
