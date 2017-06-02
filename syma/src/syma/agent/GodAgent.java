@@ -22,6 +22,7 @@ import syma.events.AEventObject;
 import syma.events.EventTimeObject;
 import syma.events.IUpdateListener;
 import syma.main.GridElement;
+import syma.parsing.GridParser;
 import syma.utils.Const;
 import syma.utils.PathSearch;
 
@@ -64,8 +65,13 @@ public class GodAgent extends AAgent {
 	
 	protected final CopyOnWriteArrayList<IUpdateListener> timeListeners_;
 	
+	private Random rand_;
+	
 	private int nbAgents_;
 	private int nbChildren_;
+	
+	private int totalNbAgents_;
+	private int totalNbChildren_;
 	
 	private long year_;
 	private long day_;
@@ -74,10 +80,22 @@ public class GodAgent extends AAgent {
 	
 	private int weekDay_;
 	
+	private int nextDayToBurnHouse_;
+	private int nextHourToBurnHouse_;
+	
+	private int totalNbHouseBurnt_;
+	
 	public GodAgent(Grid<GridElement> grid) {
 		super(grid);
 		timeListeners_ = new CopyOnWriteArrayList<IUpdateListener>();
 		weekDay_ = 0;
+		
+		rand_ = new Random();
+		
+		nextDayToBurnHouse_ = Const.randBetween(0, 10000, rand_) % (Const.MAX_HOUSE_BURN_WEEK + 1);
+		nextHourToBurnHouse_ = Const.randBetween(1, 10000, rand_) % 24;
+		
+		totalNbHouseBurnt_ = 0;
 	}
 	
 	public static void init(Grid<GridElement> grid) {
@@ -90,6 +108,12 @@ public class GodAgent extends AAgent {
 		instance_.hour_ = 6;
 		instance_.min_ = 58;
 		instance_.year_ = 0;
+		instance_.totalNbAgents_ = 0;
+		instance_.totalNbChildren_ = 0;
+		instance_.totalNbHouseBurnt_ = 0;
+		
+		instance_.nextDayToBurnHouse_ = Const.randBetween(0, 10000, instance_.rand_) % (Const.MAX_HOUSE_BURN_WEEK + 1);
+		instance_.nextHourToBurnHouse_ = Const.randBetween(1, 10000, instance_.rand_) % 24;
 	}
 	
 	public static GodAgent instance() {
@@ -99,6 +123,9 @@ public class GodAgent extends AAgent {
 	@Override
 	@ScheduledMethod(start = 1, interval = 1)
 	public void step() {
+		
+		if (Const.IS_SIMULATION_OVER) return;
+		
 		++min_;
 
 		if (min_ >= 60) {
@@ -110,14 +137,29 @@ public class GodAgent extends AAgent {
 					(getCurrentDay() == Day.FRIDAY || getCurrentDay() == Day.SATURDAY)) {
 				callEvt(new EventTimeObject(EventTimeObject.Type.CHILL_HOUR));
 			}
+			
+			if (nextDayToBurnHouse_ == weekDay_ &&
+				nextHourToBurnHouse_ == hour_) {
+				if (Const.MAX_HOUSE_BURN_WEEK > 0) this.probalityToBurnHouse();
+			}
+			
 			//System.out.println("Clock: Hour = " + hour_);
 		}
 		
 		if (hour_ >= 24) {
 			++day_;
 			weekDay_ = (++weekDay_ % 7);
-			System.out.println("WEEK DAY = " + getCurrentDayStr());
 			hour_ = 0;
+			
+			if (weekDay_ == 0) {
+				nextDayToBurnHouse_ = Const.randBetween(0, 10000, rand_) % (Const.MAX_HOUSE_BURN_WEEK + 1);
+				nextHourToBurnHouse_ = Const.randBetween(1, 1000, rand_) % 24;
+				if (Math.random() < 0.6) nextDayToBurnHouse_ = -1;
+			}
+			
+			String logMsg = Const.ENV_TAG + "\n";
+			logMsg += "Day of the week: " + this.getCurrentDayStr() + "\n";
+			LOGGER.log(Level.INFO, logMsg);
 		}
 		
 		if (day_ >= 365 / Const.YEAR_FACTOR) {
@@ -194,8 +236,7 @@ public class GodAgent extends AAgent {
 		
 		int nbGeography = list.size();
 		
-		Random rand = new Random();
-		int initialIdx = rand.nextInt(nbGeography); 
+		int initialIdx = rand_.nextInt(nbGeography); 
 		int idx = initialIdx;
 		
 		T elt = list.get(idx);
@@ -209,6 +250,22 @@ public class GodAgent extends AAgent {
 		
 		return elt;
 		
+	}
+	
+	public void printRecap() {
+		
+		String logMsg = "-------------------------------------------\n";
+			  logMsg += "---------------SIMULATION END--------------\n";
+			  logMsg += "- TOTAL NUMBER AGGENTS THAT LIVED: " + totalNbAgents_ + "\n";
+			  logMsg += "- TOTAL NUMBER CHILD BIRTH: " + totalNbChildren_ + "\n";
+			  logMsg += "- - - - - - - - - - - - - - - - - - - - - -\n";
+			  logMsg += "- YEARS SPENT BY SIMULATION: " + year_ + "\n";
+			  logMsg += "- NUMBER OF GENERATION(S): " + (year_ / 30) + "\n";
+			  logMsg += "- - - - - - - - - - - - - - - - - - - - - -\n";
+			  logMsg += "- NUMBER OF HOUSE(S) BURNT: " + totalNbHouseBurnt_ + "\n";
+			  logMsg += "-------------------------------------------\n";
+			  
+		LOGGER.log(Level.INFO, logMsg);	
 	}
 	
 	/* GETTERS // SETTERS */
@@ -230,6 +287,7 @@ public class GodAgent extends AAgent {
 	
 	public void incChildNb() {
 		++nbChildren_;
+		++totalNbChildren_;
 	}
 	
 	public void decChildNb() {
@@ -238,6 +296,7 @@ public class GodAgent extends AAgent {
 	
 	public void incAgentNb() {
 		++nbAgents_;
+		++totalNbAgents_;
 	}
 	
 	public void decAgentNb() {
@@ -260,10 +319,62 @@ public class GodAgent extends AAgent {
 		return getCurrentDay() == Day.SATURDAY || getCurrentDay() == Day.SUNDAY;
 	}
 	
+	public int getNbAgents() {
+		return nbAgents_;
+	}
+	
+	private void probalityToBurnHouse() {
+		
+		Context<AAgent> contextAgents = ContextUtils.getContext(this);
+		Iterable randAgentIt = contextAgents.getRandomObjects(HumanAgent.class, 1);
+		
+		if (randAgentIt.iterator().hasNext()) {
+			HumanAgent agent = (HumanAgent)randAgentIt.iterator().next();
+			Building oldHouse = agent.getHome();
+			Building newHouse = getEmptyGeography(Building.globalList);
+			
+			int x = oldHouse.getX();
+			int y = oldHouse.getY();
+			
+			++totalNbHouseBurnt_;
+			oldHouse.setBurnt();
+			
+			if ((x == agent.getX() && y == agent.getY()) || newHouse == null) {
+				
+				String logMsg = Const.HOUSE_TAG + "\n";
+				logMsg += "Building " + oldHouse.getID() + " burnt and kill Agent " + agent.getID() + " on " + getFormattedTime();
+				LOGGER.log(Level.WARNING, logMsg);
+				
+				agent.die();
+				
+				if (newHouse == null) {
+					Const.IS_SIMULATION_OVER = true;
+					String logEnd = Const.ENV_TAG + "\n";
+					logEnd += "No more houses are available.";
+					logMsg += "The simulation has terminated on " + getFormattedTime();
+					LOGGER.log(Level.WARNING, logEnd);
+					
+					printRecap();
+				}
+				
+				return;
+			}
+			
+			String logMsg = Const.HOUSE_TAG + "\n";
+			logMsg += "Building " + oldHouse.getID() + " burnt everybody is safe. Burnt on " + getFormattedTime();
+			LOGGER.log(Level.WARNING, logMsg);
+			
+			agent.setHome(newHouse);
+			agent.getYearListener().updateEvent(new EventTimeObject(EventTimeObject.Type.BURNING_TIME));
+		}
+		
+	}
+	
 	private void callEvt(AEventObject o) {
 		timeListeners_.forEach((IUpdateListener e) -> {
 			e.updateEvent(o);
 		});	
 	}
+	
 	
 }

@@ -54,6 +54,8 @@ public class HumanAgent extends AAgent {
 	private float maxAge_;
 
 	private PathSearch pathSearch_;
+	
+	private boolean shouldDie_;
 
 	Random rand_;
 
@@ -74,14 +76,13 @@ public class HumanAgent extends AAgent {
 		@Override
 		public void updateEvent(AEventObject e) {
 			if (e == null) return;
-
+			
+			GodAgent env = GodAgent.instance();
+			
 			EventTimeObject obj = (EventTimeObject)e;
 			switch (obj.type) {
 			case YEAR:
 				++age_;
-				if (age_ < Const.MAJOR_AGE) {
-					System.out.println("AGE = " + age_);
-				}
 				if (age_ == Const.MAJOR_AGE) {
 					turnAdult();
 				} else if (age_ == searchPartnerAge_) {
@@ -106,7 +107,6 @@ public class HumanAgent extends AAgent {
 					break;
 				}
 				if (Math.random() <= Const.SPARE_TIME_RATE) {
-					GodAgent env = GodAgent.instance();
 					Bar b = env.getClosestGeography(Bar.globalList, pathSearch_, HumanAgent.this.getPos());
 					if (b != null) {
 						HumanAgent.this.addGoalHangOut(b);
@@ -114,6 +114,25 @@ public class HumanAgent extends AAgent {
 				}
 				break;
 			default:
+				break;
+			case BURNING_TIME:
+				HumanAgent.this.goals_.clear();
+				
+				school_ = getClosestSchool(); 
+				if (hasChildren()) {
+					HumanAgent.this.getChildren().forEach(a -> {
+						((HumanAgent)a).school_ = school_;
+						a.goals_.clear();
+					});
+				}
+				if (env.getHour() < Const.NIGHT_BEGIN_HOUR) {
+					if (HumanAgent.this.hasChildren()) {
+						HumanAgent.this.addGoalGoToSchoolAndHome();
+					} else {
+						MoveTo moveToHouse = computeTraject(home_, null, true, false);
+						HumanAgent.this.addGoal(moveToHouse);	
+					}
+				}
 				break;
 			}
 		}
@@ -132,7 +151,9 @@ public class HumanAgent extends AAgent {
 
 		home_ = home;
 		home_.addAgent(this);
-
+		
+		shouldDie_ = false;
+		
 		pathSearch_ = new PathSearch(grid_);
 
 		school_ = getClosestSchool();
@@ -143,13 +164,14 @@ public class HumanAgent extends AAgent {
 	@Override
 	@ScheduledMethod(start = 1, interval = 1, priority = 2)
 	public void decide() {
+		GodAgent env = GodAgent.instance();
+		if (Const.IS_SIMULATION_OVER) return;
+		
 		AGoal g = peekGoal();
 		if (g != null && g.success()) {
 			deactivateOrder();
 			g.triggerCallback(null);
 		}
-
-		GodAgent env = GodAgent.instance();
 
 		// Checks whether there are food
 		// in its house.
@@ -175,7 +197,7 @@ public class HumanAgent extends AAgent {
 
 		double deathRate = ((float)age_ / (float)maxAge_) * Math.random();
 
-		if (deathRate >= 0.85) {
+		if (shouldDie_ || deathRate >= 0.85) {
 			die();
 		}
 
@@ -183,19 +205,25 @@ public class HumanAgent extends AAgent {
 		this.home_.consumeFood();
 	}
 
-	private void die() {
+	public void die() {
 		GodAgent env = GodAgent.instance();
+		if (age_ < Const.MAJOR_AGE) {
+			env.decChildNb();
+		}
 		env.decAgentNb();
-
+		
 		String logMsg = Const.AGENT_TAG + "\n";
 		logMsg += "Agent " + id_ + " died at " + age_ + " on " + env.getFormattedTime();
 		LOGGER.log(Level.INFO, logMsg);
 
 		// Kills all children that are minor
 		// if parent die.
+		Stream<AAgent> children = null;
 		if (this.hasChildren()) {
-			this.getChildren().forEach(a -> {
-				((HumanAgent)a).die();
+			children = this.getChildren();
+			children.forEach(a -> {
+				a.goals_.clear();
+				((HumanAgent)a).shouldDie_ = true;
 			});
 		}
 
@@ -208,6 +236,9 @@ public class HumanAgent extends AAgent {
 				n.removeEdge((RepastEdge)e);
 			});
 		}
+		
+		// Removes goals
+		this.goals_.clear();
 
 		// Removes agent from home
 		home_.removeAgent(this);
@@ -219,6 +250,19 @@ public class HumanAgent extends AAgent {
 
 		Context<HumanAgent> context = ContextUtils.getContext(this);
 		context.remove(this);
+		
+		// Simulation is over
+		if (env.getNbAgents() <= 0) {
+			Const.IS_SIMULATION_OVER = true;
+			String logEnd = Const.ENV_TAG + "\n";
+			logEnd += "Every agents are dead.";
+			logEnd += "The simulation has terminated on " + env.getFormattedTime();
+			LOGGER.log(Level.WARNING, logEnd);
+			
+			env.printRecap();
+			
+			return;
+		}
 	}
 
 	private MoveTo computeTraject(GridElement dest, IUpdateListener callback, boolean autoremove, boolean child) {
@@ -378,7 +422,6 @@ public class HumanAgent extends AAgent {
 			HumanAgent.this.pollGoal();
 
 			int timeAtShop = Const.randBetween(Const.MIN_NB_MIN_SHOPPING, Const.MAX_NB_MIN_SHOPPING, rand_);
-			System.out.println(timeAtShop);
 
 			String logMsg = Const.SHOPPING_TAG + "\n";
 			logMsg += "Agent " + id_ + " is coming home on " + env.getFormattedTime() + "\n";

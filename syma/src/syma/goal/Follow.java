@@ -8,7 +8,7 @@ import syma.main.GridElement;
 
 public class Follow extends AGoal {
 
-	private final AAgent dest_;
+	private AAgent dest_;
 	private final Grid<GridElement> grid_;
 
 	public Follow(AAgent target, IUpdateListener callback, AAgent dest, Grid<GridElement> grid) {
@@ -19,7 +19,9 @@ public class Follow extends AGoal {
 
 	@Override
 	public void update() {
-		target_.setPos(dest_.getX(), dest_.getY());
+		if (dest_ != null) {
+			target_.setPos(dest_.getX(), dest_.getY());
+		}
 	}
 
 	@Override
@@ -35,6 +37,10 @@ public class Follow extends AGoal {
 	public String toString() {
 		return "Follow [dest_=" + dest_ + ", target_=" + target_
 				+ ", autoRemoveWhenReached_=" + autoRemoveWhenReached_ + "]";
+	}
+
+	public void setDestToNull() {
+		dest_ = null;
 	}
 
 }
