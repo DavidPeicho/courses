@@ -195,6 +195,8 @@ public class HumanAgent extends AAgent {
 	@ScheduledMethod(start = 1, interval = 1, priority = 1)
 	public void step() {
 		super.step();
+		
+		if (Const.IS_SIMULATION_OVER) return;
 
 		double deathRate = ((float)age_ / (float)maxAge_) * Math.random();
 
@@ -251,19 +253,7 @@ public class HumanAgent extends AAgent {
 
 		Context<HumanAgent> context = ContextUtils.getContext(this);
 		context.remove(this);
-		
-		// Simulation is over
-		if (env.getNbAgents() <= 0) {
-			Const.IS_SIMULATION_OVER = true;
-			String logEnd = Const.ENV_TAG + "\n";
-			logEnd += "Every agents are dead.";
-			logEnd += "The simulation has terminated on " + env.getFormattedTime();
-			LOGGER.log(Level.WARNING, logEnd);
-			
-			env.printRecap();
-			
-			return;
-		}
+
 	}
 
 	private MoveTo computeTraject(GridElement dest, IUpdateListener callback, boolean autoremove, boolean child) {
@@ -665,19 +655,28 @@ public class HumanAgent extends AAgent {
 
 		WorkPlace work = env.getEmptyGeography(WorkPlace.globalList);
 		Building house = env.getEmptyGeography(Building.globalList);
-
-		this.workplace_ = work;
-		if (house != null) {
-			house.addAgent(this);
-			home_ = house;
-		}
-
+		
 		// Removes link with parent
 		Context<HumanAgent> context = ContextUtils.getContext(this);
 		Network n = (Network)context.getProjection("genealogy");
 		n.getEdges(this).forEach(e -> {
 			n.removeEdge((RepastEdge)e);
 		});
+		
+		this.workplace_ = work;
+		
+		if (house == null) {
+			Const.IS_SIMULATION_OVER = true;
+			String logEnd = Const.ENV_TAG + "\n";
+			logEnd += "No more houses are available.";
+			logEnd += "The simulation has terminated on " + env.getFormattedTime();
+			LOGGER.log(Level.WARNING, logEnd);
+			
+			env.printRecap();
+			return;
+		}
+		
+		this.setHome(house);
 
 		goals_.clear();
 		addGoal(computeTraject(home_, null, true, false));

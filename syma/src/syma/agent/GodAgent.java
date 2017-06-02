@@ -143,6 +143,8 @@ public class GodAgent extends AAgent {
 				nextHourToBurnHouse_ == hour_) {
 				if (Const.MAX_HOUSE_BURN_WEEK > 0) this.probalityToBurnHouse();
 			}
+			
+			this.checkIfFinished();
 		}
 		
 		if (hour_ >= 24) {
@@ -255,16 +257,13 @@ public class GodAgent extends AAgent {
 		
 		String logMsg = "-------------------------------------------\n";
 			  logMsg += "---------------SIMULATION END--------------\n";
-			  logMsg += "- TOTAL NUMBER AGGENTS THAT LIVED: " + totalNbAgents_ + "\n";
-			  logMsg += "- TOTAL NUMBER CHILD BIRTH: " + totalNbChildren_ + "\n";
-			  logMsg += "- - - - - - - - - - - - - - - - - - - - - -\n";
 			  logMsg += "- YEARS SPENT BY SIMULATION: " + year_ + "\n";
 			  logMsg += "- NUMBER OF GENERATION(S): " + (year_ / 30) + "\n";
 			  logMsg += "- - - - - - - - - - - - - - - - - - - - - -\n";
 			  logMsg += "- NUMBER OF HOUSE(S) BURNT: " + totalNbHouseBurnt_ + "\n";
 			  logMsg += "-------------------------------------------\n";
 			  
-		LOGGER.log(Level.INFO, logMsg);	
+		LOGGER.log(Level.INFO, logMsg);
 	}
 	
 	/* GETTERS // SETTERS */
@@ -355,7 +354,7 @@ public class GodAgent extends AAgent {
 					Const.IS_SIMULATION_OVER = true;
 					String logEnd = Const.ENV_TAG + "\n";
 					logEnd += "No more houses are available.";
-					logMsg += "The simulation has terminated on " + getFormattedTime();
+					logEnd += "The simulation has terminated on " + getFormattedTime();
 					LOGGER.log(Level.WARNING, logEnd);
 					
 					printRecap();
@@ -372,6 +371,17 @@ public class GodAgent extends AAgent {
 			agent.getHome().addAgent(agent);
 			
 			agent.getYearListener().updateEvent(new EventTimeObject(EventTimeObject.Type.BURNING_TIME));
+		}
+		
+	}
+	
+	private void checkIfFinished() {
+		
+		Context<AAgent> contextAgents = ContextUtils.getContext(this);
+		
+		if (contextAgents.getObjects(HumanAgent.class).size() <= 0) {
+			Const.IS_SIMULATION_OVER = true;
+			this.printRecap();
 		}
 		
 	}
