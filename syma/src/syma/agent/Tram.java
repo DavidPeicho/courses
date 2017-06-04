@@ -82,9 +82,15 @@ public class Tram extends AAgent {
 				}
 			}
 		}
+		
+		if (roadStops.isEmpty()) {
+			Tram.isValid = false;
+			return;
+		}
+		
 		if (roadStops.size() != stops.size()) {
 			String str = Const.ENV_TAG + "\n";
-			str += "The provided bus path contains stop that are not connected to the road.s";
+			str += "The provided bus path contains stop that are not connected to the road.";
 			LOGGER.log(Level.SEVERE, str);
 			Tram.isValid = false;
 		} else {

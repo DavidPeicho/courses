@@ -55,7 +55,7 @@ public class ContextManager implements ContextBuilder<GridElement> {
 		Const.SPARE_TIME_RATE = RunEnvironment.getInstance().getParameters().getFloat("spareTimeRate");
 		Const.MAX_HOUSE_BURN_WEEK = RunEnvironment.getInstance().getParameters().getInteger("nbHouseBurnPerWeek");
 		Const.IS_SIMULATION_OVER = false;
-
+		
 		loggerInit();
 		logInit();
 		
@@ -108,6 +108,9 @@ public class ContextManager implements ContextBuilder<GridElement> {
 		Bar.globalList.clear();
 		ShoppingCentre.globalList.clear();
 		Tram.isValid = true;
+		
+		int mod = Const.MAX_HOUSE_BURN_WEEK;
+		Const.MAX_HOUSE_BURN_WEEK = mod == 0 ? 0 : (mod % 7) + 1;
 		
 		Const.NB_SCHOOL = 0;
 		Const.NB_HOUSES = 0;

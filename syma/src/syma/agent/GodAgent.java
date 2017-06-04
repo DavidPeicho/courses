@@ -141,7 +141,8 @@ public class GodAgent extends AAgent {
 			
 			if (nextDayToBurnHouse_ == weekDay_ &&
 				nextHourToBurnHouse_ == hour_) {
-				if (Const.MAX_HOUSE_BURN_WEEK > 0) this.probalityToBurnHouse();
+				float rate = 0.35f + (0.9f - (1.0f / (float)Const.MAX_HOUSE_BURN_WEEK));
+				if (Const.MAX_HOUSE_BURN_WEEK > 0 && Math.random() < rate) this.probalityToBurnHouse();
 			}
 			
 			this.checkIfFinished();
