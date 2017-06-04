@@ -13,13 +13,13 @@
 									
 		/>
 				<parameter name="childProbability" displayName="Child Probability" type="float" 
-						defaultValue="0.55" 
+						defaultValue="0.6" 
 						isReadOnly="false" 
 						converter="repast.simphony.parameter.StringConverterFactory$FloatConverter"
 									
 		/>
 				<parameter name="maxNbAgents" displayName="Start Number Agents" type="int" 
-						defaultValue="20" 
+						defaultValue="30" 
 						isReadOnly="false" 
 						converter="repast.simphony.parameter.StringConverterFactory$IntConverter"
 									
