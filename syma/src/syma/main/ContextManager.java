@@ -57,7 +57,6 @@ public class ContextManager implements ContextBuilder<GridElement> {
 		Const.IS_SIMULATION_OVER = false;
 		
 		loggerInit();
-		logInit();
 		
 		try {
 			map = GridParser.instance().parse(pathToMap);
@@ -98,6 +97,8 @@ public class ContextManager implements ContextBuilder<GridElement> {
 		if (fail) return context;
 		
 		spawnDefaultAgents(map, context, grid);
+		
+		logInit();
 		return context;
 	}
 	
