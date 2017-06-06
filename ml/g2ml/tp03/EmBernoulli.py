@@ -3,25 +3,27 @@ import random as rd
 import sys
 
 class EmBernoulli:
-    def _init_centers(self, data, nbClasses):
-        centers = np.zeros((data.shape[0], nbClasses))
+    def _init_center(self, data, nbComponents):
+        center = np.zeros((data.shape[0], nbComponents))
+        minimages = data.shape[1] // 4
+        for i in range(nbComponents):
+            mini = 0
+            maxi = rd.randint(minimages, data.shape[1])
+            center[:, i] = np.mean(data[:, minimages:maxi], axis=1)
 
-        for i in range(nbClasses):
-            centers[:, i] = np.mean(data[:, rd.randint(0, data.shape[1])])
+        return center
 
-        return centers
-
-    def computeEM(self, data, nbClasses):
-        # FIXME
-        maxIt = 30
+    def computeEM(self, data, nbComponents):
+        delta = 1e-2
         # P(k)
-        W = np.repeat(1 / nbClasses, nbClasses)
-        center = self._init_centers(data, nbClasses)
-        for it in range(maxIt):
+        W = np.repeat(1 / nbComponents, nbComponents)
+        center = self._init_center(data, nbComponents)
+        while True:
             tabl = self._expectationStep(data, center, W)
-            W, center = self._maximizationStep(tabl, data)
-
-        return W, center
+            newW, center = self._maximizationStep(tabl, data)
+            if np.sum(np.abs(newW - W)) < delta:
+                return newW, center
+            W = newW
 
     def _bernoulli(self, x, center):
         # proba is P(X1, ..., Xn)
