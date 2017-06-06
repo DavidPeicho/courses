@@ -13,7 +13,7 @@ class EmBernoulli:
 
     def computeEM(self, data, nbClasses):
         # FIXME
-        maxIt = 3
+        maxIt = 30
         # P(k)
         W = np.repeat(1 / nbClasses, nbClasses)
         center = self._init_centers(data, nbClasses)
@@ -23,13 +23,12 @@ class EmBernoulli:
 
         return W, center
 
-
     def _bernoulli(self, x, center):
         # proba is P(X1, ..., Xn)
         proba = np.zeros(x.shape)
         # Retrieve indices of black and white pixels.
         indices = [np.array(np.where(x == i)) for i in range(2)]
-        proba[indices[0]] = center[indices[0]]
+        proba[indices[0]] = 1 - center[indices[0]]
         proba[indices[1]] = center[indices[1]]
         return np.prod(proba)
 
@@ -41,7 +40,7 @@ class EmBernoulli:
 
         for n in range(N):
             for k in range(K):
-                # Probabilité que l'image n soit de classe k.
+                # Probability for the image to be from K class.
                 tabl[n, k] = self._bernoulli(data[:, n], center[:, k]) * W[k]
             tsum = np.sum(tabl[n, :])
             tabl[n, :] = tabl[n, :] / tsum

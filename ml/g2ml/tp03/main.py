@@ -11,7 +11,6 @@ test_data, test_labels = load_mnist(dataset='testing', path='./')
 train_data = np.reshape(train_data, (60000, 28 * 28)).T
 test_data  = np.reshape(test_data,  (10000, 28 * 28)).T
 
-
 def EM(data):
     pass
 
@@ -30,7 +29,7 @@ def etapeE(data, center, W):
 
     for n in range(N):
         for k in range(K):
-            tabl[n, k] = bernouli(data[:, n], centre[:, k] * W[k])
+            tabl[n, k] = bernouli(data[:, n], center[:, k] * W[k])
         tabl[n, :] = tabl[n, :] / np.sum(tabl[n, :])
 
     return tabl
@@ -45,8 +44,9 @@ def etapeM(tabl, data):
 
 if __name__ == '__main__':
     # Binarize data.
-    binarize = lambda x : x < 128/255
+    binarize = lambda x : x < 128 / 255
     vfunc = np.vectorize(binarize)
+    
     btrain_data = vfunc(train_data)
     # Display images.
     vz.plotGroupImages(btrain_data[:,:10])
