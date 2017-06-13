@@ -5,11 +5,11 @@ import sys
 class EmBernoulli:
     def _init_center(self, data, nbComponents):
         center = np.zeros((data.shape[0], nbComponents))
-        minimages = data.shape[1] // 4
+        minimages = 0
         for i in range(nbComponents):
             mini = 0
             maxi = rd.randint(minimages, data.shape[1])
-            center[:, i] = np.mean(data[:, minimages:maxi], axis=1)
+            center[:, i] = np.mean(data[:, mini:maxi], axis=1)
 
         return center
 
@@ -32,7 +32,13 @@ class EmBernoulli:
         indices = [np.array(np.where(x == i)) for i in range(2)]
         proba[indices[0]] = 1 - center[indices[0]]
         proba[indices[1]] = center[indices[1]]
-        return np.prod(proba)
+        prod = np.prod(proba)
+
+        # This lines allow to fix NaN problems,
+        # by replacing them by zeros
+        if np.isnan(prod) or prod <= 0:
+            return np.finfo(prod.dtype).eps
+        return prod
 
     def _expectationStep(self, data, center, W):
         N = data.shape[1] # Number of data.
@@ -43,9 +49,14 @@ class EmBernoulli:
         for n in range(N):
             for k in range(K):
                 # Probability for the image to be from K class.
-                tabl[n, k] = self._bernoulli(data[:, n], center[:, k]) * W[k]
-            tsum = np.sum(tabl[n, :])
-            tabl[n, :] = tabl[n, :] / tsum
+                tabl[n, k] = np.log(self._bernoulli(data[:, n], center[:, k])) + np.log(W[k])
+
+            max_value = np.amax(tabl[n,:])
+            tsum = np.sum(tabl[n, :] - max_value)
+
+            #print((tabl[n, :] - max_value) - tsum)
+
+            tabl[n, :] = np.exp((tabl[n, :] - max_value) - tsum)
 
         return tabl
 
