@@ -4,14 +4,6 @@ class Index:
         self.didToUrl = didToUrl
         self.wordToDids = wordToDids
 
-    def getUrlsFromStr(self, str):
-        dIds = self.wordToDids[str]
-        urls = []
-        for d in dIds:
-            urls.append(self.didToUrl[d])
-
-        return urls
-
     @staticmethod
     def build(postings):
 
