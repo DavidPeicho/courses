@@ -10,7 +10,7 @@ class TokenizedDocument:
     def analyze(document, processors):
         words = []
         url = document.url
-        doc_words = re.split("[,; ()\t\n\-!?:]+", document.text)
+        doc_words = re.split("[,; ><()\t\n\!?:]+", document.text)
         for word in doc_words:
             tokenized_word = word
             for p in processors:
