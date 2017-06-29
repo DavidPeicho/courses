@@ -1,8 +1,17 @@
+import pickle
+
 class Index:
     def __init__(self, urlToDid, didToUrl, wordToDids):
         self.urlToDid = urlToDid
         self.didToUrl = didToUrl
         self.wordToDids = wordToDids
+
+    def save(self, path):
+        pickle.dump(self, open(path, 'wb'))
+
+    @staticmethod
+    def load(path):
+        return pickle.load(open(path, 'rb'))
 
     @staticmethod
     def build(postings):
@@ -33,6 +42,4 @@ class Index:
                 wordToDids[word].append(urlToDid[url])
 
         return Index(urlToDid, didToUrl, wordToDids)
-
-    #@staticmethod
-    #def save(index, path):
+        
