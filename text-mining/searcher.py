@@ -89,13 +89,9 @@ class Searcher:
             return list(set(self._eval(tree.left, index)) | set(self._eval(tree.right, index)))
         elif tree.op == Op.NOT:
             negation = []
-            val = tree.left.data
-            if not(val in index.wordToDids):
-                return []
+            l = self._eval(tree.left, index)
             for key in index.wordToDids:
-                if key is val:
-                    continue
-                negation = list(set(negation) | set(set(index.wordToDids[key]) - set(index.wordToDids[val])))
+                negation = list(set(negation) | (set(set(index.wordToDids[key]) - set(l))))
 
             return negation
         elif tree.op == Op.DATA and not(tree.data is None):

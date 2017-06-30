@@ -1,0 +1,57 @@
+This project is a implements a very small and silly GoOgle search.
+It basically creates an unordered map fitting in the RAM.
+
+The project has only been tested with Python 3.0, we recommand you
+to use the same version has we did.
+
+In order to run the program, you can execute the following:
+$ python3 main.py -i assets/emails/rec.autos -s 'lama !OR we' -idx test/test.idx
+
+----------
+Arguments:
+----------
+All the arguments are are optional, in order to let you choose
+what you want to do. You can:
+
+-> --input/-i path_to_folder: Gives the path to the folder containing
+the data on which the index is built
+
+-> --save-index/--si: Specifies the location to save the build index file.
+Important: if this argument is not given, the index is not saved on the disk.
+
+-> --index/-idx: Specifies the index file use for search.
+Important: If you do not provided a precomputed index, the process
+will try to build an index from the input folder given with (-i).
+If there is no input folder, it will fail and exit.
+
+-> -s QUERY: Searches a given query.
+A query should be define under the form: "toto !OR lama !AND kikou".
+The process will then create an AST from left to right.
+So, with our simple example:
+
+                   !OR
+                  /   \
+                toto !AND
+                     /  \
+                   lama kikou
+
+You can use : !AND, !OR, and !NOT.
+Be careful, !NOT is a unary operator and should be placed
+before what you want to negate.
+
+There is also something else to note, if the word does not exist at all, the query
+will be default abort. So, "!NOT akdakdkda" will give no results if "akdakdkda"
+is not in the index.
+
+---------
+Examples:
+---------
+- Create an index from the folder `assets` and save it to `lama_des_bois.index`, without
+running any query on it:
+$ python3 main.py --save-index lama_des_bois.index -i assets
+
+- Create an index, do not save it and run a query on it:
+$ python3 main.py -i assets/emails/rec.autos -s "check"
+
+- Use an index saved on the disk, and run a query on it:
+$ python3 main.py -s '!NOT adsorption !OR lama' --index test/test.idx

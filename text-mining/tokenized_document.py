@@ -1,7 +1,12 @@
 import re
 
 class TokenizedDocument:
-    
+    """
+    Contains a tokenized version of a document.
+
+    It uses one/several processors to apply transformation on words.
+    """
+
     def __init__(self, words, url):
         self.words = words
         self.url = url
