@@ -1,12 +1,25 @@
 import pickle
 
 class Index:
+    """
+    Index built from a list of documents.
+
+    Save mapping from url to document ids, from documents ids to url,
+    and from words to documents ids.
+    """
+
     def __init__(self, urlToDid, didToUrl, wordToDids):
         self.urlToDid = urlToDid
         self.didToUrl = didToUrl
         self.wordToDids = wordToDids
 
     def save(self, path):
+        """
+        Saves the index at the given path.
+
+        @params
+        path: the location to save the index
+        """
         pickle.dump(self, open(path, 'wb'))
 
     @staticmethod
@@ -15,7 +28,9 @@ class Index:
 
     @staticmethod
     def build(postings):
-
+        """
+        Builds an index from postings and return it.
+        """
         # Maps url to a single Did
         urlToDid = {}
         # Maps did to a single url
