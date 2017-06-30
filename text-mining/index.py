@@ -20,8 +20,6 @@ class Index:
         urlToDid = {}
         # Maps did to a single url
         didToUrl = {}
-        # Maps word to a list of Dids
-        wordToDids = {}
 
         # Creates the mapping from url to a single Did
         for key in postings:
@@ -33,13 +31,7 @@ class Index:
                 didToUrl[dId] = url
 
         # Creates the mapping from word to a list of Dids
-        for word in postings:
-            if not(word in wordToDids):
-                wordToDids[word] = []
-
-            value = postings[word]
-            for url in value.urls:
-                wordToDids[word].append(urlToDid[url])
+        wordToDids = {w : set(map(lambda u: urlToDid[u], p.urls))
+                      for w, p in postings.items()}
 
         return Index(urlToDid, didToUrl, wordToDids)
-        
