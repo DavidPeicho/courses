@@ -40,6 +40,15 @@ def tokenize_all(documents):
         tokenized_documents.append(tokenized_doc)
 
 def build_index():
+    """
+    Builds and index from a given folder.
+
+    Normalizes the documents, tokezine them, and create the index.
+
+    This function is called only when the user has provided a wrong
+    index file, or even when it did not provide anything at all.
+    """
+
     processors.append(NormalizerProcessor())
 
     # Fetches every documents from the input folder
@@ -58,18 +67,29 @@ def build_index():
 
     return index
 
+
 def print_result(args, urls_found):
-    
+    """
+    This function prints a summary to the user about its request
+
+    It prints informations about the initial query, the index used,
+    and the list of the results, if any have been found.
+    """
+
     str = '---------------------------------------\n'
-    str += "Search Input Folder:\t{0}\n".format(args.input)
-    str += "Search Input Word:\t{0}\n".format(args.search) + "\n"
+    str += "Input Folder:\t\t{0}\n".format(args.input)
+    if not(urls_found is None):
+        str += "Search Input Word:\t\t{0}\n".format(args.search) + "\n"
     str += "Results : "
 
     print(str)
-    if urls_found:
-        print("\n".join(urls_found))
+    if not(urls_found is None):
+        if len(urls_found):
+            print("\n".join(urls_found))
+        else:
+            print('There are no results matching your query.')
     else:
-        print('There is no files matching your request')
+        print('You did not provide any search. Use -s QUERY to search in the index.')
 
 if __name__ == "__main__":
 
@@ -83,6 +103,9 @@ if __name__ == "__main__":
     # Builds the index only if
     # the user did not provide any
     if args.index is None:
+        if args.input is None:
+            print('[ERROR!]\tImpossible to process. You did not link any index with --index,and you did not provide an input folder with -i\n')
+            exit(1)
         index = build_index()
     else:
         try:
@@ -90,16 +113,26 @@ if __name__ == "__main__":
             print('[INDEX]\t\tLoading index...')
         except:
             print('[ERROR!]\tImpossible to load the index.\n')
-            print('[INDEX]\t\tRecomputing the index on error...')
-            index = build_index()
             recomputed_index = True
     
+    if recomputed_index:
+        if args.input is None:
+            print('[INDEX]\t\tImpossible to recompute, you did not provide an input folder with -i path.')
+            exit(1)
+        print('[INDEX]\t\tRecomputing the index on error...')
+        index = build_index()
+
     # Saves the index if asked by the user
-    if not(args.save_index is None) and recomputed_index :
+    if not(args.save_index is None):
         print('[SAVING]\tSaving created index...\n')
         index.save(args.save_index)
 
-    print('[SEARCHING]\tSearching for the word \'{0}\'...'.format(wordToSearch))
-    searcher = Searcher()
-    print_result(args, searcher.search_ast(wordToSearch, index))
-    #searcher.search_ast(wordToSearch, index)
+    searcher = None
+    if not(args.search is None) and len(args.search):
+        print('[SEARCHING]\tSearching for the word \'{0}\'...'.format(wordToSearch))
+        searcher = Searcher()
+    
+    if searcher is None:
+        print_result(args, None)
+    else:
+        print_result(args, searcher.search_ast(wordToSearch, index))
