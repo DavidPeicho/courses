@@ -5,6 +5,18 @@ class Op():
     DATA = 4
 
 class Tree(object):
+    """
+    Binary Tree node structure.
+
+    Used to represents a simple AST.
+    
+    @param
+    op: the operance
+    data: data if any (token for leaves node)
+    left: left child
+    right: right child
+    """
+
     def __init__(self):
         self.left = None
         self.right = None
@@ -37,7 +49,9 @@ class Tree(object):
 
 class Searcher:
     def search(self, str, index):
-
+        """
+        Searches for a single word in the given index
+        """
         if not(str in index.wordToDids):
             return None
 
@@ -49,14 +63,26 @@ class Searcher:
         return urls
 
     def search_ast(self, ast, index):
-        urls = []
+        """
+        Step1: Builds an AST from the given query.
+
+        Step2: Makes an evaluation of the AST, by performing set intersection,
+        union, and negation.
+        """
         
         tree = self._parse(ast, 0)
-        return self._eval(tree, index)
-        #print(self._eval(tree, index))
+        dIds = self._eval(tree, index)
+        
+        urls = []
+        for d in dIds:
+            urls.append(index.didToUrl[d])
 
+        return urls
 
     def _eval(self, tree, index):
+        """
+        Evaluates recursively the given AST.
+        """
         if tree.op == Op.AND:
             return list(set(self._eval(tree.left, index)) & set(self._eval(tree.right, index)))
         elif tree.op == Op.OR:
@@ -68,18 +94,23 @@ class Searcher:
                 return []
             for key in index.wordToDids:
                 if key is val:
-                    print('CAACA')
                     continue
                 negation = list(set(negation) | set(set(index.wordToDids[key]) - set(index.wordToDids[val])))
+
             return negation
         elif tree.op == Op.DATA and not(tree.data is None):
             if not(tree.data in index.wordToDids):
                 return []
+            
             return index.wordToDids[tree.data]
 
         return []
 
     def _parse(self, ast, start):
+        """
+        Parses the string query into an AST structure
+        """
+
         ast_len = len(ast)
         i = start
         while i  < ast_len:
@@ -97,6 +128,7 @@ class Searcher:
                 if ast[i + 1] == 'N' and ast[i + 2] == 'O' and ast[i + 3] == 'T':
                     return self._parse_not(ast, i + 4)
             i = i + 1
+
         node = Tree()
         node.op = Op.DATA
         node.data = ast[start:ast_len].strip(' \t\n\r')
