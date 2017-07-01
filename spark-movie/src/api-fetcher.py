@@ -22,6 +22,7 @@ class Crawler:
 
     def crawl_all(self):
         for y in range(self._min_year, self._max_year + 1):
+            print('Starting to crawl year ' + str(y))
             self._crawl_year(y)
         
         self._file.close()
@@ -42,6 +43,7 @@ class Crawler:
 
         nb_pages = page_data["total_pages"] + 1
         for p in range(2, nb_pages):
+            print(p)
             page_data = self._request_page(year, p)
             if not("results" in page_data) or page_data["results"] is None:
                 continue
@@ -58,7 +60,6 @@ class Crawler:
         for movie in data_movies:
             movie_id = movie["id"]
             data_reviews = self._request_reviews(movie_id)
-            print (data_reviews)
             if not("results" in data_reviews)\
                 or data_reviews["results"] is None or len(data_reviews["results"]) == 0:
                 continue
@@ -71,6 +72,9 @@ class Crawler:
             del movie["adult"]
             # Adds reviews to movie
             movie["reviews"] = movie["reviews"] + data_reviews["results"]
+
+            if not("total_pages" in data_reviews) or data_reviews["total_pages"] is None:
+                continue
 
             nb_page_reviews = data_reviews["total_pages"] + 1
             for r in range(2, nb_page_reviews):
@@ -90,6 +94,7 @@ class Crawler:
             self._file.write("{}\n".format(json.dumps(m)))
 
     def _request_page(self, year, page_nb):
+        print('Requesting page {} for year {}...'.format(page_nb, year))
         self._wait_and_reset_queries()
 
         params = dict(
@@ -104,6 +109,7 @@ class Crawler:
         return data
 
     def _request_reviews(self, id):
+        print('Requesting reviews for movie {}...'.format(id))
         self._wait_and_reset_queries()
 
         params = dict(
@@ -143,8 +149,7 @@ if __name__ == "__main__":
         "review": REVIEW_ROUTE_API
     }
 
-    #MIN_YEAR = 1950
-    MIN_YEAR = 2012
+    MIN_YEAR = 1950
     MAX_YEAR = 2017
 
     args = parse_args()
