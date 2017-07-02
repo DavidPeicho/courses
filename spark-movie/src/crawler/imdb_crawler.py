@@ -3,31 +3,30 @@ import json
 import requests
 import time
 
-class Crawler:
+from .abstract_crawler import AbstractCrawler
+
+class IMDBCrawler(AbstractCrawler):
     
-    def __init__(self, routes, token, output_file_path, min_year, max_year):
-        self._token = token
+    def __init__(self, routes, token, output_file_path = None):
+        AbstractCrawler.__init__(self, routes, output_file_path)
         self._routes = routes
-        self._file_path = output_file_path
+        self._token = token
         
-        self._min_year = min_year
-        self._max_year = max_year
+        self._min_year = 1950
+        self._max_year = 2000
 
         self.nb_queries = 0
 
-        # Opens the output file directly and keep it open
-        # to avoid another process to use it and to reduce
-        # I/O.
-        self._file = open(self._file_path, 'a')
-
-    def crawl_all(self):
+    def crawl_sync(self, callback):
         for y in range(self._min_year, self._max_year + 1):
             print('Starting to crawl year ' + str(y))
-            self._crawl_year(y)
-        
-        self._file.close()
+            self._crawl_year(y, callback)
 
-    def _crawl_year(self, year):
+    def setMinMaxYear(self, min_val, max_val):
+        self._min_year = min_val
+        self._max_year = max_val
+
+    def _crawl_year(self, year, callback):
         page_data = self._request_page(year, 1)
         if (not("total_pages" in page_data)
             or page_data["total_pages"] is None):
@@ -39,6 +38,7 @@ class Crawler:
             return
 
         movies = self._filter_movies(page_data)
+        self._trigger_callbacks(movies, callback)
         self._write_page(movies)
 
         nb_pages = page_data["total_pages"] + 1
@@ -49,6 +49,7 @@ class Crawler:
                 continue
             
             movies = self._filter_movies(page_data)
+            self._trigger_callbacks(movies, callback)
             self._write_page(movies)
 
     def _filter_movies(self, page_data):
@@ -86,12 +87,19 @@ class Crawler:
 
         return movies
 
+    def _trigger_callbacks(self, movies, callback):
+        if (len(movies) == 0):
+            return
+
+        for m in movies:
+            callback(m)
+
     def _write_page(self, movies):
         if (len(movies) == 0):
             return
 
         for m in movies:
-            self._file.write("{}\n".format(json.dumps(m)))
+            self.write(json.dumps(m))
 
     def _request_page(self, year, page_nb):
         print('Requesting page {} for year {}...'.format(page_nb, year))
@@ -102,7 +110,8 @@ class Crawler:
             year=year,
             page=page_nb
         )
-        resp = requests.get(url=self._routes["movies_list"], params=params)
+        url = self._routes["movies_list"]
+        resp = self.request(url, params)
         data = json.loads(resp.text)
 
         self.nb_queries = self.nb_queries + 1
@@ -115,8 +124,8 @@ class Crawler:
         params = dict(
             api_key=self._token
         )
-        url = self._routes["review"] + str(id) + '/reviews'
-        resp = requests.get(url=url, params=params)
+        url = self._routes["review"].format(str(id))
+        resp = self.request(url, params)
         data = json.loads(resp.text)
 
         self.nb_queries = self.nb_queries + 1
@@ -126,36 +135,3 @@ class Crawler:
         if self.nb_queries >= 4:
             time.sleep(1)
             self.nb_queries = 0
-
-
-def parse_args():
-    description = "Simple crawler for movies."
-    arg_parser = argparse.ArgumentParser(description=description)
-    
-    # Register arguments
-    arg_parser.add_argument('-o', '--output',
-                            help='Output file in which data are written.',
-                            required=True)
-
-    return arg_parser.parse_args()
-
-if __name__ == "__main__":
-    THEMOVIEDB_API_TOKEN = "2cde1ceaa291c9271e32272dc26200fe"
-    
-    MOVIES_ROUTE_API = "https://api.themoviedb.org/3/discover/movie"
-    REVIEW_ROUTE_API = "https://api.themoviedb.org/3/movie/"
-    routes = {
-        "movies_list": MOVIES_ROUTE_API,
-        "review": REVIEW_ROUTE_API
-    }
-
-    MIN_YEAR = 1950
-    MAX_YEAR = 2017
-
-    args = parse_args()
-    if (args.output is None):
-        print('Error: you have to provide an output file using --output/-o FILE')
-        exit(1)
-
-    crawler = Crawler(routes, THEMOVIEDB_API_TOKEN, args.output, MIN_YEAR, MAX_YEAR)
-    crawler.crawl_all()
