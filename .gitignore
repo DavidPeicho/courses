@@ -1,6 +1,9 @@
 *.swp
 *.gz
 
+*/*/target/
+*/*/project/
+
 # Eclipse
 .metadata
 bin/
