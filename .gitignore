@@ -21,3 +21,6 @@ debug.log
 # Python
 *.pyc
 __pycache__/
+
+# Projects dependent files/folders
+spark-movie/spark-consumer/checkpoint
