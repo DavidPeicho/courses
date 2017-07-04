@@ -15,7 +15,7 @@ object MovieUtils {
         implicit val reviewFormat = Json.format[Review]
     }
 
-	case class Movie (
+	case class MovieRaw (
         id : Int,
         original_title : String,
 		title : String,
@@ -29,8 +29,12 @@ object MovieUtils {
 		genre_ids : List[Int],
         video : Boolean
     )
-    object Movie {
-        implicit val movieFormat = Json.format[Movie]
+    object MovieRaw {
+        implicit val movieFormat = Json.format[MovieRaw]
     }
+
+    /*case class Movie (
+
+    )*/
 
 }

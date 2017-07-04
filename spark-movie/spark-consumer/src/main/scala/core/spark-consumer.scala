@@ -1,6 +1,6 @@
 package com.sparkmovie.core
 
-import org.apache.kafka.clients.producer.{KafkaProducer, ProducerConfig}
+import org.apache.kafka.clients.producer.{KafkaProducer, ProducerConfig, ProducerRecord}
 import org.apache.kafka.common.serialization.StringDeserializer
 import org.apache.spark.SparkConf
 import org.apache.spark.streaming._
@@ -8,21 +8,29 @@ import org.apache.spark.streaming.kafka010._
 import org.apache.spark.streaming.kafka010.LocationStrategies.PreferConsistent
 import org.apache.spark.streaming.kafka010.ConsumerStrategies.Subscribe
 
+import org.apache.spark.rdd._
+
 import play.api.libs.json._
 
 import com.sparkmovie.utils.CommandLineParser
 import com.sparkmovie.utils.MovieUtils
+import com.sparkmovie.utils.SparkKafkaUtils
 
 object SparkConsumer {
+
+    val TOPICS = Map[String, String] (
+        "RAW_MOVIE_READ" -> "movie-topic",
+        "MOVIE_WRITE" -> "movie-processed"
+    )
 
     def main(args: Array[String]) {
 
         val requiredOptions = List(
-            "adress",
+            "brokers",
             "group-id"
         )
         val topics = Array(
-            "movie-topic"
+            TOPICS.get("RAW_MOVIE_READ").get
         )
         
         System.out.println("\n[SPARK CONSUMER] Starting Spark instance...")
@@ -36,7 +44,7 @@ object SparkConsumer {
         }
 
         val kafkaParams = Map[String, Object] (
-            "bootstrap.servers" -> options.get("adress").get,
+            "bootstrap.servers" -> options.get("brokers").get,
             "group.id" -> options.get("group-id").get,
             "auto.offset.reset" -> "latest",
             "enable.auto.commit" -> (false: java.lang.Boolean),
@@ -61,24 +69,30 @@ object SparkConsumer {
 
         stream.map(record => (record.key, record.value))
         stream.foreachRDD { rdd =>
-            println("Printing everything:")
-            /*rdd.foreachPartition { partitionOfRecords =>
-
-            }*/
-            rdd.map(x => x.value()).foreach(x => {
-                    //print(x)
-                    Json.parse(x).validate[MovieUtils.Movie] match {
-                        case JsSuccess(movie, _) => {    
-                            movie
-                        }
-                        case JsError(_) => println("parsing failed")
-                    }
-                }
-            )
+            val rddValues = rdd.map(x => x.value())
+            convertToJSON(rddValues).foreach { v =>
+                val producer = SparkKafkaUtils.createProducer(options.get("brokers").get)
+                val message = new ProducerRecord[String, String](TOPICS.get("MOVIE_WRITE").get, null, "CACAAAAAAA")
+                producer.send(message)
+            }
         }
 
         ssc.start()
         ssc.awaitTermination()
+    }
+
+    def convertToJSON(rdd : RDD[String]) : RDD[Option[MovieUtils.MovieRaw]] = {
+        rdd.map(x => {
+            Json.parse(x).validate[MovieUtils.MovieRaw] match {
+                case JsSuccess(movie, _) => {    
+                    Some(movie)
+                }
+                case JsError(_) => {
+                    println("Failed to process")
+                    None
+                }
+            }
+        })
     }
 
 }
