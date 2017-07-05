@@ -34,6 +34,7 @@ fi
 #       RUNS KAFKA      #
 #########################
 TOPIC_RAW_MOVIE="movie-topic"
+TOPIC_MOVIE_ANALYZED="movie-analyzed"
 TOPIC_PROCESSED_MOVIE="movie-processed"
 
 KAFKA_BIN="$KAFKA_FOLDER_ARG"/bin
@@ -55,6 +56,9 @@ kafka_server_pid="$!"
 # Creates the movie topic, where raw movie data
 # are written from the Python producer script.
 "$KAFKA_BIN"/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic "$TOPIC_RAW_MOVIE" &
+# Creates the movie analyzed topc, where movie with
+# the associated sentiment analysis are written from the Python analyzer script.
+"$KAFKA_BIN"/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic "$TOPIC_MOVIE_ANALYZED" &
 # Creates the procesed movie topic, where processed movie data
 # are written from the Spark producer.
 "$KAFKA_BIN"/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic "$TOPIC_PROCESSED_MOVIE" &

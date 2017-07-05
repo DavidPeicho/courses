@@ -1,6 +1,7 @@
 package com.sparkmovie.core
 
 import org.apache.kafka.clients.producer.{KafkaProducer, ProducerConfig, ProducerRecord}
+import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.apache.kafka.common.serialization.StringDeserializer
 import org.apache.spark.SparkConf
 import org.apache.spark.streaming._
@@ -69,13 +70,40 @@ object SparkConsumer {
 
         stream.map(record => (record.key, record.value))
         stream.foreachRDD { rdd =>
-            val rddValues = rdd.map(x => x.value())
-            convertToJSON(rddValues).foreach { v =>
-                val producer = SparkKafkaUtils.createProducer(options.get("brokers").get)
-                val message = new ProducerRecord[String, String](TOPICS.get("MOVIE_WRITE").get, null, "CACAAAAAAA")
-                producer.send(message)
-            }
+            
+            rdd.foreachPartition(partition => {
+                val producer = SparkKafkaUtils
+                                .createProducer(options.get("brokers").get)
+
+                partition.foreach {
+                  
+                    case movieConsumer : ConsumerRecord[String, String] => {
+
+                        Json.parse(movieConsumer.value())
+                            .validate[MovieUtils.MovieRaw] match {
+                                case JsSuccess(movie, _) => {
+                                    val jsonMovie = Some(movie)
+                                    // Analyze movie
+                                    // Send to kafka the new movie class
+                                    // val message = new ProducerRecord[String, String](TOPICS.get("MOVIE_WRITE").get, null, "CACAAAAAAA")
+                                    // producer.send(message)
+                                }
+                                case JsError(_) => {
+                                    println("Failed to process")
+                                    None
+                                }
+                            }
+
+                    }
+
+                }
+
+                producer.flush()
+                producer.close()
+
+            })
         }
+        //}
 
         ssc.start()
         ssc.awaitTermination()

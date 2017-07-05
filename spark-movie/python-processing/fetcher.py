@@ -3,23 +3,8 @@ import json
 
 from kafka import SimpleProducer, KafkaClient
 
-#from .crawler.imdb_crawler import IMDBCrawler
-from crawler import imdb_crawler
-
-class KafkaHandler:
-    def __init__(self):
-        self._client = KafkaClient("localhost:9092")
-        self._producer = SimpleProducer(
-            self._client, async = True,
-            batch_send_every_n = 1000,
-            batch_send_every_t = 10
-        )
-
-    def produce(self, movie_data, topic):
-        try:
-            self._producer.send_messages(topic, movie_data.encode('utf-8'))
-        except Exception as e:
-            print(e)
+from utils.kafka_producer import KafkaProducerWrapper
+from fetcher_lib.crawler import imdb_crawler
 
 def parse_args():
     description =   """
@@ -61,7 +46,7 @@ def stream_from_api(kafka_handler):
         print("[KAFKA] Movie pushed to topic \'{}\'".format('movie-topic'))
         kafka_handler.produce(string, 'movie-topic')
     
-    MIN_YEAR = 1950
+    MIN_YEAR = 2001
     MAX_YEAR = 2017
 
     crawler = imdb_crawler.IMDBCrawler(routes, THEMOVIEDB_API_TOKEN, args.output)
@@ -72,7 +57,7 @@ def stream_from_api(kafka_handler):
     crawler.stop()
 
 if __name__ == "__main__":
-    kafka_handler = KafkaHandler()
+    kafka_handler = KafkaProducerWrapper()
 
     args = parse_args()
     if not(args.input is None):
