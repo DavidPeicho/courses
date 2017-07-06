@@ -20,7 +20,7 @@ import com.sparkmovie.utils.SparkKafkaUtils
 object SparkConsumer {
 
     val TOPICS = Map[String, String] (
-        "RAW_MOVIE_READ" -> "movie-topic",
+        "RAW_MOVIE_READ" -> "movie-analyzed",
         "MOVIE_WRITE" -> "movie-processed"
     )
 
