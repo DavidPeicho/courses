@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+import signal
+
 import argparse
 import json
 
@@ -44,10 +46,12 @@ def stream_from_api(kafka_handler):
 
     # Defines callback triggered each time a movie is
     # fetched from the api
-    def callback(movie):
-        string = json.dumps(movie)
-        print("[KAFKA] Movie pushed to topic \'{}\'".format('movie-topic'))
-        kafka_handler.produce(string, 'movie-topic')
+    def callback(movies):
+        for movie in movies:
+            string = json.dumps(movie)
+            print("[KAFKA] Movie `{}` pushed to topic \'{}\'".format(movie["title"], 'movie-topic'))
+            kafka_handler.produce(string, 'movie-topic')
+        kafka_handler.flush()
     
     MIN_YEAR = 2001
     MAX_YEAR = 2017
@@ -61,6 +65,14 @@ def stream_from_api(kafka_handler):
 
 if __name__ == "__main__":
     kafka_handler = KafkaProducerWrapper()
+
+    # Catch SIGINT to stop the script properly
+    def exit_script(signal, frame):
+        print('[FETCHER] Stopping the fetch...')
+        kafka_handler.flush()
+        exit(0)
+
+    signal.signal(signal.SIGINT, exit_script)
 
     args = parse_args()
     if not(args.input is None):

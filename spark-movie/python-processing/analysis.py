@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import os
+import signal
 import argparse
 import json
 
@@ -42,6 +43,13 @@ def parse_args():
     return arg_parser.parse_args()
 
 if __name__ == "__main__":
+
+    # Catch SIGINT to stop the script properly
+    def exit_script(signal, frame):
+        print('[ANALYSER] Stopping the fetch...')
+        exit(0)
+
+    signal.signal(signal.SIGINT, exit_script)
 
     DATA_ROOT_FOLDER = "data/reviews/train/data/"
     #DATA_ROOT_FOLDER = "data/txt_sentoken/"
@@ -88,10 +96,19 @@ if __name__ == "__main__":
             movie = json.loads(message.value.decode("utf-8"))
             movie["review_analysis"] = []
 
+            # Adds a new list to the movie, composed of
+            # 1 for positive review, and 0 for negative ones.
             for r in movie["reviews"]:
                 content = r["content"]
                 val = 1 if svm.project([content]) == "pos" else 0
                 movie["review_analysis"].append(val)
+
+
+            # Writes processed movie with sentiment analyses to
+            # output topic.
+            string_movie = json.dumps(movie)
+            producer.produce(string_movie, args.producer)
+            producer.flush()
 
             print(movie)
         except:

@@ -91,8 +91,7 @@ class IMDBCrawler(AbstractCrawler):
         if (len(movies) == 0):
             return
 
-        for m in movies:
-            callback(m)
+        callback(movies)
 
     def _write_page(self, movies):
         if (len(movies) == 0):
