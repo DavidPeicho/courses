@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import argparse
 import json
 
@@ -28,6 +30,7 @@ def stream_file(file_path, kafka_handler):
     with open(file_path, "r") as f:
         for line in f:
             kafka_handler.produce(line, 'movie-topic')
+        kafka_handler.flush()
 
 def stream_from_api(kafka_handler):
     THEMOVIEDB_API_TOKEN = "2cde1ceaa291c9271e32272dc26200fe"

@@ -2,10 +2,11 @@
 
 import os
 import argparse
-
-import numpy as np
+import json
 
 from sentiment_analysis.linear_svm import LinearSVM
+from utils.kafka_consumer import KafkaConsummerWrapper
+from utils.kafka_producer import KafkaProducerWrapper
 
 def parse_args():
     description =   """
@@ -16,6 +17,9 @@ def parse_args():
     arg_parser = argparse.ArgumentParser(description=description)
     
     # Register arguments
+    arg_parser.add_argument('-b', '--broker',
+                            help='Broker on which the connection is established.',
+                            required=False)
     arg_parser.add_argument('-c', '--consummer',
                             help='Id of the Kafka topic to consumme from. \'movie-topic\' by default.',
                             required=False)
@@ -53,6 +57,18 @@ if __name__ == "__main__":
         args.positive = POS_FOLDER
     if args.negative is None:
         args.negative = NEG_FOLDER
+    if args.broker is None:
+        args.broker = "localhost:9092"
+
+    # Prints message describing script inputs
+    print('[ANALYSER] Starting script with inputs:')
+    print('[ANALYSER]\t- broker: {}'.format(args.broker))
+    print('[ANALYSER]\t- consumer topic: {}'.format(args.consummer))
+    print('[ANALYSER]\t- producer topic: {}'.format(args.producer))
+
+    # Setups Kafka consumer and producer
+    consumer = KafkaConsummerWrapper(args.consummer, args.broker)
+    producer = KafkaProducerWrapper(args.broker)
 
     # The user did not provide a previsouly trained model,
     # the script needs to train from any possible data folder.
@@ -63,22 +79,24 @@ if __name__ == "__main__":
 
         if args.save_db:
             svm.dump(args.save_db)
-
     else:
         svm = LinearSVM.load(args.load_db)
 
-    test_data = []
-    test_labels = []
-    for root, sub, files in os.walk("data/txt_sentoken/neg"):
-        for file_name in files:
-            url = os.path.join(root, file_name)
-            content = open(url, 'r', encoding='utf-8', errors='ignore').read()
-            test_data.append(content)
-            test_labels.append('neg')
+    # Consumer callback
+    def callback(message):
+        try:
+            movie = json.loads(message.value.decode("utf-8"))
+            movie["review_analysis"] = []
 
-    y_test = svm.project(test_data)
-    i = 0
-    for a in y_test:
-        if a == "neg":
-            i = i + 1
-    print(i)
+            for r in movie["reviews"]:
+                content = r["content"]
+                val = 1 if svm.project([content]) == "pos" else 0
+                movie["review_analysis"].append(val)
+
+            print(movie)
+        except:
+            pass
+
+    # Consumes from the given entry topic,
+    # and produce to the given output topic.
+    consumer.consume(callback)
