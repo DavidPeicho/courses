@@ -3,6 +3,9 @@ package com.sparkmovie.core
 import org.apache.kafka.clients.producer.{KafkaProducer, ProducerConfig, ProducerRecord}
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.apache.kafka.common.serialization.StringDeserializer
+
+import org.apache.spark.SparkContext
+import org.apache.spark.SparkFiles
 import org.apache.spark.SparkConf
 import org.apache.spark.streaming._
 import org.apache.spark.streaming.kafka010._
@@ -19,19 +22,12 @@ import com.sparkmovie.utils.SparkKafkaUtils
 
 object SparkConsumer {
 
-    val TOPICS = Map[String, String] (
-        "RAW_MOVIE_READ" -> "movie-analyzed",
-        "MOVIE_WRITE" -> "movie-processed"
-    )
-
     def main(args: Array[String]) {
 
         val requiredOptions = List(
             "brokers",
-            "group-id"
-        )
-        val topics = Array(
-            TOPICS.get("RAW_MOVIE_READ").get
+            "group-id",
+            "consume"
         )
         
         System.out.println("\n[SPARK CONSUMER] Starting Spark instance...")
@@ -43,6 +39,8 @@ object SparkConsumer {
                 System.exit(1)
             }
         }
+
+        val topics = Array(options.get("consume").get)
 
         val kafkaParams = Map[String, Object] (
             "bootstrap.servers" -> options.get("brokers").get,
@@ -57,8 +55,13 @@ object SparkConsumer {
                                 .setAppName("SparkConsumer")
                                 .setMaster("local[*]")
 
+        // Register sentiment analysis script
+        val sc = new SparkContext(sparkConf)
+        sc.addFile("../python-processing/analysis.py")
+        sc.addFile("../python-processing/sentiment_analysis/linear_svm.py")
+        sc.addFile("../python-processing/learning_database.pkl")
         // Creates the streaming context allowing to connect to Kafka.
-        val ssc = new StreamingContext(sparkConf, Seconds(1))
+        val ssc = new StreamingContext(sc, Seconds(1))
         ssc.checkpoint("checkpoint")
 
         // Creates the stream connecting the streaming context
@@ -70,10 +73,23 @@ object SparkConsumer {
 
         stream.map(record => (record.key, record.value))
         stream.foreachRDD { rdd =>
-            
-            rdd.foreachPartition(partition => {
-                val producer = SparkKafkaUtils
-                                .createProducer(options.get("brokers").get)
+
+            rdd.map(rddVal => (rddVal.value))
+                .pipe(SparkFiles.get("analysis.py"))
+                .foreachPartition(partition => {
+
+                    partition.foreach {
+                        case movieStr : String => {
+                            System.out.println("PRINNNNNNNNNNNNNTING")
+                            System.out.println("MESSSSAGE = " + movieStr)
+                            System.out.println("PRINNNNNNNNNNNNNTING")
+                        }
+                    }
+
+            })
+
+            /*rdd.foreachPartition(partition => {
+                val producer = SparkKafkaUtils.createProducer(options.get("brokers").get)
 
                 partition.foreach {
                   
@@ -101,7 +117,7 @@ object SparkConsumer {
                 producer.flush()
                 producer.close()
 
-            })
+            })*/
         }
         //}
 
