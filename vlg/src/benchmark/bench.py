@@ -1,6 +1,7 @@
 import networkx as nx
 import math
 import subprocess
+import os
 
 class Benchmark:
     presets_dic = {
@@ -25,9 +26,14 @@ class Benchmark:
             'nstart' : 1000, 'kstart' : 50
         }
     }
-    # TODO: Handles Unix systems
-    converter_path = 'src/findcommunities/build/convert.exe'
-    community_path = 'src/findcommunities/build/community.exe'
+    # Checks whether we should use .exe extension or not
+    #converter_path = 'src/findcommunities/build/convert.exe'
+    #community_path = 'src/findcommunities/build/community.exe'
+    converter_path = 'src/findcommunities/build/convert'
+    community_path = 'src/findcommunities/build/community'
+    if os.name == 'nt':
+        converter_path = converter_path.format + '.exe'
+        community_path = community_path.format + '.exe'
 
     @staticmethod
     def compute(nmax, kmax, nstep, kstep, nstart=1, kstart=2):

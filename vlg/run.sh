@@ -12,7 +12,7 @@ check_arg_with_value()
 # Parses command line arguments
 ##
 preset=""
-while [[ $# -ne 0 ]] ; do
+while [ $# -ne 0 ] ; do
     key="$1"
     case $key in
         -p|--preset)
@@ -30,15 +30,15 @@ done
 # Checks O.S
 ##
 python_bin=""
-if [[ "$OSTYPE" == "linux-gnu" ]]; then
+if [ "$OSTYPE" = "linux-gnu" ]; then
     python_bin="python3"
-elif [[ "$OSTYPE" == "darwin"* ]]; then
+elif [ "$OSTYPE" = "darwin"* ]; then
     python_bin="python3"
-elif [[ "$OSTYPE" == "cygwin" ]]; then
+elif [ "$OSTYPE" = "cygwin" ]; then
     python_bin="python.exe"    
-elif [[ "$OSTYPE" == "msys" ]]; then
+elif [ "$OSTYPE" = "msys" ]; then
     python_bin="python.exe"
-elif [[ "$OSTYPE" == "win32" ]]; then
+elif [ "$OSTYPE" = "win32" ]; then
     python_bin="python.exe"
 else
     python_bin="python3"
@@ -54,7 +54,7 @@ make all
 # Runs benchmark with given preset
 ##
 cd -
-if [ -z "${python_bin// }" ]; then
+if [ -z "$python_bin" ]; then
     echo "first"
     "$python_bin" main.py -p "$preset"
 else

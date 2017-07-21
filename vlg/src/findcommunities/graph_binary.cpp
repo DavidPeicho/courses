@@ -14,7 +14,9 @@
 //-----------------------------------------------------------------------------
 // see readme.txt for more details
 
-//#include <sys/mman.h>
+#ifdef _WIN32
+  #include <sys/mman.h>
+#endif
 #include "graph_binary.h"
 
 Graph::Graph() {
