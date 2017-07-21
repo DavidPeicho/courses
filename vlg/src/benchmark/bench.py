@@ -21,8 +21,8 @@ class Benchmark:
             'nstart' : 200, 'kstart' : 50
         },
         'vslow' : {
-            'nmax' : 10000, 'kmax' : 1000, 'nstep' : 500, 'kstep' : 150,
-            'nstart' : 1000, 'kstart' : 150
+            'nmax' : 5000, 'kmax' : 200, 'nstep' : 1000, 'kstep' : 50,
+            'nstart' : 1000, 'kstart' : 50
         }
     }
     # TODO: Handles Unix systems

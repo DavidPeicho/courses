@@ -86,12 +86,12 @@ if __name__ == "__main__":
     else:
         # No preset given, launch the benchmark with user values
         # or default values.
-        args.nmax = 10000 if args.nmax is None else int(args.nmax)
-        args.kmax = 10000 if args.kmax is None else int(args.kmax)
-        args.nstep = 500 if args.nstep is None else int(args.nstep)
-        args.kstep = 1000 if args.kstep is None else int(args.kstep)
-        args.nstart = 1000 if args.nstart is None else int(args.nstart)
-        args.kstart = 1000 if args.kstart is None else int(args.kstart)
+        args.nmax = 200 if args.nmax is None else int(args.nmax)
+        args.kmax = 200 if args.kmax is None else int(args.kmax)
+        args.nstep = 40 if args.nstep is None else int(args.nstep)
+        args.kstep = 20 if args.kstep is None else int(args.kstep)
+        args.nstart = 20 if args.nstart is None else int(args.nstart)
+        args.kstart = 20 if args.kstart is None else int(args.kstart)
         bench_results = Benchmark.compute(
             args.nmax, args.kmax, args.nstep,
             args.kstep, args.nstart, args.kstart
