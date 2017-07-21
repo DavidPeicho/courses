@@ -32,8 +32,8 @@ class Benchmark:
     converter_path = 'src/findcommunities/build/convert'
     community_path = 'src/findcommunities/build/community'
     if os.name == 'nt':
-        converter_path = converter_path.format + '.exe'
-        community_path = community_path.format + '.exe'
+        converter_path = converter_path + '.exe'
+        community_path = community_path + '.exe'
 
     @staticmethod
     def compute(nmax, kmax, nstep, kstep, nstart=1, kstart=2):

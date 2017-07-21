@@ -55,9 +55,7 @@ make all
 ##
 cd -
 if [ -z "$python_bin" ]; then
-    echo "first"
     "$python_bin" main.py -p "$preset"
 else
-    echo "second"
     "$python_bin" main.py
 fi
