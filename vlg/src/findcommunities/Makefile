@@ -1,7 +1,7 @@
 #!/bin/bash
 
 CC=g++
-CFLAGS= -static-libstdc++ -U__STRICT_ANSI__ -O5 -Wall
+CFLAGS= -std=c++11 -static-libstdc++ -U__STRICT_ANSI__ -O5 -Wall
 LDFLAGS= -lm -Wall
 TO_CP=libstdc++-6.dll
 BUILD_FLDER=build
@@ -14,19 +14,16 @@ all: $(EXEC)
 community : $(OBJ1) main_community.o
 	mkdir -p $(BUILD_FLDER)
 	$(CC) -o $(BUILD_FLDER)/$@ $^ $(LDFLAGS)
-	rm *.o
 	cp $(TO_CP) $(BUILD_FLDER)
 
 convert : $(OBJ2) main_convert.o
 	mkdir -p $(BUILD_FLDER)
 	$(CC) -o $(BUILD_FLDER)/$@ $^ $(LDFLAGS)
-	rm *.o
 	cp $(TO_CP) $(BUILD_FLDER)
 
 hierarchy : main_hierarchy.o
 	mkdir -p $(BUILD_FLDER)
 	$(CC) -o $(BUILD_FLDER)/$@ $^ $(LDFLAGS)
-	rm *.o
 	cp $(TO_CP) $(BUILD_FLDER)
 
 ##########################################

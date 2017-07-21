@@ -40,7 +40,7 @@ Graph::Graph(char *filename, int type) {
   nb_links=degrees[nb_nodes-1]/2;
   links = (int *)malloc((long)nb_links*8);
   finput.read((char *)links, (long)nb_links*8);  
-  cerr << "total : " << nb_links << endl;
+  //cerr << "total : " << nb_links << endl;
 
   // IF WEIGHTED : read weights: 4 bytes for each link (each link is counted twice)
   if (type==WEIGHTED) {

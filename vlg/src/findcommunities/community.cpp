@@ -274,8 +274,8 @@ Community::one_level() {
     }
 
     new_mod = modularity();
-    cerr << "pass number " << nb_pass_done << " of " << nb_pass 
-         << " : " << new_mod << " " << cur_mod << endl;
+    /*cerr << "pass number " << nb_pass_done << " of " << nb_pass 
+         << " : " << new_mod << " " << cur_mod << endl;*/
 
   } while (improvement && new_mod-cur_mod>min_modularity && nb_pass_done!=nb_pass);
 

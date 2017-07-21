@@ -22,6 +22,7 @@
 #include <sstream>
 #include <vector>
 #include <algorithm>
+#include <chrono>
 
 #include "graph_binary.h"
 #include "community.h"
@@ -36,7 +37,7 @@ int display_level = -2;
 int k1 = 16;
 
 void
-usage(char *prog_name, char *more) {
+usage(char *prog_name, const char *more) {
   cerr << more;
   cerr << "usage: " << prog_name << " input_file [options]" << endl << endl;
   cerr << "input_file: read the graph to partition from this file." << endl;
@@ -89,69 +90,37 @@ display_time(const char *str) {
   cerr << str << " : " << ctime (&rawtime);
 }
 
-
-
 int
 main(int argc, char **argv) {
   srand(time(NULL));
 
   parse_args(argc, argv);
-
-  time_t time_begin, time_end;
-  time(&time_begin);
-  display_time("start");
     
   Community c(filename, type, -1, precision);
-
-  display_time("file read");
+  auto time_begin = std::chrono::high_resolution_clock::now();
 
   double mod = c.modularity();
-
-  cerr << "network : " 
-       << c.g.nb_nodes << " nodes, " 
-       << c.g.nb_links << " links, "
-       << c.g.total_weight << " weight." << endl;
- 
   double new_mod = c.one_level();
-
-  display_time("communities computed");
-  cerr << "modularity increased from " << mod << " to " << new_mod << endl;
-
-  if (display_level==-1)
-    c.display_partition();
 
   Graph g = c.partition2graph_binary();
 
-  display_time("network of communities computed");
-
   int level=0;
-  while(new_mod-mod>precision) {
+  while(new_mod - mod > precision) {
     mod=new_mod;
     Community c(g, -1, precision);
-
-    cerr << "\nnetwork : " 
-	 << c.g.nb_nodes << " nodes, " 
-	 << c.g.nb_links << " links, "
-	 << c.g.total_weight << " weight." << endl;
     
     new_mod = c.one_level();
     
-    display_time("communities computed");
-    cerr << "modularity increased from " << mod << " to " << new_mod << endl;
-    
-    if (display_level==-1)
-      c.display_partition();
-    
     g = c.partition2graph_binary();
     level++;
-    
-    if (level==display_level)
-      g.display();
-    
-    display_time("network of communities computed");
 
   }
-  time(&time_end);
   
-  cerr << precision << " " << new_mod << " " << (time_end-time_begin) << endl;
+  // Prints time taken by the binary in ms
+  auto time_end = std::chrono::high_resolution_clock::now();
+  
+  auto elapsed = time_end - time_begin;
+  auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(elapsed);
+  
+  cout << ms.count() << endl;
 }
