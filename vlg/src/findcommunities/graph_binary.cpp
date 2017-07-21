@@ -14,7 +14,7 @@
 //-----------------------------------------------------------------------------
 // see readme.txt for more details
 
-#ifdef _WIN32
+#ifndef _WIN32
   #include <sys/mman.h>
 #endif
 #include "graph_binary.h"
