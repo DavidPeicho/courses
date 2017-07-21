@@ -21,12 +21,16 @@
 #include <stdio.h>
 #include <assert.h>
 #include <malloc.h>
+#include <time.h>
 #include <iostream>
 #include <iomanip>
 #include <fstream>
 #include <vector>
 #include <map>
 #include <algorithm>
+#ifdef _WIN32
+  #include <windows.h>
+#endif
 
 #define WEIGHTED   0
 #define UNWEIGHTED 1

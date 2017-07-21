@@ -14,7 +14,7 @@
 //-----------------------------------------------------------------------------
 // see readme.txt for more details
 
-#include <sys/mman.h>
+//#include <sys/mman.h>
 #include "graph_binary.h"
 
 Graph::Graph() {
@@ -129,7 +129,11 @@ Graph::Graph(int n1, int k1, int n2, int k2, int n3, int k3) {
 
 // generates a random graph using the benchmark approach
 Graph::Graph(int n1, int k1, int n2, int k2) {
-  srand(getpid());
+  #ifdef _WIN32
+    srand(GetCurrentProcessId());
+  #else
+    srand(getpid());
+  #endif
 
 //  srand(time(NULL));
   nb_nodes = n1*n2;

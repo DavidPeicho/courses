@@ -23,7 +23,7 @@ char *outfile  = NULL;
 int type       = UNWEIGHTED;
 
 void
-usage(char *prog_name, char *more) {
+usage(char *prog_name, const char *more) {
   cerr << more;
   cerr << "usage: " << prog_name << " -i input_file -o outfile [options]" << endl << endl;
   cerr << "read the graph and convert it to binary format." << endl;

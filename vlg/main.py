@@ -1,5 +1,6 @@
 import argparse
-import networkx as nx
+
+from src.benchmark.bench import Benchmark
 
 def parse_args():
     desc =          """
@@ -30,10 +31,11 @@ def parse_args():
 
     parser = argparse.ArgumentParser(description=desc)
     parser.add_argument('-p', '--preset', help=presetArgHelp, required=False)
-    parser.add_argument('-nmax', '--n-max', help=nmaxArgHelp, required=False)
-    parser.add_argument('-kmax', '--k-max', help=kmaxArgHelp, required=False)
-    parser.add_argument('-nstep', '--n-step', help=nstepArgHelp, required=False)
-    parser.add_argument('-kstep', '--k-step', help=kstepArgHelp, required=False)
+    parser.add_argument('-nmax', '--nmax', help=nmaxArgHelp, required=False)
+    parser.add_argument('-kmax', '--kmax', help=kmaxArgHelp, required=False)
+    parser.add_argument('-nstep', '--nstep', help=nstepArgHelp, required=False)
+    parser.add_argument('-kstep', '--kstep', help=kstepArgHelp, required=False)
+    parser.add_argument('-c', '--graph_converter', help=kstepArgHelp, required=False)
 
     return parser.parse_args()
 
@@ -41,5 +43,24 @@ if __name__ == "__main__":
 
     args = parse_args()
     
+    # Sets up the path to the binary converting
+    # text graph to binary.
+    if not(args.graph_converter is None):
+        Benchmark.converter_path = args.graph_converter
 
-    # G = nx.connected_caveman_graph(3, 3)
+    # Checks whether the user asked to make the benchmark
+    # using one of the available preset or not.
+    if not(args.preset is None):
+        if not(args.preset in Benchmark.presets_dic):
+            print('Benchmark: the preset {} does not exist!'.format(args.preset))
+            exit(1)
+        # Launches benchmark with selected preset
+        Benchmark.preset(args.presetStr)
+    else:
+        # No preset given, launch the benchmark with user values
+        # or default values.
+        args.nmax = 150 if args.nmax is None else int(args.nmax)
+        args.kmax = 100 if args.kmax is None else int(args.kmax)
+        args.nstep = 1 if args.nstep is None else int(args.nstep)
+        args.kstep = 1 if args.kstep is None else int(args.kstep)
+        Benchmark.compute(args.nmax, args.kmax, args.nstep, args.kstep)

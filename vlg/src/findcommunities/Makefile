@@ -1,8 +1,10 @@
 #!/bin/bash
 
 CC=g++
-CFLAGS= -ansi -O5 -Wall
-LDFLAGS= -ansi -lm -Wall
+CFLAGS= -static-libstdc++ -U__STRICT_ANSI__ -O5 -Wall
+LDFLAGS= -lm -Wall
+TO_CP=libstdc++-6.dll
+BUILD_FLDER=build
 EXEC=community convert hierarchy
 OBJ1= graph_binary.o community.o
 OBJ2= graph.o
@@ -10,13 +12,22 @@ OBJ2= graph.o
 all: $(EXEC)
 
 community : $(OBJ1) main_community.o
-	$(CC) -o $@ $^ $(LDFLAGS)
+	mkdir -p $(BUILD_FLDER)
+	$(CC) -o $(BUILD_FLDER)/$@ $^ $(LDFLAGS)
+	rm *.o
+	cp $(TO_CP) $(BUILD_FLDER)
 
 convert : $(OBJ2) main_convert.o
-	$(CC) -o $@ $^ $(LDFLAGS)
+	mkdir -p $(BUILD_FLDER)
+	$(CC) -o $(BUILD_FLDER)/$@ $^ $(LDFLAGS)
+	rm *.o
+	cp $(TO_CP) $(BUILD_FLDER)
 
 hierarchy : main_hierarchy.o
-	$(CC) -o $@ $^ $(LDFLAGS)
+	mkdir -p $(BUILD_FLDER)
+	$(CC) -o $(BUILD_FLDER)/$@ $^ $(LDFLAGS)
+	rm *.o
+	cp $(TO_CP) $(BUILD_FLDER)
 
 ##########################################
 # Generic rules
