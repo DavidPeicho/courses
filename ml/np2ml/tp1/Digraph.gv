@@ -1,0 +1,6 @@
+// The Round Table
+digraph {
+	Humidity [label=Humidity]
+	Wind [label=Wind]
+	Outlook [label=Outlook]
+}
